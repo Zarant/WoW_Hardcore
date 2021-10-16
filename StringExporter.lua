@@ -1,3 +1,0 @@
-function Hardcore:GenerateVerificationString()
-
-end

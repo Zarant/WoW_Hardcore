@@ -859,19 +859,19 @@ function Hardcore:initMinimapButton()
 
 	-- Create minimap button using LibDBIcon
 	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("Hardcore", {
-			type = "data source",
-			text = "Hardcore",
-			icon = "Interface\\AddOns\\Hardcore\\Media\\logo_emblem.blp",
-			OnClick = function(self, btn)
-				MiniBtnClickFunc(btn)
-			end,
-			OnTooltipShow = function(tooltip)
-				if not tooltip or not tooltip.AddLine then return end
-				tooltip:AddLine("Hardcore")
-				tooltip:AddLine("|cFFCFCFCFclick|r show window")
-				tooltip:AddLine("|cFFCFCFCFshift click|r toggle enable")
-				tooltip:AddLine("|cFFCFCFCFctrl click|r toggle minimap button")
-			end,
+		type = "data source",
+		text = "Hardcore",
+		icon = "Interface\\AddOns\\Hardcore\\Media\\logo_emblem.blp",
+		OnClick = function(self, btn)
+			MiniBtnClickFunc(btn)
+		end,
+		OnTooltipShow = function(tooltip)
+			if not tooltip or not tooltip.AddLine then return end
+			tooltip:AddLine("Hardcore")
+			tooltip:AddLine("|cFFCFCFCFclick|r show window")
+			tooltip:AddLine("|cFFCFCFCFshift click|r toggle enable")
+			tooltip:AddLine("|cFFCFCFCFctrl click|r toggle minimap button")
+		end,
 	})
 
 	icon = LibStub("LibDBIcon-1.0", true)
@@ -920,6 +920,7 @@ function Hardcore:PrintBubbleHearthInfractions()
 	end
 
 local attribute_separator = "-"
+local ATTRIBUTE_SEPARATOR = "-"
 function Hardcore:GenerateVerificationString()
 	_, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
 	realm = GetRealmName()
