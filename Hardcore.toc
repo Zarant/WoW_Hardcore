@@ -10,5 +10,6 @@
 ## SavedVariablesPerCharacter: Hardcore_Character
 
 ChatThrottleLib.lua
+utils.lua
 Hardcore.xml
 Hardcore.lua

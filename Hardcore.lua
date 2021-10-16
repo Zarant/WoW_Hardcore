@@ -568,6 +568,8 @@ function Hardcore:FormatRow(row, fullcolor, formattype)
 			end
 		elseif formattype == "Rules" then
 			row_str = row
+		elseif formattype == "GetVerified" then
+			row_str = row
 		end
 	end
 
@@ -682,7 +684,7 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Show()
 		Hardcore_Zone_Sort:Show()
 		Hardcore_TOD_Sort:Show()
-		Hardcore_StringVerificationEditBox:Hide()
+		Hardcore_VerificationString:Hide()
 	elseif display == "GetVerified" then
 		--hide buttons 
 		Hardcore_Name_Sort:Hide()
@@ -692,9 +694,10 @@ function Hardcore_Frame_OnShow()
 		Hardcore_TOD_Sort:Hide()
 		DeathListEntry2:Hide()
 
+		local verificationstring = Hardcore:GenerateVerificationString()
 		local f = {}
 		table.insert(f,"To get verified, copy the string below and visit http://classichc.net/verification \n")
-		tabke.insert(f, "obfuscated string")
+		table.insert(f, verificationstring)
 		displaylist = f
 	elseif display == "Rules" then
 		--hide buttons 
@@ -703,7 +706,7 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Hide()
 		Hardcore_Zone_Sort:Hide()
 		Hardcore_TOD_Sort:Hide()
-		Hardcore_StringVerificationEditBox:Hide()
+		Hardcore_VerificationString:Hide()
 
 		-- hard coded rules table lol
 		local f = {}
@@ -784,8 +787,8 @@ function Hardcore_Deathlist_ScrollBar_Update()
 				local row = Hardcore:FormatRow(displaylist[lineplusoffset], true, display)
 				if row then
 					if display == "GetVerified" and line == 2 then
-						Hardcore_StringVerificationEditBox:SetText(row)
-						Hardcore_StringVerificationEditBox:Show()
+						Hardcore_VerificationString:SetText(row)
+						Hardcore_VerificationString:Show()
 					else
 						button:SetText(row)
 						button:Show()
@@ -856,19 +859,19 @@ function Hardcore:initMinimapButton()
 
 	-- Create minimap button using LibDBIcon
 	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("Hardcore", {
-		type = "data source",
-		text = "Hardcore",
-		icon = "Interface\\AddOns\\Hardcore\\Media\\logo_emblem.blp",
-		OnClick = function(self, btn)
-			MiniBtnClickFunc(btn)
-		end,
-		OnTooltipShow = function(tooltip)
-			if not tooltip or not tooltip.AddLine then return end
-			tooltip:AddLine("Hardcore")
-			tooltip:AddLine("|cFFCFCFCFclick|r show window")
-			tooltip:AddLine("|cFFCFCFCFshift click|r toggle enable")
-			tooltip:AddLine("|cFFCFCFCFctrl click|r toggle minimap button")
-		end,
+			type = "data source",
+			text = "Hardcore",
+			icon = "Interface\\AddOns\\Hardcore\\Media\\logo_emblem.blp",
+			OnClick = function(self, btn)
+				MiniBtnClickFunc(btn)
+			end,
+			OnTooltipShow = function(tooltip)
+				if not tooltip or not tooltip.AddLine then return end
+				tooltip:AddLine("Hardcore")
+				tooltip:AddLine("|cFFCFCFCFclick|r show window")
+				tooltip:AddLine("|cFFCFCFCFshift click|r toggle enable")
+				tooltip:AddLine("|cFFCFCFCFctrl click|r toggle minimap button")
+			end,
 	})
 
 	icon = LibStub("LibDBIcon-1.0", true)
@@ -915,6 +918,14 @@ function Hardcore:PrintBubbleHearthInfractions()
 			end
 		end
 	end
+
+local attribute_separator = "-"
+function Hardcore:GenerateVerificationString()
+	_, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+	realm = GetRealmName()
+	level = UnitLevel("player")
+
+	return stringToUnicode(realm)..attribute_separator..stringToUnicode(race)..attribute_separator..stringToUnicode(class)..attribute_separator..stringToUnicode(name)..attribute_separator..stringToUnicode(tostring(level))..attribute_separator..stringToUnicode(tostring(Hardcore_Character.time_played))..attribute_separator..stringToUnicode(tostring(Hardcore_Character.time_tracked))
 end
 
 --[[ Timers ]]--

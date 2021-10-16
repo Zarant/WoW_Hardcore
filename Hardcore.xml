@@ -143,6 +143,15 @@
 			   </Anchor>
 			</Anchors>
 		  </Button>
+		  <EditBox name="Hardcore_VerificationString" multiline="true" inherits="DeathListEntryTemplate">
+			<Size>
+				<AbsDimension x="300" y="200"></AbsDimension>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="DeathListEntry1" relativePoint="BOTTOMLEFT"/>
+			</Anchors>
+			<FontString inherits="GameFontNormal"/>
+		  </EditBox>
 		  <Button name="DeathListEntry2" inherits="DeathListEntryTemplate">
 			<Anchors>
 			  <Anchor point="TOPLEFT" relativeTo="DeathListEntry1" relativePoint="BOTTOMLEFT"/>
