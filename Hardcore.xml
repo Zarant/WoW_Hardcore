@@ -330,6 +330,17 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+			<Button name="Hardcore_GetVerified" inherits="UIPanelButtonTemplate" text="Get verified">
+				<Size x="95" y="37" />
+				<Anchors>
+					<Anchor point="TOPLEFT" x="210" y="-450" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Hardcore:SwitchDisplay("GetVerified")
+					</OnClick>
+				</Scripts>
+			</Button>
 			<Button name="Hardcore_DispRules" inherits="UIPanelButtonTemplate" text="Rules">
 				<Size x="75" y="37" />
 				<Anchors>

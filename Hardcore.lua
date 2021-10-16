@@ -682,6 +682,20 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Show()
 		Hardcore_Zone_Sort:Show()
 		Hardcore_TOD_Sort:Show()
+		Hardcore_StringVerificationEditBox:Hide()
+	elseif display == "GetVerified" then
+		--hide buttons 
+		Hardcore_Name_Sort:Hide()
+		Hardcore_Class_Sort:Hide()
+		Hardcore_Level_Sort:Hide()
+		Hardcore_Zone_Sort:Hide()
+		Hardcore_TOD_Sort:Hide()
+		DeathListEntry2:Hide()
+
+		local f = {}
+		table.insert(f,"To get verified, copy the string below and visit http://classichc.net/verification \n")
+		tabke.insert(f, "obfuscated string")
+		displaylist = f
 	elseif display == "Rules" then
 		--hide buttons 
 		Hardcore_Name_Sort:Hide()
@@ -689,6 +703,7 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Hide()
 		Hardcore_Zone_Sort:Hide()
 		Hardcore_TOD_Sort:Hide()
+		Hardcore_StringVerificationEditBox:Hide()
 
 		-- hard coded rules table lol
 		local f = {}
@@ -768,8 +783,13 @@ function Hardcore_Deathlist_ScrollBar_Update()
 				--get data
 				local row = Hardcore:FormatRow(displaylist[lineplusoffset], true, display)
 				if row then
-					button:SetText(row)
-					button:Show()
+					if display == "GetVerified" and line == 2 then
+						Hardcore_StringVerificationEditBox:SetText(row)
+						Hardcore_StringVerificationEditBox:Show()
+					else
+						button:SetText(row)
+						button:Show()
+					end
 				else
 					button:Hide()
 				end
