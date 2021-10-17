@@ -29,7 +29,11 @@ Hardcore_Settings = {
 Hardcore_Character = {
 	time_tracked = 0,
 	time_played = 0,
+<<<<<<< HEAD
 	bubble_hearth_incidents = {},
+=======
+	deaths = 0,
+>>>>>>> 9559890 (feature: track deaths and add death count to verification string)
 }
 
 --[[ Local variables ]]--
@@ -167,6 +171,16 @@ function Hardcore:PLAYER_LOGIN()
 		Hardcore_Character.time_tracked = 0
 	end
 
+<<<<<<< HEAD
+=======
+	if Hardcore_Character.deaths == nil then
+		Hardcore_Character.deaths = 0
+	end
+
+	--cache player name
+	PLAYER_NAME, _ = UnitName("player")
+
+>>>>>>> 9559890 (feature: track deaths and add death count to verification string)
 	-- Show recording reminder
 	Hardcore:RecordReminder()
 
@@ -257,6 +271,9 @@ function Hardcore:PLAYER_DEAD()
 
 	--screenshot
 	C_Timer.After(PICTURE_DELAY, Screenshot)
+
+	-- Update death count
+	Hardcore_Character.deaths = Hardcore_Character.deaths + 1
 
 	-- Get information
 	local playerId = UnitGUID("player")
@@ -696,7 +713,7 @@ function Hardcore_Frame_OnShow()
 
 		local verificationstring = Hardcore:GenerateVerificationString()
 		local f = {}
-		table.insert(f,"To get verified, copy the string below and visit http://classichc.net/verification \n")
+		table.insert(f,"To get verified, copy the string below and visit https://classichc.net/get-verified")
 		table.insert(f, verificationstring)
 		displaylist = f
 	elseif display == "Rules" then
@@ -919,14 +936,14 @@ function Hardcore:PrintBubbleHearthInfractions()
 		end
 	end
 
-local attribute_separator = "-"
 local ATTRIBUTE_SEPARATOR = "-"
 function Hardcore:GenerateVerificationString()
 	_, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
 	realm = GetRealmName()
 	level = UnitLevel("player")
 
-	return stringToUnicode(realm)..attribute_separator..stringToUnicode(race)..attribute_separator..stringToUnicode(class)..attribute_separator..stringToUnicode(name)..attribute_separator..stringToUnicode(tostring(level))..attribute_separator..stringToUnicode(tostring(Hardcore_Character.time_played))..attribute_separator..stringToUnicode(tostring(Hardcore_Character.time_tracked))
+	-- TODO: track deaths and add them here
+	return stringToUnicode(realm)..ATTRIBUTE_SEPARATOR..stringToUnicode(race)..ATTRIBUTE_SEPARATOR..stringToUnicode(class)..ATTRIBUTE_SEPARATOR..stringToUnicode(name)..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(level))..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(Hardcore_Character.time_played))..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(Hardcore_Character.time_tracked))..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(Hardcore_Character.deaths))
 end
 
 --[[ Timers ]]--
