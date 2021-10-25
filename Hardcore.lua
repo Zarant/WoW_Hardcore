@@ -709,11 +709,12 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Hide()
 		Hardcore_Zone_Sort:Hide()
 		Hardcore_TOD_Sort:Hide()
-		DeathListEntry2:Hide()
+		DeathListEntry3:Hide()
 
 		local verificationstring = Hardcore:GenerateVerificationString()
 		local f = {}
 		table.insert(f,"To get verified, copy the string below and visit https://classichc.net/get-verified")
+		table.insert(f, "")
 		table.insert(f, verificationstring)
 		displaylist = f
 	elseif display == "Rules" then
@@ -803,7 +804,10 @@ function Hardcore_Deathlist_ScrollBar_Update()
 				--get data
 				local row = Hardcore:FormatRow(displaylist[lineplusoffset], true, display)
 				if row then
-					if display == "GetVerified" and line == 2 then
+					-- Hacky way to display the verification string in a EditBox
+					-- Currently the UI is a table that gets rendered to a list of buttons
+					-- Requires a big refactor to fix
+					if display == "GetVerified" and line == 3 then
 						Hardcore_VerificationString:SetText(row)
 						Hardcore_VerificationString:Show()
 					else
