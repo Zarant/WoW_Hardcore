@@ -166,9 +166,10 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	end
 end
 
-function Hardcore:PLAYER_LEAVING_WORLD()
-	Hardcore:CleanData()
-end
+-- Removing seeming-redundant code, left as a framework in case we use this event again
+-- function Hardcore:PLAYER_LEAVING_WORLD()
+--   Hardcore:CleanData()
+-- end
 
 function Hardcore:PLAYER_DEAD()
 	if Hardcore_Settings.enabled == false then return end
