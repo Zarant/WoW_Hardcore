@@ -9,7 +9,7 @@
 ## SavedVariables: Hardcore_Settings
 ## SavedVariablesPerCharacter: Hardcore_Character
 
-ChatThrottleLib.lua
-utils.lua
+embeds.xml
+
 Hardcore.xml
 Hardcore.lua
