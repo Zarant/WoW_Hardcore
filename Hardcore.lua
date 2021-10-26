@@ -29,11 +29,8 @@ Hardcore_Settings = {
 Hardcore_Character = {
 	time_tracked = 0,
 	time_played = 0,
-<<<<<<< HEAD
-	bubble_hearth_incidents = {},
-=======
 	deaths = 0,
->>>>>>> 9559890 (feature: track deaths and add death count to verification string)
+	bubble_hearth_incidents = {},
 }
 
 --[[ Local variables ]]--
@@ -171,8 +168,6 @@ function Hardcore:PLAYER_LOGIN()
 		Hardcore_Character.time_tracked = 0
 	end
 
-<<<<<<< HEAD
-=======
 	if Hardcore_Character.deaths == nil then
 		Hardcore_Character.deaths = 0
 	end
@@ -180,7 +175,6 @@ function Hardcore:PLAYER_LOGIN()
 	--cache player name
 	PLAYER_NAME, _ = UnitName("player")
 
->>>>>>> 9559890 (feature: track deaths and add death count to verification string)
 	-- Show recording reminder
 	Hardcore:RecordReminder()
 
@@ -939,6 +933,7 @@ function Hardcore:PrintBubbleHearthInfractions()
 			end
 		end
 	end
+end
 
 local ATTRIBUTE_SEPARATOR = "-"
 function Hardcore:GenerateVerificationString()
