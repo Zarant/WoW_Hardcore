@@ -947,7 +947,7 @@ function Hardcore:GenerateVerificationString()
 	level = UnitLevel("player")
 
 	-- TODO: track deaths and add them here
-	return stringToUnicode(realm)..ATTRIBUTE_SEPARATOR..stringToUnicode(race)..ATTRIBUTE_SEPARATOR..stringToUnicode(class)..ATTRIBUTE_SEPARATOR..stringToUnicode(name)..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(level))..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(Hardcore_Character.time_played))..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(Hardcore_Character.time_tracked))..ATTRIBUTE_SEPARATOR..stringToUnicode(tostring(Hardcore_Character.deaths))
+	return Hardcore_stringToUnicode(realm)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(race)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(class)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(name)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(level))..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(Hardcore_Character.time_played))..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(Hardcore_Character.time_tracked))..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(Hardcore_Character.deaths))
 end
 
 --[[ Timers ]]--

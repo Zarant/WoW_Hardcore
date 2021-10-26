@@ -1,21 +1,21 @@
-function stringToUnicode(str)
+function Hardcore_stringToUnicode(str)
 	local unicode = ""
 	for i = 1, #str do
 		local char = str:sub(i, i)
-		unicode = unicode..string.byte(char)..generateRandomString(generateRandomIntegerInRange(1, 3))
+		unicode = unicode..string.byte(char)..Hardcore_generateRandomString(generateRandomIntegerInRange(1, 3))
 	end
 	return unicode
 end
 
-function generateRandomString(character_count)
+function Hardcore_generateRandomString(character_count)
 	local str = ""
 	for i = 1, character_count do
-		str = str..generateRandomLetter()
+		str = str..Hardcore_generateRandomLetter()
 	end
 	return str
 end
 
-function generateRandomLetter()
+function Hardcore_generateRandomLetter()
 	local validLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	local randomIndex = math.floor(math.random() * #validLetters)
 	return validLetters:sub(randomIndex, randomIndex)
