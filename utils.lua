@@ -24,3 +24,23 @@ end
 function Hardcore_generateRandomIntegerInRange(min, max)
     return math.floor(math.random() * (max - min + 1)) + min;
 end
+
+function Hardcore_map(tbl, f)
+    local t = {}
+    for k,v in pairs(tbl) do
+        t[k] = f(v)
+    end
+    return t
+end
+
+function Hardcore_join(tbl, separator)
+	local str = ""
+	for k, v in pairs(tbl) do
+		if str == "" then
+			str = v
+		else
+			str = str..separator..v
+		end
+	  end
+	return str
+end

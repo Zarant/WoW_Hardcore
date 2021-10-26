@@ -941,7 +941,9 @@ function Hardcore:GenerateVerificationString()
 	realm = GetRealmName()
 	level = UnitLevel("player")
 
-	return Hardcore_stringToUnicode(realm)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(race)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(class)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(name)..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(level))..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(Hardcore_Character.time_played))..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(Hardcore_Character.time_tracked))..ATTRIBUTE_SEPARATOR..Hardcore_stringToUnicode(tostring(Hardcore_Character.deaths))
+	local verificationData = {realm, race, class, name, tostring(level), tostring(Hardcore_Character.time_played), tostring(Hardcore_Character.time_tracked), tostring(Hardcore_Character.deaths)}
+	local verificationString = Hardcore_join(Hardcore_map(verificationData, Hardcore_stringToUnicode), ATTRIBUTE_SEPARATOR)
+	return verificationString
 end
 
 --[[ Timers ]]--
