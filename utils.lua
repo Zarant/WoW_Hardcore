@@ -2,7 +2,7 @@ function Hardcore_stringToUnicode(str)
 	local unicode = ""
 	for i = 1, #str do
 		local char = str:sub(i, i)
-		unicode = unicode..string.byte(char)..Hardcore_generateRandomString(generateRandomIntegerInRange(2, 3))
+		unicode = unicode..string.byte(char)..Hardcore_generateRandomString(Hardcore_generateRandomIntegerInRange(2, 3))
 	end
 	return unicode
 end
@@ -21,6 +21,6 @@ function Hardcore_generateRandomLetter()
 	return validLetters:sub(randomIndex, randomIndex)
 end
 
-function generateRandomIntegerInRange(min, max)
+function Hardcore_generateRandomIntegerInRange(min, max)
     return math.floor(math.random() * (max - min + 1)) + min;
 end
