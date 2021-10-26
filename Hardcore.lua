@@ -123,7 +123,6 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("PLAYER_UNGHOST")
 	self:RegisterEvent("PLAYER_DEAD")
 	self:RegisterEvent("CHAT_MSG_ADDON")
-	-- self:RegisterEvent("PLAYER_LEAVING_WORLD")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("MAIL_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
@@ -165,11 +164,6 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 		CTL:SendAddonMessage("NORMAL", COMM_NAME, COMM_COMMANDS[1]..COMM_COMMAND_DELIM, "GUILD")
 	end
 end
-
--- Removing seeming-redundant code, left as a framework in case we use this event again
--- function Hardcore:PLAYER_LEAVING_WORLD()
---   Hardcore:CleanData()
--- end
 
 function Hardcore:PLAYER_DEAD()
 	if Hardcore_Settings.enabled == false then return end
