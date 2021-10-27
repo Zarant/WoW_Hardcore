@@ -11,5 +11,6 @@
 
 embeds.xml
 
+utils.lua
 Hardcore.xml
 Hardcore.lua
