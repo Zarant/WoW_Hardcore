@@ -7,6 +7,17 @@ function Hardcore_stringToUnicode(str)
 	return unicode
 end
 
+function Hardcore_tableToUnicode(tbl)
+	local unicode = ""
+	for i, _ in ipairs(tbl) do
+		for k, v in pairs(tbl[i]) do
+			unicode = unicode..Hardcore_stringToUnicode(v).."%"
+		end
+		unicode = strsub(unicode, 0, #unicode - 1).."?"
+	end
+	return strsub(unicode, 0, #unicode - 1)
+end
+
 function Hardcore_generateRandomString(character_count)
 	local str = ""
 	for i = 1, character_count do

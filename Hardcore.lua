@@ -27,6 +27,7 @@ Hardcore_Settings = {
 
 --[[ Character saved variables ]]--
 Hardcore_Character = {
+	guid = "",
 	time_tracked = 0,
 	time_played = 0,
 	deaths = 0,
@@ -135,6 +136,7 @@ function Hardcore:PLAYER_LOGIN()
 	_, class, _ = UnitClass("player")
 	PLAYER_NAME, _ = UnitName("player")
 	PLAYER_GUID = UnitGUID("player")
+	local PLAYER_LEVEL = UnitLevel("player")
 
 	--fires on first loading
 	self:RegisterEvent("PLAYER_UNGHOST")
@@ -152,12 +154,15 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
-	if ( Hardcore_Character.time_tracked == nil ) then
-		Hardcore_Character.time_tracked = 0
-	end
-
-	if Hardcore_Character.deaths == nil then
-		Hardcore_Character.deaths = 0
+	-- different guid + lvl1 means new character with the same name
+	if Hardcore_Character.guid ~= PLAYER_GUID and PLAYER_LEVEL == 1 then
+		Hardcore_Character = {
+			guid = guid,
+			time_tracked = 0,
+			time_played = 0,
+			deaths = 0,
+			bubble_hearth_incidents = {},
+		}
 	end
 
 	--cache player name
@@ -923,15 +928,17 @@ function Hardcore:PrintBubbleHearthInfractions()
 	end
 end
 
-local ATTRIBUTE_SEPARATOR = "-"
+local ATTRIBUTE_SEPARATOR = "_"
 function Hardcore:GenerateVerificationString()
-	_, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
-	realm = GetRealmName()
-	level = UnitLevel("player")
+	local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+	local realm = GetRealmName()
+	local level = UnitLevel("player")
 
-	local verificationData = {realm, race, class, name, tostring(level), tostring(Hardcore_Character.time_played), tostring(Hardcore_Character.time_tracked), tostring(Hardcore_Character.deaths)}
-	local verificationString = Hardcore_join(Hardcore_map(verificationData, Hardcore_stringToUnicode), ATTRIBUTE_SEPARATOR)
-	return verificationString
+	local baseVerificationData = {Hardcore_Character.guid, realm, race, class, name, tostring(level), tostring(Hardcore_Character.time_played), tostring(Hardcore_Character.time_tracked), tostring(Hardcore_Character.deaths)}
+	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringToUnicode), ATTRIBUTE_SEPARATOR)
+	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
+
+	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString}, ATTRIBUTE_SEPARATOR)
 end
 
 --[[ Timers ]]--
