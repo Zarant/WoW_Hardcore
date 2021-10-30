@@ -870,7 +870,11 @@ function Hardcore:initMinimapButton()
 		end,
 		OnTooltipShow = function(tooltip)
 			if not tooltip or not tooltip.AddLine then return end
-			tooltip:AddLine("Hardcore")
+			local status = "Disabled"
+			if Hardcore_Settings.enabled then
+				status = "Enabled"
+			end
+			tooltip:AddLine("Hardcore: " .. status)
 			tooltip:AddLine("|cFFCFCFCFclick|r show window")
 			tooltip:AddLine("|cFFCFCFCFshift click|r toggle enable")
 			tooltip:AddLine("|cFFCFCFCFctrl click|r toggle minimap button")
