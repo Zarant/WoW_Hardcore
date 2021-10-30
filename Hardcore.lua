@@ -155,7 +155,7 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
 	-- different guid + lvl1 means new character with the same name
-	if Hardcore_Character.guid ~= PLAYER_GUID and PLAYER_LEVEL == 1 then
+	if Hardcore_Character.guid ~= PLAYER_GUID then
 		Hardcore_Character = {
 			guid = PLAYER_GUID,
 			time_tracked = 0,
