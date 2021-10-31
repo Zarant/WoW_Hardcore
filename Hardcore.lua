@@ -912,7 +912,6 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Show()
 		Hardcore_Zone_Sort:Show()
 		Hardcore_TOD_Sort:Show()
-		Hardcore_VerificationString:Hide()
 	elseif display == "GetVerified" then
 		--hide buttons 
 		Hardcore_Name_Sort:Hide()
@@ -941,7 +940,6 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Hide()
 		Hardcore_Zone_Sort:Hide()
 		Hardcore_TOD_Sort:Hide()
-		Hardcore_VerificationString:Hide()
 
 		-- hard coded rules table lol
 		local f = {}
@@ -995,6 +993,10 @@ function Hardcore_Frame_OnShow()
 		table.insert(f,"Multiboxing goes against the spirit of the Hardcore Challenge and is not allowed")
 		table.insert(f,"")
 		displaylist = f
+	end
+
+	if display ~= "GetVerified" then
+		Hardcore_VerificationString:Hide()
 	end
 
 	--subtitle text
