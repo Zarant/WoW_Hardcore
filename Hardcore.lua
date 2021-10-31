@@ -1166,11 +1166,13 @@ function Hardcore:GenerateVerificationString()
 	local realm = GetRealmName()
 	local level = UnitLevel("player")
 
-	local baseVerificationData = {Hardcore_Character.guid, realm, race, class, name, tostring(level), tostring(Hardcore_Character.time_played), tostring(Hardcore_Character.time_tracked), tostring(Hardcore_Character.deaths)}
-	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringToUnicode), ATTRIBUTE_SEPARATOR)
+	local baseVerificationData = {Hardcore_Character.guid, realm, race, class, name, level, Hardcore_Character.time_played, Hardcore_Character.time_tracked, Hardcore_Character.deaths}
+	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode), ATTRIBUTE_SEPARATOR)
 	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
+	local playedtimeGapsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.played_time_gap_warnings)
 
-	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString}, ATTRIBUTE_SEPARATOR)
+
+	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString, playedtimeGapsVerificationString}, ATTRIBUTE_SEPARATOR)
 end
 
 --[[ Timers ]]--

@@ -1,4 +1,11 @@
-function Hardcore_stringToUnicode(str)
+function Hardcore_stringOrNumberToUnicode(val)
+	local str
+	if Hardcore_IsNumber(val) then
+		str = tostring(val)
+	else
+		str = val
+	end
+
 	local unicode = ""
 	for i = 1, #str do
 		local char = str:sub(i, i)
@@ -11,7 +18,7 @@ function Hardcore_tableToUnicode(tbl)
 	local unicode = ""
 	for i, _ in ipairs(tbl) do
 		for k, v in pairs(tbl[i]) do
-			unicode = unicode..Hardcore_stringToUnicode(v).."%"
+			unicode = unicode..Hardcore_stringOrNumberToUnicode(v).."%"
 		end
 		unicode = strsub(unicode, 0, #unicode - 1).."?"
 	end
@@ -133,4 +140,8 @@ function Hardcore_GetPlayerPlusRealmName()
 	local FULL_PLAYER_NAME = longName..'-'..serverName
 
 	return FULL_PLAYER_NAME
+end
+
+function Hardcore_IsNumber(val)
+	return type(val) == "number"
 end
