@@ -31,7 +31,7 @@ Hardcore_Character = {
 	time_played = 0, -- seconds
 	accumulated_time_diff = 0, -- seconds
 	tracked_played_percentage = 0,
-	deaths = 0,
+	deaths = {},
 	bubble_hearth_incidents = {},
 	played_time_gap_warnings = {},
 }
@@ -228,6 +228,7 @@ function Hardcore:PLAYER_LOGIN()
 
 	-- fires on first loading
 	self:RegisterEvent("PLAYER_UNGHOST")
+	self:RegisterEvent("PLAYER_ALIVE")
 	self:RegisterEvent("PLAYER_DEAD")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -250,7 +251,7 @@ function Hardcore:PLAYER_LOGIN()
 			time_played = 0,
 			accumulated_time_diff = 0,
 			tracked_played_percentage = 0,
-			deaths = 0,
+			deaths = {},
 			bubble_hearth_incidents = {},
 			played_time_gap_warnings ={}
 		}
@@ -350,6 +351,16 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	end
 end
 
+function Hardcore:PLAYER_ALIVE()
+	if #Hardcore_Character.deaths == 0 then
+		return
+	end
+
+	if Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger == nil then
+		Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger = date("%m/%d/%y %H:%M:%S")
+	end
+end
+
 function Hardcore:PLAYER_DEAD()
 	if Hardcore_Settings.enabled == false then
 		return
@@ -358,8 +369,15 @@ function Hardcore:PLAYER_DEAD()
 	-- screenshot
 	C_Timer.After(PICTURE_DELAY, Screenshot)
 
-	-- Update death count
-	Hardcore_Character.deaths = Hardcore_Character.deaths + 1
+	-- Update deaths
+
+
+	if #Hardcore_Character.deaths == 0 or (#Hardcore_Character.deaths > 0 and Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger ~= nil) then
+		table.insert(Hardcore_Character.deaths, {
+			player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
+			player_alive_trigger = nil
+		})
+	end
 
 	-- Get information
 	local playerId = UnitGUID("player")
@@ -1194,7 +1212,7 @@ function Hardcore:GenerateVerificationString()
 
 	local baseVerificationData = {Hardcore_Character.guid, realm, race, class, name, level,
 									Hardcore_Character.time_played, Hardcore_Character.time_tracked,
-									Hardcore_Character.deaths}
+									#Hardcore_Character.deaths}
 	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode),
 		ATTRIBUTE_SEPARATOR)
 	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
