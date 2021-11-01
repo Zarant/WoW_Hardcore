@@ -370,8 +370,6 @@ function Hardcore:PLAYER_DEAD()
 	C_Timer.After(PICTURE_DELAY, Screenshot)
 
 	-- Update deaths
-
-
 	if #Hardcore_Character.deaths == 0 or (#Hardcore_Character.deaths > 0 and Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger ~= nil) then
 		table.insert(Hardcore_Character.deaths, {
 			player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
