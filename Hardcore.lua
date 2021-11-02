@@ -220,6 +220,8 @@ end
 --[[ Events ]]--
 
 function Hardcore:PLAYER_LOGIN()
+	Hardcore:HandleLegacyDeaths()
+
 	-- cache player data
 	_, class, _ = UnitClass("player")
 	PLAYER_NAME, _ = UnitName("player")
@@ -1350,6 +1352,19 @@ function Hardcore:FetchGuildRoster()
 
 		num_ellipsis = num_ellipsis + 1
 	end)
+end
+
+function Hardcore:HandleLegacyDeaths()
+	if type(Hardcore_Character.deaths) == "number" then
+		local deathcount = Hardcore_Character.deaths
+		Hardcore_Character.deaths = {}
+		for i = 1, deathcount do
+			table.insert(Hardcore_Character.deaths, {
+				player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
+				player_alive_trigger = date("%m/%d/%y %H:%M:%S")
+			})
+		end
+	end
 end
 
 --[[ Timers ]]--
