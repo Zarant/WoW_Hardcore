@@ -396,8 +396,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						<!-- Hardcore:SwitchDisplay("GetVerified") -->						
-						Hardcore.Ace3_dialog:Open("WoWProRecorder")
+						Hardcore:SwitchDisplay("GetVerified")
 					</OnClick>
 				</Scripts>
 			</Button>
