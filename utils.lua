@@ -145,3 +145,17 @@ end
 function Hardcore_IsNumber(val)
 	return type(val) == "number"
 end
+
+function Hardcore_FilterUnique(tbl)
+	local hash = {}
+	local res = {}
+
+	for _,v in ipairs(tbl) do
+	   if (not hash[v]) then
+		   res[#res+1] = v
+		   hash[v] = true
+	   end
+	end
+
+	return res
+end
