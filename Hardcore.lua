@@ -150,24 +150,6 @@ Hardcore.ALERT_STYLES = ALERT_STYLES
 
 Hardcore.Ace3 = LibStub("AceAddon-3.0"):NewAddon("Hardcore", "AceEvent-3.0", "AceConsole-3.0")
 
-Hardcore.Ace3_config = LibStub("AceConfig-3.0")
-Hardcore.Ace3_dialog = LibStub("AceConfigDialog-3.0")
-Hardcore.Ace3_config:RegisterOptionsTable("WoWProRecorder", {
-	name = "GROUP1",
-	type = "group",
-	args = {
-		help = {
-			order = 0,
-			type = "description",
-			name = "YOUR MOM",
-		},
-	},
-})
-Hardcore.Ace3_dialog:SetDefaultSize("WoWProRecorder", 200, 200)
-
-local AC = LibStub("AceConfig-3.0")
-local ACD = LibStub("AceConfigDialog-3.0")
-
 local textStore
 
 function Hardcore:RunAce3Test()
