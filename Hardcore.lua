@@ -145,6 +145,61 @@ local ALERT_STYLES = {
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
 Hardcore.ALERT_STYLES = ALERT_STYLES
 
+
+--[[ Ace3 config and imports ]]--
+
+Hardcore.Ace3 = LibStub("AceAddon-3.0"):NewAddon("Hardcore", "AceEvent-3.0", "AceConsole-3.0")
+
+Hardcore.Ace3_config = LibStub("AceConfig-3.0")
+Hardcore.Ace3_dialog = LibStub("AceConfigDialog-3.0")
+Hardcore.Ace3_config:RegisterOptionsTable("WoWProRecorder", {
+	name = "GROUP1",
+	type = "group",
+	args = {
+		help = {
+			order = 0,
+			type = "description",
+			name = "YOUR MOM",
+		},
+	},
+})
+Hardcore.Ace3_dialog:SetDefaultSize("WoWProRecorder", 200, 200)
+
+local AC = LibStub("AceConfig-3.0")
+local ACD = LibStub("AceConfigDialog-3.0")
+
+local textStore
+
+function Hardcore:RunAce3Test()
+
+	local AceGUI = LibStub("AceGUI-3.0")
+
+	local frame = AceGUI:Create("Frame")
+	frame:SetTitle("Example Frame")
+	frame:SetStatusText("Copy and paste this to https://classichc.net/verify")
+	frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
+	frame:SetLayout("Fill")
+	
+	local editbox = AceGUI:Create("MultiLineEditBox")
+	editbox:SetLabel("Your validation code:")
+	local fakelongstring = Hardcore:GenerateVerificationString()
+	for i=1,10 do
+		fakelongstring = fakelongstring .. fakelongstring
+	end
+	editbox:SetText(fakelongstring)
+	editbox:SetWidth(600)
+	editbox:DisableButton(true)
+	editbox:HighlightText(0, -1)
+	editbox:SetCallback("OnEnterPressed", function(widget, event, text) textStore = text end)
+	frame:AddChild(editbox)
+	
+	-- local button = AceGUI:Create("Button")
+	-- button:SetText("Click Me!")
+	-- button:SetWidth(200)
+	-- button:SetCallback("OnClick", function() print(textStore) end)
+	-- frame:AddChild(button)
+end
+
 Hardcore_Frame:ApplyBackdrop()
 
 --[[ Command line handler ]]--
@@ -191,6 +246,8 @@ local function SlashHandler(msg, editbox)
 		Hardcore:ShowAlertFrame(style, message)
 	-- End Alert debug code
 
+	elseif cmd == "ace" then
+		Hardcore:RunAce3Test()
 	else
 		-- If not handled above, display some sort of help message
 		Hardcore:Print("|cff00ff00Syntax:|r/hardcore [command]")

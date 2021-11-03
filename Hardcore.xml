@@ -396,10 +396,11 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Hardcore:SwitchDisplay("GetVerified")
-          </OnClick>
-        </Scripts>
-      </Button>
+						<!-- Hardcore:SwitchDisplay("GetVerified") -->						
+						Hardcore.Ace3_dialog:Open("WoWProRecorder")
+					</OnClick>
+				</Scripts>
+			</Button>
 			<Button name="Hardcore_DispRules" inherits="UIPanelButtonTemplate" text="Rules">
 				<Size x="75" y="37" />
 				<Anchors>
