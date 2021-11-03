@@ -396,7 +396,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Hardcore:SwitchDisplay("GetVerified")
+						Hardcore:GetVerifiedDialog()
 					</OnClick>
 				</Scripts>
 			</Button>
