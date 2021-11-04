@@ -213,6 +213,37 @@ end
 SLASH_HARDCORE1, SLASH_HARDCORE2 = '/hardcore', '/hc'
 SlashCmdList["HARDCORE"] = SlashHandler
 
+local saved_variable_meta = {
+	{ key = "guid", initial_data = UnitGUID("player") },
+	{ key = "time_tracked", initial_data = 0 },
+	{ key = "time_played", initial_data = 0 },
+	{ key = "accumulated_time_diff", initial_data = 0 },
+	{ key = "tracked_played_percentage", initial_data = 0 },
+	{ key = "deaths", initial_data = {} },
+	{ key = "bubble_hearth_incidents", initial_data = {} },
+	{ key = "played_time_gap_warnings", initial_data = {} },
+	{ key = "trade_partners", initial_data = {} }
+}
+
+function Hardcore:InitializeSavedVariables()
+	if Hardcore_Character == nil then
+		Hardcore_Character = {}
+	end
+
+	for i, v in ipairs(saved_variable_meta) do
+		if Hardcore_Character[v.key] == nil then
+			Hardcore_Character[v.key] = v.initial_data
+		end
+	end
+end
+
+function Hardcore:ForceResetSavedVariables()
+	print("resetting saved vars")
+	for i, v in ipairs(saved_variable_meta) do
+		Hardcore_Character[v.key] = v.initial_data
+	end
+end
+
 --[[ Override default WoW UI ]]--
 
 TradeFrameTradeButton:SetScript("OnClick", function()
@@ -265,19 +296,11 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
-	-- different guid + lvl1 means new character with the same name
+	Hardcore:InitializeSavedVariables()
+
+	-- different guid means new character with the same name
 	if Hardcore_Character.guid ~= PLAYER_GUID then
-		Hardcore_Character = {
-			guid = PLAYER_GUID,
-			time_tracked = 0,
-			time_played = 0,
-			accumulated_time_diff = 0,
-			tracked_played_percentage = 0,
-			deaths = {},
-			bubble_hearth_incidents = {},
-			played_time_gap_warnings ={},
-			trade_partners = {}
-		}
+		Hardcore:ForceResetSavedVariables()
 	end
 
 	-- cache player name
