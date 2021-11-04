@@ -167,28 +167,32 @@ function Hardcore:GetVerifiedDialog()
 	Hardcore.verify_shown = true
 	
 
-	local frame = AceGUI:Create("Frame")
-	frame:SetTitle("Classic Hardcore Verification")
-	frame:SetStatusText("Select All (Ctrl-A), Copy (Ctrl-C), Paste (Ctrl-V) this code to https://classichc.net/verify")
-	frame:SetCallback("OnClose", function(widget) Hardcore:CloseVerifiedDialog(widget) end)
-	frame:SetLayout("Flow")
+	local window = AceGUI:Create("Window")
+	window:SetTitle("Classic Hardcore Verification")
+	window:SetCallback("OnClose", function(widget) Hardcore:CloseVerifiedDialog(widget) end)
+	window:SetLayout("Flow")
+	window:SetWidth(700)
+
+	local frame = window.frame
 	
+	local label = AceGUI:Create("Label")
+	label:SetText("Select All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)\nthis code to https://classichc.net/get-verified/")
+	label:SetWidth(700)
+	label:SetFontObject(GameFontNormalHuge)
+
 	local editbox = AceGUI:Create("MultiLineEditBox")
 	editbox:SetLabel("Your validation code:")
-	local fakelongstring = Hardcore:GenerateVerificationString()
-	for i=1,10 do
-		fakelongstring = fakelongstring .. fakelongstring
-	end
-	editbox:SetText(fakelongstring)
-	-- editbox:SetWidth(700)
+	local verification_string = Hardcore:GenerateVerificationString()
+	editbox:SetText(verification_string)
 	editbox:SetRelativeWidth(1)
-	editbox:SetNumLines(28)
+	editbox:SetFullHeight(1)
 	editbox:DisableButton(true)
 	editbox:HighlightText(0, -1)
 	editbox:SetFocus()
-	editbox:SetCallback("OnTextChanged", function(widget, event, text) widget:SetText(fakelongstring) end)
-	-- editbox:SetDisabled(true)
-	frame:AddChild(editbox)
+	editbox:SetCallback("OnTextChanged", function(widget, event, text) widget:SetText(verification_string) end)
+
+	window:AddChild(label)
+	window:AddChild(editbox)
 end
 
 Hardcore_Frame:ApplyBackdrop()
