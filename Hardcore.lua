@@ -1172,9 +1172,10 @@ function Hardcore:GenerateVerificationString()
 	local realm = GetRealmName()
 	local level = UnitLevel("player")
 
+	local tradePartners = Hardcore_join(Hardcore_Character.trade_partners, ",")
 	local baseVerificationData = {Hardcore_Character.guid, realm, race, class, name, level,
 									Hardcore_Character.time_played, Hardcore_Character.time_tracked,
-									#Hardcore_Character.deaths}
+									#Hardcore_Character.deaths, tradePartners}
 	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode),
 		ATTRIBUTE_SEPARATOR)
 	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
