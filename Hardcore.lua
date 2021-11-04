@@ -238,7 +238,6 @@ function Hardcore:InitializeSavedVariables()
 end
 
 function Hardcore:ForceResetSavedVariables()
-	print("resetting saved vars")
 	for i, v in ipairs(saved_variable_meta) do
 		Hardcore_Character[v.key] = v.initial_data
 	end
