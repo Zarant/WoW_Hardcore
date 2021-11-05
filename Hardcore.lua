@@ -160,12 +160,13 @@ function Hardcore:CloseVerifiedDialog(widget)
 end
 
 function Hardcore:GetVerifiedDialog()
-
+	-- This pattern used because Hardcore:CloseVerifiedDialog() above
+	-- doesn't *hide* the window, it *destroys* it.
+	-- this hard-check prevents reconstructing what's already showing
 	if Hardcore.verify_shown == true then
 		return
 	end
 	Hardcore.verify_shown = true
-	
 
 	local window = AceGUI:Create("Window")
 	window:SetTitle("Classic Hardcore Verification")
