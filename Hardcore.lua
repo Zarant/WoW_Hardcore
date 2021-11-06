@@ -17,6 +17,16 @@ You should have received a copy of the GNU General Public License
 along with the Hardcore AddOn. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+-- the big frame object for our addon
+local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
+Hardcore.ALERT_STYLES = ALERT_STYLES
+Hardcore.verify_shown = false
+
+--[[ Ace3 config and imports ]]--
+
+Hardcore.Ace3 = LibStub("AceAddon-3.0"):NewAddon("Hardcore", "AceEvent-3.0", "AceConsole-3.0")
+local AceGUI = LibStub("AceGUI-3.0")
+
 --[[ Global saved variables ]]--
 Hardcore_Settings = {
 	enabled = true,
@@ -140,19 +150,6 @@ local ALERT_STYLES = {
 		delay = 10,
 	},
 }
-
--- the big frame object for our addon
-local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
-Hardcore.ALERT_STYLES = ALERT_STYLES
-Hardcore.verify_shown = false
-
-
---[[ Ace3 config and imports ]]--
-
-Hardcore.Ace3 = LibStub("AceAddon-3.0"):NewAddon("Hardcore", "AceEvent-3.0", "AceConsole-3.0")
-local AceGUI = LibStub("AceGUI-3.0")
-
-local textStore
 
 function Hardcore:CloseVerifiedDialog(widget)
 	Hardcore.verify_shown = false
