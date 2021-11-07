@@ -151,7 +151,7 @@
 				<AbsDimension x="500" y="200"></AbsDimension>
 			</Size>
 			<Anchors>
-				<Anchor point="TOPLEFT" relativeTo="DeathListEntry2" relativePoint="BOTTOMLEFT" x="-200"/>
+				<Anchor point="TOPLEFT" relativeTo="DeathListEntry2" relativePoint="BOTTOMLEFT" x="-150"/>
 			</Anchors>
 			<Layers>
     </Layers>

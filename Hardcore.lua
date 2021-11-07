@@ -1053,7 +1053,7 @@ function Hardcore_Frame_OnShow()
 
 		local verificationstring = Hardcore:GenerateVerificationString()
 		local f = {}
-		table.insert(f, "To get verified, copy the string below and visit https://classichc.net/get-verified")
+		table.insert(f, "To get verified, copy the string below and visit the classichc website.")
 		table.insert(f, "")
 		table.insert(f, verificationstring)
 		displaylist = f
@@ -1073,11 +1073,9 @@ function Hardcore_Frame_OnShow()
 
 		-- hard coded rules table lol
 		local f = {}
-		table.insert(f, "Official website with info, rules, news, hall of legends, challenges \n")
-		table.insert(f, "https://classichc.net")
-		table.insert(f, "Help is avaiable on discord (link on website)")
-		table.insert(f, "")
-		table.insert(f, "11/24/2020 from https://classichc.net/rules/")
+		table.insert(f, "For more info, rules, news, hall of legends, challenges, and more\n")
+		table.insert(f, "visit the classichc website.")
+		table.insert(f, "Help is available on discord (link on website)")
 		table.insert(f, "")
 		table.insert(f, "All professions allowed")
 		table.insert(f, "No restriction on talents")
@@ -1136,7 +1134,7 @@ function Hardcore_Frame_OnShow()
 	elseif display == "AddonStatus" and guild_roster_loading then
 		Hardcore_SubTitle:SetText(STRING_ADDON_STATUS_SUBTITLE_LOADING)
 	else
-		Hardcore_SubTitle:SetText("classichc.net")
+		Hardcore_SubTitle:SetText("DEATH = DELETE")
 	end
 
 	Hardcore_Deathlist_ScrollBar_Update()
@@ -1181,7 +1179,7 @@ function Hardcore:RecordReminder()
 		return
 	end
 
-	Hardcore:ShowAlertFrame(ALERT_STYLES.hc_enabled, "Hardcore Enabled")
+	Hardcore:ShowAlertFrame(ALERT_STYLES.hc_enabled, "Character Activity is Being Monitored")
 
 end
 
