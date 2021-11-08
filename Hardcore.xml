@@ -69,22 +69,17 @@
 			<KeyValue key="backdropInfo" value="BACKDROP_DIALOG_32_32" type="global"/>
 		</KeyValues>
 		<Layers>
-			<Layer>
-				<Texture name="Hardcore_Logo1" file="Interface\AddOns\Hardcore\Media\logo-emblem.blp">
-					<Size x="70" y="70" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="67" y="-15" />
-					</Anchors>
-				</Texture>
-				<Texture name="Hardcore_Logo2" file="Interface\AddOns\Hardcore\Media\logo-emblem.blp">
-					<Size x="70" y="70" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="572" y="-15" />
-					</Anchors>
-				</Texture>
-			</Layer>
+		<Layer>
+			<Texture name="Hardcore_Logo1" file="Interface\AddOns\Hardcore\Media\wowhc-emblem-white-red.blp">
+				<Size x="50" y="50" />
+				<Anchors>
+					<Anchor point="TOPLEFT" x="235" y="-5" />
+				</Anchors>
+			</Texture>
+		</Layer>
 			<Layer level="OVERLAY">
-				<FontString name="Hardcore_Title" inherits="GameFontNormalHuge3" text="Hardcore">
+				<FontString name="Hardcore_Title" inherits="HardcoreFont" text="HARDCORE">
+					<Color a="1" r="1" g="1" b="1" />
 					<Size x="242" y="37" />
 					<Anchors>
 						<Anchor point="TOPLEFT" x="242" y="-15" />
