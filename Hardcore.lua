@@ -288,7 +288,8 @@ local saved_variable_meta = {
 	{ key = "deaths", initial_data = {} },
 	{ key = "bubble_hearth_incidents", initial_data = {} },
 	{ key = "played_time_gap_warnings", initial_data = {} },
-	{ key = "trade_partners", initial_data = {} }
+	{ key = "trade_partners", initial_data = {} },
+	{ key = "grief_warning_conditions", initial_data = GRIEF_WARNING_BOTH_FACTIONS }
 }
 
 function Hardcore:InitializeSavedVariables()
