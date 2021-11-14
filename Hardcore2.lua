@@ -214,7 +214,7 @@ local ALERT_STYLES = {
 		file = "alert-hc-red.blp",
 		delay = 10,
 		alertSound = 8959
-	},
+	}
 }
 Hardcore_Alert_Frame:SetScale(0.7)
 
@@ -305,7 +305,7 @@ local function SlashHandler(msg, editbox)
 			Hardcore:Print("|cff00ff00Grief alert options:|r off horde alliance both")
 		end
 	-- Alert debug code
-	elseif cmd == "alert" and debug == true then
+	elseif cmd == "alert" then
 		local head, tail = "", {}
 		for substring in args:gmatch("%S+") do
 			if head == "" then
@@ -1138,8 +1138,6 @@ function Hardcore_Frame_OnShow()
 		table.insert(f, "")
 		table.insert(f, "No grouping in open world")
 		table.insert(f, "")
-		table.insert(f, "No battlegrounds allowed")
-		table.insert(f, "")
 		table.insert(f, "Buffs from others are allowed, don't ask for others for buffs")
 		table.insert(f, "")
 		table.insert(f, "Dungeon Groups are authorized but only ONE run of each Dungeon per character")
@@ -1156,8 +1154,9 @@ function Hardcore_Frame_OnShow()
 		table.insert(f, "Paladins can’t Bubble Hearth")
 		table.insert(f, "No Light of Elune + Hearthstone")
 		table.insert(f, "")
-		table.insert(f, "You can verify your run using this addon (Get verified tab). Recording or streaming is also")
-		table.insert(f, "recommended to provide evidence for special circumstances such as disconnection deaths.")
+		table.insert(f, "You need a record your journey to be verified")
+		table.insert(f, "Stream or record and upload to youtube or twitch")
+		table.insert(f, "then submit the playlist of your run on the verification page")
 		table.insert(f, "")
 		table.insert(f,
 			"At 60 you earn your IMMORTALITY and become a full fledged character with insane bragging rights ")
