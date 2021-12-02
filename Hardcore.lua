@@ -59,6 +59,7 @@ Hardcore_Character = {
 
 --[[ Local variables ]]--
 local debug = false
+local isPlayerDead -- Used to prevent double guild/addon messages.
 local pulses = {}
 local alert_msg_time = {
 	PULSE = {},
@@ -540,6 +541,8 @@ function Hardcore:UNIT_SPELLCAST_SUCCEEDED(...)
 end
 
 function Hardcore:PLAYER_ENTERING_WORLD()
+    isPlayerDead = UnitIsDeadOrGhost("player")
+    
 	Hardcore_Frame:RegisterForDrag("LeftButton")
 	Hardcore_Alerts_Button:SetText(Hardcore_Settings.notify and "Disable alerts" or "Enable alerts")
 		
@@ -565,50 +568,53 @@ function Hardcore:PLAYER_ALIVE()
 end
 
 function Hardcore:PLAYER_DEAD()
-	-- Screenshot
-	C_Timer.After(PICTURE_DELAY, Screenshot)
+    if not isPlayerDead then
+        -- Screenshot
+        C_Timer.After(PICTURE_DELAY, Screenshot)
 
-	-- Update deaths
-	if #Hardcore_Character.deaths == 0 or (#Hardcore_Character.deaths > 0 and Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger ~= nil) then
-		table.insert(Hardcore_Character.deaths, {
-			player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
-			player_alive_trigger = nil
-		})
-	end
+        -- Update deaths
+        if #Hardcore_Character.deaths == 0 or (#Hardcore_Character.deaths > 0 and Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger ~= nil) then
+            table.insert(Hardcore_Character.deaths, {
+                player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
+                player_alive_trigger = nil
+            })
+        end
 
-	-- Send message to guild
-	local playerGreet = GENDER_GREETING[UnitSex("player")]
-	local name = UnitName("player")
-	local _, _, classID = UnitClass("player")
-	local class = CLASSES[classID]
-	local level = UnitLevel("player")
-    local zone, mapID
-    if IsInInstance() then
-        zone = GetInstanceInfo()
-    else
-        mapID = C_Map.GetBestMapForUnit("player")
-        zone = C_Map.GetMapInfo(mapID).name
+        -- Send message to guild
+        local playerGreet = GENDER_GREETING[UnitSex("player")]
+        local name = UnitName("player")
+        local _, _, classID = UnitClass("player")
+        local class = CLASSES[classID]
+        local level = UnitLevel("player")
+        local zone, mapID
+        if IsInInstance() then
+            zone = GetInstanceInfo()
+        else
+            mapID = C_Map.GetBestMapForUnit("player")
+            zone = C_Map.GetMapInfo(mapID).name
+        end
+        local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
+        local messageString = messageFormat:format(playerGreet, name, class, level, zone)
+        if not (Last_Attack_Source == nil) then
+            messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
+            Last_Attack_Source = nil
+        end
+      
+        if not (recent_msg["text"] == nil) then
+            local playerPronoun = GENDER_POSSESSIVE_PRONOUN[UnitSex("player")]
+                messageString = string.format("%s. %s last words were \"%s\"", messageString, playerPronoun, recent_msg["text"])
+        end
+      
+        SendChatMessage(messageString, "GUILD")
+
+        -- Send addon message
+        local deathData = string.format("%s%s%s", level, COMM_FIELD_DELIM, mapID and mapID or "")
+        local commMessage = COMM_COMMANDS[3] .. COMM_COMMAND_DELIM .. deathData
+        if CTL then
+            CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
+        end
+        isPlayerDead = true
     end
-	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
-	local messageString = messageFormat:format(playerGreet, name, class, level, zone)
-	if not (Last_Attack_Source == nil) then
-		messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
-		Last_Attack_Source = nil
-	end
-  
-  if not (recent_msg["text"] == nil) then
-    local playerPronoun = GENDER_POSSESSIVE_PRONOUN[UnitSex("player")]
-		messageString = string.format("%s. %s last words were \"%s\"", messageString, playerPronoun, recent_msg["text"])
-  end
-  
-	SendChatMessage(messageString, "GUILD")
-
-	-- Send addon message
-    local deathData = string.format("%s%s%s", level, COMM_FIELD_DELIM, mapID and mapID or "")
-	local commMessage = COMM_COMMANDS[3] .. COMM_COMMAND_DELIM .. deathData
-	if CTL then
-		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
-	end
 end
 
 function Hardcore:PLAYER_TARGET_CHANGED()
@@ -636,6 +642,7 @@ function Hardcore:PLAYER_TARGET_CHANGED()
 end
 
 function Hardcore:PLAYER_UNGHOST()
+    isPlayerDead = false
 	if UnitIsDeadOrGhost("player") == 1 then
 		return
 	end -- prevent message on ghost login or zone
