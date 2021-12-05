@@ -53,8 +53,11 @@ Hardcore_Character = {
 	deaths = {},
 	bubble_hearth_incidents = {},
 	played_time_gap_warnings = {},
-	trade_partners = {},
+	trade = {},
 	grief_warning_conditions = GRIEF_WARNING_BOTH_FACTIONS,
+	is_valid_run = false,
+	-- deprecated
+	trade_partners = {},
 }
 
 --[[ Local variables ]]--
@@ -345,8 +348,11 @@ local saved_variable_meta = {
 	{ key = "deaths", initial_data = {} },
 	{ key = "bubble_hearth_incidents", initial_data = {} },
 	{ key = "played_time_gap_warnings", initial_data = {} },
+	{ key = "trades", initial_data = {} },
+	{ key = "grief_warning_conditions", initial_data = GRIEF_WARNING_BOTH_FACTIONS },
+	{ key = "is_valid_run", initial_data = false },
+	-- deprecated
 	{ key = "trade_partners", initial_data = {} },
-	{ key = "grief_warning_conditions", initial_data = GRIEF_WARNING_BOTH_FACTIONS }
 }
 
 function Hardcore:InitializeSavedVariables()
@@ -370,8 +376,25 @@ end
 --[[ Override default WoW UI ]]--
 
 TradeFrameTradeButton:SetScript("OnClick", function()
+	local trade = Hardcore_FindInTable(Hardcore_Characters.trades, function (trade)
+		return trade.partner == TradeFrameRecipientNameText:GetText()
+	end)
+	if trade ~= nil then
+		table.insert(Hardcore_Character.trades, {
+			partner = trade.partner,
+			count = trade.count + 1
+		})
+	else
+		table.insert(Hardcore_Character.trades, {
+			partner = TradeFrameRecipientNameText:GetText(),
+			count = 1
+		})
+	end
+
+	-- legacy handling
 	table.insert(Hardcore_Character.trade_partners, TradeFrameRecipientNameText:GetText())
 	Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
+
 	AcceptTrade()
 end)
 
@@ -1444,8 +1467,8 @@ function Hardcore:GenerateVerificationString()
 	local realm = GetRealmName()
 	local level = UnitLevel("player")
 
-	local tradePartners = Hardcore_join(Hardcore_Character.trade_partners, ",")
-	local baseVerificationData = {Hardcore_Character.guid, realm, race, class, name, level,
+	local trades = Hardcore_tableToUnicode(Hardcore_Character.trades)
+	local baseVerificationData = {tostring(Hardcore_Character.is_valid_run), Hardcore_Character.guid, realm, race, class, name, level,
 									Hardcore_Character.time_played, Hardcore_Character.time_tracked,
 									#Hardcore_Character.deaths, tradePartners}
 	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode),
@@ -1453,8 +1476,11 @@ function Hardcore:GenerateVerificationString()
 	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
 	local playedtimeGapsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.played_time_gap_warnings)
 
+	-- legacy handling
+	local tradePartners = Hardcore_join(Hardcore_Character.trade_partners, ",")
+
 	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString,
-							playedtimeGapsVerificationString}, ATTRIBUTE_SEPARATOR)
+							playedtimeGapsVerificationString, trades}, ATTRIBUTE_SEPARATOR)
 end
 
 --[[ Timers ]]--
