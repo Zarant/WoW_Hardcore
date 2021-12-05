@@ -161,7 +161,6 @@ function Hardcore_FilterUnique(tbl)
 end
 
 function Hardcore_FindInTable(tbl, cb)
-	print(tbl)
 	for i, v in ipairs(tbl) do
 		print(i, v)
 		local result = cb(v)

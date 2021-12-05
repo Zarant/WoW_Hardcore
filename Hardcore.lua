@@ -1468,7 +1468,7 @@ function Hardcore:GenerateVerificationString()
 	local level = UnitLevel("player")
 
 	local trades = Hardcore_tableToUnicode(Hardcore_Character.trades)
-	local baseVerificationData = {tostring(Hardcore_Character.is_valid_run), Hardcore_Character.guid, realm, race, class, name, level,
+	local baseVerificationData = Hardcore_Character.guid, realm, race, class, name, level,
 									Hardcore_Character.time_played, Hardcore_Character.time_tracked,
 									#Hardcore_Character.deaths, tradePartners}
 	local baseVerificationString = Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode),
@@ -1480,7 +1480,7 @@ function Hardcore:GenerateVerificationString()
 	local tradePartners = Hardcore_join(Hardcore_Character.trade_partners, ",")
 
 	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString,
-							playedtimeGapsVerificationString, trades}, ATTRIBUTE_SEPARATOR)
+							playedtimeGapsVerificationString, trades, tostring(Hardcore_Character.is_valid_run)}, ATTRIBUTE_SEPARATOR)
 end
 
 --[[ Timers ]]--
