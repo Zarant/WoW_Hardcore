@@ -162,7 +162,6 @@ end
 
 function Hardcore_FindInTable(tbl, cb)
 	for i, v in ipairs(tbl) do
-		print(i, v)
 		local result = cb(v)
 		if result == true then
 			return v
