@@ -931,11 +931,11 @@ end
 
 function Hardcore:CHAT_MSG_CHANNEL(...)
 	local _, _, _, _, _, _, channelID = ...
-    if channelID == 1 or channelID == 2 or channelID >= 22 and channelID <= 25 then
-        if self:SetRecentMsg(...) then
-            recent_msg["type"] = 5
-        end
-    end
+	if channelID == 1 or channelID == 2 or channelID >= 22 and channelID <= 25 then
+		if self:SetRecentMsg(...) then
+			recent_msg["type"] = 5
+		end
+	end
 end
 
 -- Returns true if the last message was successfully recorded, false otherwise.
