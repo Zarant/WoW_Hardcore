@@ -59,7 +59,7 @@ Hardcore_Character = {
 
 --[[ Local variables ]]--
 local debug = false
-local isPlayerDead -- Used to prevent double guild/addon messages.
+local isPlayerDead = nil -- Used to prevent double guild/addon messages.
 local pulses = {}
 local alert_msg_time = {
 	PULSE = {},
@@ -541,8 +541,6 @@ function Hardcore:UNIT_SPELLCAST_SUCCEEDED(...)
 end
 
 function Hardcore:PLAYER_ENTERING_WORLD()
-	isPlayerDead = UnitIsDeadOrGhost("player")
-	
 	Hardcore_Frame:RegisterForDrag("LeftButton")
 	Hardcore_Alerts_Button:SetText(Hardcore_Settings.notify and "Disable alerts" or "Enable alerts")
 		
