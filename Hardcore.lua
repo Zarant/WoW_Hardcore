@@ -569,6 +569,10 @@ end
 
 function Hardcore:PLAYER_DEAD()
     if not isPlayerDead then
+        if Last_Attack_Source == UnitName("pet") then -- If the pet died first, do nothing.
+            return
+        end
+        
         -- Screenshot
         C_Timer.After(PICTURE_DELAY, Screenshot)
 
@@ -595,6 +599,7 @@ function Hardcore:PLAYER_DEAD()
         end
         local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
         local messageString = messageFormat:format(playerGreet, name, class, level, zone)
+
         if not (Last_Attack_Source == nil) then
             messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
             Last_Attack_Source = nil
@@ -872,15 +877,10 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
-	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-	local _, ev, _, _, source_name, _, _, _, _, _, _, _, _, _, _, _, _ = CombatLogGetCurrentEventInfo()
-
-	if not (source_name == PLAYER_NAME) then
-		if not (source_name == nil) then
-			if string.find(ev, "DAMAGE") ~= nil then
-				Last_Attack_Source = source_name
-			end
-		end
+    print(...)
+	local _, subEvent, _, sourceGUID, sourceName, _, _, destGUID = CombatLogGetCurrentEventInfo()
+	if destGUID == PLAYER_GUID and sourceGUID ~= PLAYER_GUID and sourceName and subEvent:find("DAMAGE") then
+        Last_Attack_Source = sourceName
 	end
 end
 
