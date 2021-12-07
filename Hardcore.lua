@@ -541,8 +541,8 @@ function Hardcore:UNIT_SPELLCAST_SUCCEEDED(...)
 end
 
 function Hardcore:PLAYER_ENTERING_WORLD()
-    isPlayerDead = UnitIsDeadOrGhost("player")
-    
+	isPlayerDead = UnitIsDeadOrGhost("player")
+	
 	Hardcore_Frame:RegisterForDrag("LeftButton")
 	Hardcore_Alerts_Button:SetText(Hardcore_Settings.notify and "Disable alerts" or "Enable alerts")
 		
@@ -568,58 +568,57 @@ function Hardcore:PLAYER_ALIVE()
 end
 
 function Hardcore:PLAYER_DEAD()
-    if not isPlayerDead then
-        if Last_Attack_Source == UnitName("pet") then -- If the pet died first, do nothing.
-            return
-        end
-        
-        -- Screenshot
-        C_Timer.After(PICTURE_DELAY, Screenshot)
+	if not isPlayerDead then
+		if Last_Attack_Source == UnitName("pet") then -- If the pet died first, do nothing.
+			return
+		end
+		
+		-- Screenshot
+		C_Timer.After(PICTURE_DELAY, Screenshot)
 
-        -- Update deaths
-        if #Hardcore_Character.deaths == 0 or (#Hardcore_Character.deaths > 0 and Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger ~= nil) then
-            table.insert(Hardcore_Character.deaths, {
-                player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
-                player_alive_trigger = nil
-            })
-        end
+		-- Update deaths
+		if #Hardcore_Character.deaths == 0 or (#Hardcore_Character.deaths > 0 and Hardcore_Character.deaths[#Hardcore_Character.deaths].player_alive_trigger ~= nil) then
+			table.insert(Hardcore_Character.deaths, {
+				player_dead_trigger = date("%m/%d/%y %H:%M:%S"),
+				player_alive_trigger = nil
+			})
+		end
 
-        -- Send message to guild
-        local playerGreet = GENDER_GREETING[UnitSex("player")]
-        local name = UnitName("player")
-        local _, _, classID = UnitClass("player")
-        local class = CLASSES[classID]
-        local level = UnitLevel("player")
-        local zone, mapID
-        if IsInInstance() then
-            zone = GetInstanceInfo()
-        else
-            mapID = C_Map.GetBestMapForUnit("player")
-            zone = C_Map.GetMapInfo(mapID).name
-        end
-        local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
-        local messageString = messageFormat:format(playerGreet, name, class, level, zone)
+		-- Send message to guild
+		local playerGreet = GENDER_GREETING[UnitSex("player")]
+		local name = UnitName("player")
+		local _, _, classID = UnitClass("player")
+		local class = CLASSES[classID]
+		local level = UnitLevel("player")
+		local zone, mapID
+		if IsInInstance() then
+			zone = GetInstanceInfo()
+		else
+			mapID = C_Map.GetBestMapForUnit("player")
+			zone = C_Map.GetMapInfo(mapID).name
+		end
+		local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
+		local messageString = messageFormat:format(playerGreet, name, class, level, zone)
+		if not (Last_Attack_Source == nil) then
+			messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
+			Last_Attack_Source = nil
+		end
+	  
+		if not (recent_msg["text"] == nil) then
+			local playerPronoun = GENDER_POSSESSIVE_PRONOUN[UnitSex("player")]
+				messageString = string.format("%s. %s last words were \"%s\"", messageString, playerPronoun, recent_msg["text"])
+		end
+	  
+		SendChatMessage(messageString, "GUILD")
 
-        if not (Last_Attack_Source == nil) then
-            messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
-            Last_Attack_Source = nil
-        end
-      
-        if not (recent_msg["text"] == nil) then
-            local playerPronoun = GENDER_POSSESSIVE_PRONOUN[UnitSex("player")]
-                messageString = string.format("%s. %s last words were \"%s\"", messageString, playerPronoun, recent_msg["text"])
-        end
-      
-        SendChatMessage(messageString, "GUILD")
-
-        -- Send addon message
-        local deathData = string.format("%s%s%s", level, COMM_FIELD_DELIM, mapID and mapID or "")
-        local commMessage = COMM_COMMANDS[3] .. COMM_COMMAND_DELIM .. deathData
-        if CTL then
-            CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
-        end
-        isPlayerDead = true
-    end
+		-- Send addon message
+		local deathData = string.format("%s%s%s", level, COMM_FIELD_DELIM, mapID and mapID or "")
+		local commMessage = COMM_COMMANDS[3] .. COMM_COMMAND_DELIM .. deathData
+		if CTL then
+			CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
+		end
+		isPlayerDead = true
+	end
 end
 
 function Hardcore:PLAYER_TARGET_CHANGED()
@@ -647,7 +646,7 @@ function Hardcore:PLAYER_TARGET_CHANGED()
 end
 
 function Hardcore:PLAYER_UNGHOST()
-    isPlayerDead = false
+	isPlayerDead = false
 	if UnitIsDeadOrGhost("player") == 1 then
 		return
 	end -- prevent message on ghost login or zone
@@ -876,41 +875,40 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 	end
 end
 
-function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
-    print(...)
+function Hardcore:COMBAT_LOG_EVENT_UNFILTERED()
 	local _, subEvent, _, sourceGUID, sourceName, _, _, destGUID = CombatLogGetCurrentEventInfo()
 	if destGUID == PLAYER_GUID and sourceGUID ~= PLAYER_GUID and sourceName and subEvent:find("DAMAGE") then
-        Last_Attack_Source = sourceName
+		Last_Attack_Source = sourceName
 	end
 end
 
 function Hardcore:CHAT_MSG_SAY(...)
   if self:SetRecentMsg(...) then
-    recent_msg["type"] = 0
+	recent_msg["type"] = 0
   end
 end
 
 function Hardcore:CHAT_MSG_GUILD(...)
   if self:SetRecentMsg(...) then
-    recent_msg["type"] = 2
+	recent_msg["type"] = 2
   end
 end
 
 function Hardcore:CHAT_MSG_PARTY(...)
   if self:SetRecentMsg(...) then
-    recent_msg["type"] = 1
+	recent_msg["type"] = 1
   end
 end
 
 function Hardcore:SetRecentMsg(...)
   local text, sn, LN, CN, p2, sF, zcI, cI, cB, unu, lI, senderGUID = ...
   if PLAYERGUID == nil then
-    PLAYERGUID = UnitGUID("player")
+	PLAYERGUID = UnitGUID("player")
   end
 
   if senderGUID == PLAYERGUID then
-    recent_msg["text"] = text
-    return true
+	recent_msg["text"] = text
+	return true
   end
   return false
 end
@@ -987,30 +985,30 @@ function Hardcore:ShowAlertFrame(styleConfig, message)
 end
 
 function Hardcore:Add(data, sender)
-    -- Display the death locally if alerts are not toggled off.
-    if Hardcore_Settings.notify then
-        local level = 0
-        local mapID
-        if data then
-            level, mapID = string.split(COMM_FIELD_DELIM, data)
-            level = tonumber(level)
-            mapID = tonumber(mapID)
-        end
-        if type(level) == "number" then
-            for i = 1, GetNumGuildMembers() do
-                local name, _, _, guildLevel, _, zone, _, _, _, _, class = GetGuildRosterInfo(i)
-                if name == sender then
-                    if mapID then
-                        local mapData = C_Map.GetMapInfo(mapID) -- In case some idiot sends an invalid map ID, it won't cause mass lua errors.
-                        zone = mapData and mapData.name or zone -- If player is in an instance, will have to get zone from guild roster.
-                    end
-                    level = level > 0 and level < 61 and level or guildLevel -- If player is using an older version of the addon, will have to get level from guild roster.
-                    local messageFormat = "%s the %s%s|r has died at level %d in %s"
-                    local messageString = messageFormat:format(name:gsub("%-.*", ""), "|c" .. RAID_CLASS_COLORS[class].colorStr, class, level, zone)
-                    Hardcore:ShowAlertFrame(ALERT_STYLES.death, messageString)
-                end
-            end
-        end
+	-- Display the death locally if alerts are not toggled off.
+	if Hardcore_Settings.notify then
+		local level = 0
+		local mapID
+		if data then
+			level, mapID = string.split(COMM_FIELD_DELIM, data)
+			level = tonumber(level)
+			mapID = tonumber(mapID)
+		end
+		if type(level) == "number" then
+			for i = 1, GetNumGuildMembers() do
+				local name, _, _, guildLevel, _, zone, _, _, _, _, class = GetGuildRosterInfo(i)
+				if name == sender then
+					if mapID then
+						local mapData = C_Map.GetMapInfo(mapID) -- In case some idiot sends an invalid map ID, it won't cause mass lua errors.
+						zone = mapData and mapData.name or zone -- If player is in an instance, will have to get zone from guild roster.
+					end
+					level = level > 0 and level < 61 and level or guildLevel -- If player is using an older version of the addon, will have to get level from guild roster.
+					local messageFormat = "%s the %s%s|r has died at level %d in %s"
+					local messageString = messageFormat:format(name:gsub("%-.*", ""), "|c" .. RAID_CLASS_COLORS[class].colorStr, class, level, zone)
+					Hardcore:ShowAlertFrame(ALERT_STYLES.death, messageString)
+				end
+			end
+		end
 	end
 end
 
