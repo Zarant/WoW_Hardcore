@@ -8,6 +8,7 @@ World of Warcraft addon for the Hardcore community
 - (Grief Protection) Warns you as you target a friendly/enemy that is Pvp flagged
 - (Hardcore Rules) Prevents Mailbox and Auction House Access
 - (Bubble Hearth) Warns the player while Bubble hearthing. Also reports to guild
+- (Common communication channel) The GreenWall add-on has been embedded. It allows multiple guilds within a single realm, or connected realms to share guild chat as if they were one guild. When a member in one guild types something in guild chat, members of the other connected guilds (co-guilds) will see what was said and can respond. Guild members can use GreenWall with zero configuration. All of the necessary configuration work is done by the guild officers. There is no significant impact to the game performance. All members must have at least one spare custom chat channel available (two for officers if officer chat is also being bridged).
 
 ## FAQ
 ### Addon says active time is much lower than played time

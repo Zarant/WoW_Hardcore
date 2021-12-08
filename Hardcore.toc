@@ -1,16 +1,33 @@
 ## Interface: 11401
-## Version: 0.7.0
-## Title: Hardcore
-## Notes: Supports Classic Hardcore / Road to Ragnaros play
-## Author: The Classic Hardcore team, Molikar (Sean Kennedy)
+## Title: Hardcore 0.7.0 + Greenwall 1.11.5+classic
+## Notes: Supports Classic Hardcore / Road to Ragnaros play. Includes GreenWall, a common communication channel as a replacement for guild chat in guild confederations.
+## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
+## Version: 1.0.0
+## URL: https://www.curseforge.com/wow/addons/hardcore
+## URL: https://www.curseforge.com/wow/addons/greenwall
+## DefaultState: enabled
+## SavedVariables: Hardcore_Settings,GreenWallAccount
+## SavedVariablesPerCharacter: Hardcore_Character,GreenWall,GreenWallMeta,GreenWallLog
+## X-Category: Leveling,Guild
 ## X-License: All Rights Reserved
-## X-Category: Leveling
-
-## SavedVariables: Hardcore_Settings
-## SavedVariablesPerCharacter: Hardcore_Character
 
 embeds.xml
-
 utils.lua
 Hardcore.xml
 Hardcore.lua
+
+Constants.lua
+Globals.lua
+Settings.lua
+Utility.lua
+HoldDown.lua
+Config.lua
+Compat.lua
+Chat.lua
+Channel.lua
+SystemEventHandler.lua
+API.lua
+Interface.lua
+GreenWall.lua
+
+GreenWall.xml
