@@ -159,3 +159,13 @@ function Hardcore_FilterUnique(tbl)
 
 	return res
 end
+
+function Hardcore_FindInTable(tbl, cb)
+	for i, v in ipairs(tbl) do
+		local result = cb(v)
+		if result == true then
+			return v
+		end
+	end
+	return nil
+end
