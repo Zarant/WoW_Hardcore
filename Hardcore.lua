@@ -29,6 +29,7 @@ local CLASSES = {
 	[3] = "Hunter",
 	[4] = "Rogue",
 	[5] = "Priest",
+	[6] = "Death Knight", -- new Death Knight ID
 	[7] = "Shaman",
 	[8] = "Mage",
 	[9] = "Warlock",
@@ -47,6 +48,7 @@ Hardcore_Settings = {
 	alert_frame_y_offset = -150,
 	alert_frame_scale = 0.7,
 	show_minimap_mailbox_icon = false,
+	sacrifice = {},
 }
 
 --[[ Character saved variables ]]--
@@ -65,6 +67,9 @@ Hardcore_Character = {
 	party_mode = "Solo",
 	team = {},
 	first_recorded = -1,
+	sacrificed_at = "",
+	converted_successfully = false,
+	converted_time = "",
 }
 
 --[[ Local variables ]]--
@@ -149,6 +154,7 @@ local COLOR_YELLOW = "|c00ffff00"
 local STRING_ADDON_STATUS_SUBTITLE = "Guild Addon Status"
 local STRING_ADDON_STATUS_SUBTITLE_LOADING = "Guild Addon Status (Loading)"
 local THROTTLE_DURATION = 5
+local SACRIFICE_LEVEL = 55
 
 -- frame display
 local display = "Rules"
@@ -304,6 +310,111 @@ local function SlashHandler(msg, editbox)
 		      failure_function_executor.Fail(achievement)
 		    end
 		  end
+	elseif cmd == "dk" then
+		-- sacrifice your current lvl 55 char to allow for making DK
+		local dk_convert_option = ""
+		for substring in args:gmatch("%S+") do
+			dk_convert_option = substring
+		end
+		--Hardcore:Print(dk_convert_option)
+		local _, _, classID = UnitClass("player")
+		local level = UnitLevel("player")
+		local inCombat = UnitAffectingCombat("player")
+
+		--Hardcore:Print("Class ID: ".. classID .. ", player level: ".. PLAYER_LEVEL)
+
+		if dk_convert_option == "sacrifice" then
+			if inCombat == true then
+				Hardcore:Print("Can't use sacrifice in combat")
+				return
+			end
+			-- check if eligible
+			if classID == 6 then
+				Hardcore:Print("You can't sacrifice Death Knight character")
+				return
+			end
+			if level ~= SACRIFICE_LEVEL then
+				Hardcore:Print(string.format("You must be level %s to sacrifice", SACRIFICE_LEVEL))
+				return
+			end
+			-- need to warn before sacrifice if something is wrong
+			local debug_message = "Playtime gap percentage: " .. Hardcore_Character.tracked_played_percentage .. "%."
+			Hardcore:Debug(debug_message)
+			local percentage = Hardcore_Character.tracked_played_percentage
+
+			if Hardcore:ShouldShowPlaytimeWarning(level, percentage) then
+				Hardcore:DisplayPlaytimeWarning(level)
+				return
+			end
+			-- we deaths, bh, played_time_gaps and trade partners
+			if (#Hardcore_Character.deaths > 0 or #Hardcore_Character.bubble_hearth_incidents > 0 or #Hardcore_Character.played_time_gap_warnings > 0 or #Hardcore_Character.trade_partners > 0) then
+				Hardcore:Print("Before proceeding with sacrifice, please contact admins and verify your character as there are some warnings!")
+				return
+			end
+			local sacrifice = {}
+			sacrifice["guid"] = Hardcore_Character.guid
+			sacrifice["localtime"] = date("%m/%d/%y %H:%M:%S")
+			sacrifice["timestamp"] = time(date("*t"))
+			sacrifice["override"] = false
+			sacrifice["complete"] = false
+			if (Hardcore_Settings.sacrifice == nil) then
+				Hardcore_Settings.sacrifice = {}
+			end
+			for k, v in pairs(Hardcore_Settings.sacrifice) do Hardcore_Settings.sacrifice[k]=nil end
+			table.insert(Hardcore_Settings.sacrifice, sacrifice)
+			--Hardcore_Character.sacrificed_at = sacrifice["localtime"]
+			Hardcore:Print("Character marked for sacrifice. Die within 5 minutes and then activate it on Death Knight.")
+		elseif dk_convert_option == "activate" then 
+			if inCombat == true then
+				Hardcore:Print("Can't use activate in combat")
+				return
+			end
+			if classID ~= 6 then
+				Hardcore:Print("You can activate only Death Knight character")
+				return
+			end
+			if (Hardcore_Settings.sacrifice == nil or #Hardcore_Settings.sacrifice == 0) then
+				Hardcore:Print("There are no sacrificed characters")
+				return
+			end
+			--Hardcore:Print(Hardcore_Settings.sacrifice[1].guid)
+			--Hardcore:Print(Hardcore_Settings.sacrifice[1].localtime)
+			if Hardcore_Settings.sacrifice[1].complete then
+				Hardcore_Character.converted_successfully = true;
+				Hardcore_Character.converted_time = date("%m/%d/%y %H:%M:%S");
+				for k, v in pairs(Hardcore_Settings.sacrifice) do Hardcore_Settings.sacrifice[k]=nil end
+				Hardcore:Print("Death Knight activated. Happy hunting.")
+			else
+				Hardcore:Print("There are no sacrificed characters")
+			end
+		elseif dk_convert_option == "override" then 
+			if inCombat == true then
+				Hardcore:Print("Can't use sacrifice in combat")
+				return
+			end
+			-- check if eligible
+			if classID == 6 then
+				Hardcore:Print("You can't sacrifice Death Knight character")
+				return
+			end
+			if level ~= SACRIFICE_LEVEL then
+				Hardcore:Print(string.format("You must be level %s to sacrifice", SACRIFICE_LEVEL))
+				return
+			end
+			local sacrifice = {}
+			sacrifice["guid"] = Hardcore_Character.guid
+			sacrifice["localtime"] = date("%m/%d/%y %H:%M:%S")
+			sacrifice["timestamp"] = time(date("*t"))
+			sacrifice["override"] = true
+			sacrifice["complete"] = false
+			if (Hardcore_Settings.sacrifice == nil) then
+				Hardcore_Settings.sacrifice = {}
+			end
+			for k, v in pairs(Hardcore_Settings.sacrifice) do Hardcore_Settings.sacrifice[k]=nil end
+			table.insert(Hardcore_Settings.sacrifice, sacrifice)
+			Hardcore:Print("Character marked for sacrifice. Die within 5 minutes and then activate it on Death Knight.")
+		else 
+			Hardcore:Print("|cff00ff00Death Knight options:|r sacrifice activate override")
 		end
 	elseif cmd == "griefalert" then
 		local grief_alert_option = ""
@@ -750,6 +861,21 @@ function Hardcore:PLAYER_DEAD()
         zone = C_Map.GetMapInfo(mapID).name
     end
 	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
+
+	-- here we check if that was sacrifice
+	if (Hardcore_Settings.sacrifice ~= nil and #Hardcore_Settings.sacrifice == 1) then
+		-- sacrifice is active now we get timestamp
+		local sacrifice = Hardcore_Settings.sacrifice[1]
+		local timestamp = time(date("*t"))
+		if ((timestamp - sacrifice.timestamp) <= 300) then
+			messageFormat = "Our brave %s, %s the %s, did sacrifice at level %d in %s"
+			Hardcore_Settings.sacrifice[1].complete = true
+			Hardcore_Character.sacrificed_at = date("%m/%d/%y %H:%M:%S")
+		else
+			Hardcore:Print("Sacrifice time expired. R.I.P.")
+		end
+	end
+
 	local messageString = messageFormat:format(playerGreet, name, class, level, zone)
 	if not (Last_Attack_Source == nil) then
 		messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
@@ -762,6 +888,8 @@ function Hardcore:PLAYER_DEAD()
   end
   
 	SendChatMessage(messageString, "GUILD")
+
+	Hardcore:Print(messageString)
 
 	-- Send addon message
     local deathData = string.format("%s%s%s", level, COMM_FIELD_DELIM, mapID and mapID or "")
