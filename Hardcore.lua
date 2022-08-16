@@ -1775,9 +1775,14 @@ function Hardcore:GenerateVerificationString()
 		ATTRIBUTE_SEPARATOR)
 	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
 	local playedtimeGapsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.played_time_gap_warnings)
-
+	local converted_successfully = "FALSE"
+	if (Hardcore_Character.converted_successfully) then
+		converted_successfully = "TRUE"
+	end
+	local dkInfo = {Hardcore_Character.sacrificed_at, converted_successfully, Hardcore_Character.converted_time}
+	local deathknightVerificationString = Hardcore_join(Hardcore_map(dkInfo,Hardcore_stringOrNumberToUnicode),ATTRIBUTE_SEPARATOR)
 	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString,
-							playedtimeGapsVerificationString}, ATTRIBUTE_SEPARATOR)
+							playedtimeGapsVerificationString, deathknightVerificationString}, ATTRIBUTE_SEPARATOR)
 end
 
 --[[ Timers ]]--
