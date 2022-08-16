@@ -1779,8 +1779,14 @@ function Hardcore:GenerateVerificationString()
 	if (Hardcore_Character.converted_successfully) then
 		converted_successfully = "TRUE"
 	end
-	local dkInfo = {Hardcore_Character.sacrificed_at, converted_successfully, Hardcore_Character.converted_time}
-	local deathknightVerificationString = Hardcore_join(Hardcore_map(dkInfo,Hardcore_stringOrNumberToUnicode),ATTRIBUTE_SEPARATOR)
+	local dk_conversion = {
+		sacrificed_at = Hardcore_Character.sacrificated_at,
+		converted_successfully = converted_successfully,
+		converted_time = Hardcore_Character.converted_time,
+	}
+	local dkTable = {}
+	table.insert(dkTable, dk_conversion)
+	local deathknightVerificationString = Hardcore_tableToUnicode(dkTable)
 	return Hardcore_join({baseVerificationString, bubbleHearthIncidentsVerificationString,
 							playedtimeGapsVerificationString, deathknightVerificationString}, ATTRIBUTE_SEPARATOR)
 end
