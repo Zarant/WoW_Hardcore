@@ -2170,13 +2170,16 @@ function Hardcore:HandleLegacyDeaths()
 end
 
 function Hardcore:ApplyAlertFrameSettings()
-	Hardcore_Alert_Frame:SetScale(Hardcore_Settings.alert_frame_scale)
+	local scale = Hardcore_Settings.alert_frame_scale or 0.7
+	local x_offset = Hardcore_Settings.alert_frame_x_offset or 0
+	local y_offset = Hardcore_Settings.alert_frame_y_offset or 0
+	Hardcore_Alert_Frame:SetScale(scale)
 	Hardcore_Alert_Frame:SetPoint(
 		"TOP",
 		"UIParent",
 		"TOP",
-		Hardcore_Settings.alert_frame_x_offset / Hardcore_Settings.alert_frame_scale,
-		Hardcore_Settings.alert_frame_y_offset / Hardcore_Settings.alert_frame_scale
+		x_offset / scale,
+		y_offset / scale	
 	)
 end
 
