@@ -1,7 +1,7 @@
-## Interface: 20504
+## Interface: 30400
 ## Version: 0.9.0
 ## Title: Hardcore
-## Notes: Supports Classic Hardcore / Road to Ragnaros play
+## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Molikar (Sean Kennedy)
 ## X-License: All Rights Reserved
 ## X-Category: Leveling
