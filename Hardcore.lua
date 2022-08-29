@@ -1746,34 +1746,61 @@ function Hardcore_Frame_OnShow()
 		Hardcore_Level_Sort:Hide()
 		Hardcore_Zone_Sort:Hide()
 		Hardcore_TOD_Sort:Hide()
-		DeathListEntry3:Hide()
+		--DeathListEntry3:Hide()
 		Hardcore_DK_Sacrifice:Show()
 		Hardcore_DK_Activate:Show()
 
 		local f = {}
-		table.insert(f, "Death Knights are authorized for solo HC runs only. However, to follow along in the spirit")
-		table.insert(f, "of Hardcore, you must level another character of the same faction and “sacrifice it”.")
-		table.insert(f, "Due to certain limitations currently, Death Knights are not allowed to be played in Duos,")
-		table.insert(f, "Trios, or on achievement runs. This may change in the future.")
-		table.insert(f, "If you should fall as a Death Knight, you must start the process over from level one and")
-		table.insert(f, "sacrifice another character. ")
-		table.insert(f, "Level 55 is the only level you may sacrifice a character at.")
+		table.insert(f, "Death Knights are authorized for the Hardcore Challenge, adding in these following rules.")
+		table.insert(f, "You must level a character of the SAME FACTION following the standard HC Ruleset, at which")
+		table.insert(f, "point it must be sacrificed to create a Death Knight.")
+		table.insert(f, "The sacrificial level is a range between 55 and 58. You cannot sacrifice before or after")
+		table.insert(f, "these levels.")
+		table.insert(f, "- As a side note, sacrificing a toon does not mean you must delete it, but it will no")
+		table.insert(f, "longer be valid HC toon.")
+
+		table.insert(f, "If you should die or fail your run while playing as a Death Knight, you must start over")
+		table.insert(f, "from level 1, with a fresh toon to perform the sacrifice again. You may create your DK ")
+		table.insert(f, "in advance if you wish to RSVP a name, but do not log onto them. Remember that you need")
+		table.insert(f, "to have a lvl 55 already on the server to create a DK.")
+		table.insert(f, "Duo and Trio groups who wish to have a DK in the party must follow some additional steps")
+		table.insert(f, "in creating a DK. These steps are listed further below.")
+		table.insert(f, "General achievements will carry over when you activate your DK")
 		table.insert(f, "")
-		table.insert(f, "Listed below is the step by step process in order to create a valid Death Knight.")
+		table.insert(f, "=============== SOLO DK ===============")
 		table.insert(f, "")
-		table.insert(f, "Step 1: Level a solo character of the “SAME FACTION” to level 55, following the HC rules.")
-		table.insert(f, "(same faction isnt tech true, but it seems odd to let someone level ally to make a horde DK)")
-		table.insert(
-			f,
-			"Step 2: While out of combat, click on the “SACRIFICE” button below. This starts a 5 minute timer."
-		)
-		table.insert(
-			f,
-			"Step 3: During these 5 minutes, you must die on your current character. After dying, you DO NOT"
-		)
-		table.insert(f, " need to delete, but this toon will no longer be valid for HC.")
-		table.insert(f, "Step 4: Create your Death Knight and log onto them.")
-		table.insert(f, "Step 5: Click on “ACTIVATE” below. You are now good to go. Survive well out there!")
+		table.insert(f, "Listed below is a step by step process for creating a DK while solo..")
+		table.insert(f, "")
+		table.insert(f, "Step 1: Level a character of the “SAME FACTION” to the required level range,")
+		table.insert(f, "following the HC rules.")
+		table.insert(f, "Step 2: Click on the “SACRIFICE” button below. This starts a 5 minute timer. You cannot")
+		table.insert(f, " activate the “SACRIFICE” button while in combat, stealthed, or during Feign Death.")
+		table.insert(f, "Step 3: During these 5 minutes, you must die on your current character. After dying, log out.")
+		table.insert(f, "Step 4: DO NOT DELETE THE TOON YOU SACRIFICED UNTIL AFTER THE DK IS ACTIVATED!!")
+		table.insert(f, "Step 5: Create or log onto your Death Knight.")
+		table.insert(f, "Step 6: Click on “ACTIVATE” below. Then do a /reload. You are now good to go.")
+		table.insert(f, "Survive well out there!")
+		table.insert(f, "")
+		table.insert(f, "=============== DUO/TRIO DK's ===============")
+		table.insert(f, "")
+		table.insert(f, "There are some additional things you must do when you wish to create a DK for Duo")
+		table.insert(f, " or Trio groups.")
+		table.insert(f, "")
+		table.insert(f, "Step 1: Start your Duo/Trio group of the “SAME FACTION” and reach the level range for")
+		table.insert(f, "sacrifice, following the HC rules.")
+		table.insert(f, "Step 2: For the player who is sacrificing, click on the “SACRIFICE” button below. This starts")
+		table.insert(f, "a 5 minute timer. You cannot activate the “SACRIFICE” button while in combat, stealthed,")
+		table.insert(f, "or during Feign Death.")
+		table.insert(f, "Step 3: During these 5 minutes, you must die on your current character. After dying,")
+		table.insert(f, "drop group and logout. Your partners who are not sacrificing MUST STAY ONLINE!")
+		table.insert(f, "Step 4: DO NOT DELETE THE TOON YOU SACRIFICED UNTIL AFTER THE DK IS ACTIVATED!!")
+		table.insert(f, "Step 5: Create or log onto your Death Knight.")
+		table.insert(f, "Step 6: Click on “ACTIVATE” below. ")
+		table.insert(f, "Step 7: Rejoin the party with your partners using /inv “Name” ")
+		table.insert(f, "Step 8: All party member must /reload")
+		table.insert(f, "Step 9: If more than one player is creating a DK, then you must follow the steps ONE PERSON")
+		table.insert(f, "AT A TIME! Multiple players creating a DK in the party at the same time WILL invalidate")
+		table.insert(f, "your run. ")
 		table.insert(f, "")
 		displaylist = f
 	end
@@ -1805,10 +1832,17 @@ end
 function Hardcore_Deathlist_ScrollBar_Update()
 	-- max value
 	if not (displaylist == nil) then
-		FauxScrollFrame_Update(MyModScrollBar, #displaylist, 20, 16)
+		local maxLines = 20
+		if display == "DeathKnight" then
+			maxLines = 17
+			getglobal("DeathListEntry18"):Hide()
+			getglobal("DeathListEntry19"):Hide()
+			getglobal("DeathListEntry20"):Hide()
+		end
+		FauxScrollFrame_Update(MyModScrollBar, #displaylist, maxLines, 16)
 
 		-- loop through lines adding data
-		for line = 1, 20 do
+		for line = 1, maxLines do
 			local lineplusoffset = line + FauxScrollFrame_GetOffset(MyModScrollBar)
 			local button = getglobal("DeathListEntry" .. line)
 			if lineplusoffset <= #displaylist then
