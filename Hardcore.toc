@@ -1,5 +1,5 @@
 ## Interface: 20504
-## Version: 0.8.0
+## Version: 0.9.0
 ## Title: Hardcore
 ## Notes: Supports Classic Hardcore / Road to Ragnaros play
 ## Author: The Classic Hardcore team, Molikar (Sean Kennedy)
