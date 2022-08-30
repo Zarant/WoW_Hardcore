@@ -1,15 +1,15 @@
 local CLASS_COLOR_BY_NAME = {
-	["Druid"] = "FF7C0A",
-	["Warlock"] = "8788EE",
-	["Warrior"] = "C69B6D",
-	["Mage"] = "3FC7EB",
-	["Hunter"] = "AAD372",
-	["Priest"] = "FFFFFF",
-	["Shaman"] = "0070DD",
-	["Paladin"] = "F48CBA",
-	["Rogue"] = "FFF468",
-	["Death Knight"] = "C41E3A",
-	["General"] = "FFFFFF",
+	["DRUID"] = "FF7C0A",
+	["WARLOCK"] = "8788EE",
+	["WARRIOR"] = "C69B6D",
+	["MAGE"] = "3FC7EB",
+	["HUNTER"] = "AAD372",
+	["PRIEST"] = "FFFFFF",
+	["SHAMAN"] = "0070DD",
+	["PALADIN"] = "F48CBA",
+	["ROGUE"] = "FFF468",
+	["DEATHKNIGHT"] = "C41E3A",
+	["GENERAL"] = "FFFFFF",
 }
 local AceGUI = LibStub("AceGUI-3.0")
 local ICON_SIZE = 39
@@ -149,7 +149,7 @@ hooksecurefunc(CharacterFrame, "Hide", function(self, button)
 	TabGUI:Hide()
 end)
 
-function UpdateCharacterHC(_hardcore_character, _player_name, _version, frame_to_update, _player_class, _player_level)
+function UpdateCharacterHC(_hardcore_character, _player_name, _version, frame_to_update, _player_class, _player_class_en, _player_level)
 	frame_to_update:ReleaseChildren()
 	if _hardcore_character == nil then
 		return
@@ -199,8 +199,8 @@ function UpdateCharacterHC(_hardcore_character, _player_name, _version, frame_to
 	level_title_text:SetHeight(60)
 	local level_text = _player_level or "?"
 	local class_text
-	if _player_class ~= nil then
-		class_text = "|c00" .. CLASS_COLOR_BY_NAME[_player_class] .. _player_class .. "|r"
+	if _player_class_en ~= nil and _player_class ~= nil then
+		class_text = "|c00" .. CLASS_COLOR_BY_NAME[_player_class_en] .. _player_class .. "|r"
 	else
 		class_text = "?"
 	end
@@ -297,13 +297,14 @@ function ShowCharacterHC(_hardcore_character)
 
 	f2:ReleaseChildren()
 
-	local class, _, _ = UnitClass("player")
+	local class, class_en, _ = UnitClass("player")
 	UpdateCharacterHC(
 		_hardcore_character,
 		UnitName("player"),
 		GetAddOnMetadata("Hardcore", "Version"),
 		f2,
 		class,
+		class_en,
 		UnitLevel("player")
 	)
 	Panel:Show()
