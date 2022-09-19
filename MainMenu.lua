@@ -484,12 +484,20 @@ end
 local function DrawVerifyTab(container, _hardcore_character)
 	local ATTRIBUTE_SEPARATOR = "_"
 	local function GenerateVerificationString()
+		local version = GetAddOnMetadata("Hardcore", "Version")
 		local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
 		local realm = GetRealmName()
 		local level = UnitLevel("player")
-
+	
 		local tradePartners = Hardcore_join(_hardcore_character.trade_partners, ",")
+		local converted_successfully = "FALSE"
+		if _hardcore_character.converted_successfully then
+			converted_successfully = "TRUE"
+		end
+		local game_version_checker = _hardcore_character.game_version or { _G["HardcoreBuildLabel"] }
+	
 		local baseVerificationData = {
+			version,
 			_hardcore_character.guid,
 			realm,
 			race,
@@ -500,32 +508,18 @@ local function DrawVerifyTab(container, _hardcore_character)
 			_hardcore_character.time_tracked,
 			#_hardcore_character.deaths,
 			tradePartners,
+			_hardcore_character.sacrificed_at,
+			converted_successfully,
+			game_version_checker,
 		}
 		local baseVerificationString =
 			Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode), ATTRIBUTE_SEPARATOR)
-		local bubbleHearthIncidentsVerificationString =
-			Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
+		local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
 		local playedtimeGapsVerificationString = Hardcore_tableToUnicode(_hardcore_character.played_time_gap_warnings)
-		local converted_successfully = "FALSE"
-		if _hardcore_character.converted_successfully then
-			converted_successfully = "TRUE"
-		end
-		local dk_conversion = {
-			sacrificed_at = _hardcore_character.sacrificated_at,
-			converted_successfully = converted_successfully,
-			converted_time = _hardcore_character.converted_time,
-		}
-		local dkTable = {}
-		table.insert(dkTable, dk_conversion)
-		local deathknightVerificationString = Hardcore_tableToUnicode(dkTable)
-		local game_version_string =
-			Hardcore_join(Hardcore_map({ _G["HardcoreBuildLabel"] }, Hardcore_stringOrNumberToUnicode))
 		return Hardcore_join({
 			baseVerificationString,
 			bubbleHearthIncidentsVerificationString,
 			playedtimeGapsVerificationString,
-			deathknightVerificationString,
-			game_version_string,
 		}, ATTRIBUTE_SEPARATOR)
 	end
 
