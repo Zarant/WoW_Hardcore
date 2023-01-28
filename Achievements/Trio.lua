@@ -291,25 +291,33 @@ function trio_rules:Check()
         	return
     	end
 
-	local my_map = C_Map.GetBestMapForUnit("player")
-	local teammates_map_1 = C_Map.GetBestMapForUnit(member_str_1)
-	local teammates_map_2 = C_Map.GetBestMapForUnit(member_str_2)
+	-- updated Trio - All conditions met.
 
-	if
-		my_map == 1450
-		or teammates_map_1 == 1450
-		or teammates_map_2 == 1450
-		or my_map == 124
-		or teammates_map_1 == 124
-		or teammates_map_2 == 124
-	then -- Moonglade / Scarlet enclave
-		trio_rules:ResetWarn()
-	elseif my_map ~= teammates_map_1 or teammates_map_1 ~= teammates_map_2 or my_map ~= teammates_map_2 then
-		Hardcore:Print("Trio check: Partner(s) is in another subzone")
-		trio_rules.warning_reason = "Warning - Partner(s) is in another subzone."
-		trio_rules:Warn()
-		return
-	end
+	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
+	local teammate_subzone_1 = C_Map.GetBestMapForUnit(member_str_1) -- subzone
+	local teammate_subzone_2 = C_Map.GetBestMapForUnit(member_str_2) -- subzone
+    
+    local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
+    local teammate_zone_1 = C_Map.GetMapInfo(teammate_subzone_1).parentMapID -- parent zone
+    local teammate_zone_2 = C_Map.GetMapInfo(teammate_subzone_2).parentMapID -- parent zone
+
+	local MOONGLADE_SUBZONE = 1450
+	local SCARLET_ENCLAVE_SUBZONE = 124
+
+    if (my_subzone == MOONGLADE_SUBZONE or teammate_subzone_1 == MOONGLADE_SUBZONE or teammate_subzone_2 == MOONGLADE_SUBZONE) 
+	or (my_subzone == SCARLET_ENCLAVE_SUBZONE or teammate_subzone_1 == SCARLET_ENCLAVE_SUBZONE or teammate_subzone_2 == SCARLET_ENCLAVE_SUBZONE) then
+		-- Moonglade/Scarlet enclave subzones are exempt
+        duo_rules:ResetWarn()
+    elseif (my_zone ~= teammate_zone_1) or (my_zone ~= teammate_zone_2) or (teammate_zone_1 ~= teammate_zone_2) then
+		-- important that this check is on zone not subzone
+        Hardcore:Print("Trio check: Partner(s) in another zone!")
+        trio_rules.warning_reason = "Warning - Partner(s() another zone."
+        trio_rules:Warn()
+        return
+    end
+    if checkHardcoreStatus == true then
+        duo_rules:ResetWarn()
+    end
 
 	if checkHardcoreStatus() == true then
 		trio_rules:ResetWarn()
