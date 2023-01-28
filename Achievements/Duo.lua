@@ -236,14 +236,14 @@ function duo_rules:Check()
 		return
 	end
 
+	local MOONGLADE_SUBZONE = 1450
+	local SCARLET_ENCLAVE_SUBZONE = 124
+
 	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
 	local teammate_subzone = C_Map.GetBestMapForUnit(member_str) -- subzone
     
     local my_zone = C_Map.GetMapInfo(my_map).parentMapID -- parent zone
     local teammates_zone = C_Map.GetMapInfo(teammates_subzone).parentMapID -- parent zone
-
-	local MOONGLADE_SUBZONE = 1450
-	local SCARLET_ENCLAVE_SUBZONE = 124
 
     if my_subzone == MOONGLADE_SUBZONE or teammate_subzone == MOONGLADE_SUBZONE or my_subzone == 124 or teammates_subzone == 124 then
 		-- Moonglade/Scarlet enclave subzones are exempt
