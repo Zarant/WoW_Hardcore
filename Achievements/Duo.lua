@@ -245,7 +245,7 @@ function duo_rules:Check()
     local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
     local teammate_zone = C_Map.GetMapInfo(teammate_subzone).parentMapID -- parent zone
 
-    if my_subzone == MOONGLADE_SUBZONE or teammate_subzone == MOONGLADE_SUBZONE or my_subzone == 124 or teammate_subzone == 124 then
+    if my_subzone == MOONGLADE_SUBZONE or teammate_subzone == MOONGLADE_SUBZONE or my_subzone == SCARLET_ENCLAVE_SUBZONE or teammate_subzone == SCARLET_ENCLAVE_SUBZONE then
 		-- Moonglade/Scarlet enclave subzones are exempt
         duo_rules:ResetWarn()
     elseif my_zone ~= teammates_zone then
