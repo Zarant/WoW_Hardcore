@@ -236,20 +236,28 @@ function duo_rules:Check()
 		return
 	end
 
-	local my_map = C_Map.GetBestMapForUnit("player")
-	local teammates_map = C_Map.GetBestMapForUnit(member_str)
+	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
+	local teammate_subzone = C_Map.GetBestMapForUnit(member_str) -- subzone
+    
+    local my_zone = C_Map.GetMapInfo(my_map).parentMapID -- parent zone
+    local teammates_zone = C_Map.GetMapInfo(teammates_map).parentMapID -- parent zone
 
-	if my_map == 1450 or teammates_map == 1450 or my_map == 124 or teammates_map == 124 then -- Moonglade/Scarlet enclave
-		duo_rules:ResetWarn()
-	elseif my_map ~= teammates_map then
-		Hardcore:Print("Duo check: Partner is in another subzone")
-		duo_rules.warning_reason = "Warning - Partner is in another subzone."
-		duo_rules:Warn()
-		return
-	end
-	if checkHardcoreStatus == true then
-		duo_rules:ResetWarn()
-	end
+	local MOONGLADE_SUBZONE = 1450
+	local SCARLET_ENCLAVE_SUBZONE = 124
+
+    if my_subzone == MOONGLADE_SUBZONE or teammate_subzone == MOONGLADE_SUBZONE or my_subzone == 124 or teammates_subzone == 124 then
+		-- Moonglade/Scarlet enclave subzones are exempt
+        duo_rules:ResetWarn()
+    elseif my_zone ~= teammates_zone then
+		-- important that this check is on zone not subzone
+        Hardcore:Print("Duo check: Partner is in another zone")
+        duo_rules.warning_reason = "Warning - Partner is in another zone."
+        duo_rules:Warn()
+        return
+    end
+    if checkHardcoreStatus == true then
+        duo_rules:ResetWarn()
+    end
 end
 
 -- Register Definitions
