@@ -239,15 +239,36 @@ function duo_rules:Check()
 	local MOONGLADE_SUBZONE = 1450
 	local SCARLET_ENCLAVE_SUBZONE = 124
 
+	local CITY_SUBZONES = {
+		[84] = "Stormwind",
+		[87] = "Ironforge",
+		[88] = "Darnassus",
+		[362] = "Thunder Bluff",
+		[90] = "Undercity",
+		[85] = "Orgrimmar",
+		[161] = "Shattrath City",
+		[125] = "Dalaran",
+	}
+
 	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
 	local teammate_subzone = C_Map.GetBestMapForUnit(member_str) -- subzone
     
     local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
     local teammate_zone = C_Map.GetMapInfo(teammate_subzone).parentMapID -- parent zone
 
+	-- [RULES] --
+	
+	-- if a duo member is in moonglade/scarlet, they are to be treated as if they're in the same subzone as you
+	-- if a duo member is in a city, pass if both are in the city (r exempt, above)
+	-- duo members must share a zone id (elwynn)
+
+
+
     if my_subzone == MOONGLADE_SUBZONE or teammate_subzone == MOONGLADE_SUBZONE or my_subzone == SCARLET_ENCLAVE_SUBZONE or teammate_subzone == SCARLET_ENCLAVE_SUBZONE then
 		-- Moonglade/Scarlet enclave subzones are exempt
         duo_rules:ResetWarn()
+	elseif CITY_SUBZONES[my_subzone] and my_zone == teammates_subzone then
+		duo_rules:ResetWarn()
     elseif my_zone ~= teammates_zone then
 		-- important that this check is on zone not subzone
         Hardcore:Print("Duo check: Partner is in another zone")
