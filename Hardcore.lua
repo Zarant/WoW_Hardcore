@@ -224,7 +224,6 @@ local GRIEFING_MOBS = {
 	["Volchan"] = 1,
 	["Twilight Fire Guard"] = 1,
 	["Hakkari Oracle"] = 1,
-	-- ["Forest Spider"] = 1,
 }
 
 -- dungeon tracking
@@ -455,6 +454,17 @@ local function SlashHandler(msg, editbox)
 	elseif cmd == "debug" then
 		debug = not debug
 		Hardcore:Print("Debugging set to " .. tostring(debug))
+		-- expand the mobs to allow for anti-grief testing in elwynn
+		GRIEFING_MOBS = {
+			["Anvilrage Overseer"] = 1,
+			["Infernal"] = 1,
+			["Teremus the Devourer"] = 1,
+			["Volchan"] = 1,
+			["Twilight Fire Guard"] = 1,
+			["Hakkari Oracle"] = 1,
+			["Forest Spider"] = 1,
+			["Mangy Wolf"] = 1,
+		}
 	elseif cmd == "alerts" then
 		Hardcore_Toggle_Alerts()
 		if Hardcore_Settings.notify then

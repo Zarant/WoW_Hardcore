@@ -355,6 +355,7 @@ function HCCommonPassiveAchievementCraftedCheck(_achievement, _event, _args)
 end
 
 function HCCommonPassiveAchievementProfLevelCheck(_achievement, _event, _args)
+	if _achievement.level_cap and UnitLevel("player") > _achievement.level_cap then return end
 	if _event == "SKILL_LINES_CHANGED" or _event == "PLAYER_ENTERING_WORLD" then
 		for i = 1, GetNumSkillLines() do
 			local arg, _, _, lvl = GetSkillLineInfo(i)

@@ -43,20 +43,54 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		scroll_container:AddChild(scroll_frame)
 
 		local first_menu_description_title = AceGUI:Create("Label")
-		first_menu_description_title:SetWidth(500)
+		first_menu_description_title:SetFullWidth(1)
 		first_menu_description_title:SetText("Welcome to Classic hardcore!")
 		first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 		-- first_menu_description_title:SetPoint("TOP", 2,5)
 		scroll_frame:AddChild(first_menu_description_title)
 
 		local first_menu_description = AceGUI:Create("Label")
-		first_menu_description:SetWidth(550)
+		first_menu_description:SetFullWidth(1)
 		first_menu_description:SetText(
-			"\n\nIf playing in a duo or trio, click the `Party` tab.\n\nTo select achievements, click on an icon in the achievement tab.\n\nAt any point during the run, open the HC tab on the character screen to check party status and achievements. \n\nThis window will not appear past level 2 and configuration cannot be changed later so make sure to fill these out correctly."
+			"\n\nIf playing in a duo or trio, click the `Party` tab.\n\n" .. 
+			"To select achievements, click on an icon in the achievement tab.\n\n" .. 
+			"At any point during the run, open the HC tab on the character screen to check party status and achievements.\n\n" ..
+			"This window will not appear past level 2 and configuration cannot be changed later so make sure to fill these out correctly." ..
+			"\n\n\n"
 		)
 		first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		-- first_menu_description:SetPoint("TOP", 2,5)
 		scroll_frame:AddChild(first_menu_description)
+
+		-- ToS-style "I Agree"
+		local second_menu_description_title = AceGUI:Create("Label")
+		second_menu_description_title:SetFullWidth(1)
+		second_menu_description_title:SetText("The Hardcore Contract")
+		second_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+		scroll_frame:AddChild(second_menu_description_title)
+
+		local second_menu_description_subtitle = AceGUI:Create("Label")
+		second_menu_description_subtitle:SetFullWidth(1)
+		second_menu_description_subtitle:SetText("Join the Discord!")
+		second_menu_description_subtitle:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
+		scroll_frame:AddChild(second_menu_description_subtitle)
+
+		local second_menu_description = AceGUI:Create("Label")
+		second_menu_description:SetFullWidth(1)
+		second_menu_description:SetText(
+			"\n\n" .. 
+			"By clicking the button below, you agree to the following statements:\n\n" .. 
+			"+ \"I have read the rules (#hardcore-rules, Discord)\"\n\n" .. 
+			"+ \"I have read the FAQ (#faq, Discord)\"\n\n" .. 
+			"+ \"I understand that disconnect appeal approval requires video of both pre-disconnect activity and the reconnect/login process,\"\n\n" ..
+			"+ \"I accept responsibility for /reloading regularly and logging out cleanly to protect my data,\"\n\n" .. 
+			"+ \"I understand that buffing a PvP-flagged player will cause me to become PvP-flagged, and I may die,\"\n\n" .. 
+			"+ \"I understand that my presence in official guilds is subject to the Discord and Guild Rules (#getting-started, Discord)\"\n\n" ..  
+			"+ \"I understand that non-Classic HC affiliated guilds do not follow our standards, and thus are at your own risk.\"\n\n" .. 
+			""
+		)
+		second_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		-- first_menu_description:SetPoint("TOP", 2,5)
+		scroll_frame:AddChild(second_menu_description)
 	end
 
 
