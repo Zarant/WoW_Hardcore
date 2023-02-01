@@ -296,32 +296,59 @@ function trio_rules:Check()
 	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
 	local teammate_subzone_1 = C_Map.GetBestMapForUnit(member_str_1) -- subzone
 	local teammate_subzone_2 = C_Map.GetBestMapForUnit(member_str_2) -- subzone
-    
-    local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
-    local teammate_zone_1 = C_Map.GetMapInfo(teammate_subzone_1).parentMapID -- parent zone
-    local teammate_zone_2 = C_Map.GetMapInfo(teammate_subzone_2).parentMapID -- parent zone
 
-	local MOONGLADE_SUBZONE = 1450
-	local SCARLET_ENCLAVE_SUBZONE = 124
+	local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
+	local teammate_zone_1 = C_Map.GetMapInfo(teammate_subzone_1).parentMapID -- parent zone
+	local teammate_zone_2 = C_Map.GetMapInfo(teammate_subzone_2).parentMapID -- parent zone
 
-    if (my_subzone == MOONGLADE_SUBZONE or teammate_subzone_1 == MOONGLADE_SUBZONE or teammate_subzone_2 == MOONGLADE_SUBZONE) 
-	or (my_subzone == SCARLET_ENCLAVE_SUBZONE or teammate_subzone_1 == SCARLET_ENCLAVE_SUBZONE or teammate_subzone_2 == SCARLET_ENCLAVE_SUBZONE) then
-		-- Moonglade/Scarlet enclave subzones are exempt
-        duo_rules:ResetWarn()
-    elseif (my_zone ~= teammate_zone_1) or (my_zone ~= teammate_zone_2) or (teammate_zone_1 ~= teammate_zone_2) then
-		-- important that this check is on zone not subzone
-        Hardcore:Print("Trio check: Partner(s) in another zone!")
-        trio_rules.warning_reason = "Warning - Partner(s() another zone."
-        trio_rules:Warn()
-        return
-    end
-    if checkHardcoreStatus == true then
-        duo_rules:ResetWarn()
-    end
+	local my_class = UnitClass("player")
+	local teammate_class_1 = UnitClass(member_str_1)
+	local teammate_class_2 = UnitClass(member_str_2)
 
-	if checkHardcoreStatus() == true then
+	local CITY_SUBZONES = {
+		[84] = "Stormwind",
+		[87] = "Ironforge",
+		[88] = "Darnassus",
+		[362] = "Thunder Bluff",
+		[90] = "Undercity",
+		[85] = "Orgrimmar",
+		[161] = "Shattrath City",
+		[125] = "Dalaran",
+	}
+
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+
+	local CITY_AND_EXEMPT_SUBZONES = {}
+	for i, v in ipairs(CITY_SUBZONES) do table.insert(COMBINED_SUBZONES, v) end
+	for i, v in ipairs(EXEMPT_SUBZONES) do table.insert(COMBINED_SUBZONES, v) end
+
+	-- note: any exemptions here for Moonglade and Scarlet Enclave take class into account
+
+	if trio_rules:city_or_exempt_subzone(my_subzone, my_class) and 
+			trio_rules:city_or_exempt_subzone(teammate_subzone_1, teammate_class_1) and 
+			trio_rules:city_or_exempt_subzone(teammate_subzone_2, teammate_class_2) then
+		-- if I am in a city, my partners must also be in the same city (same subzone)
 		trio_rules:ResetWarn()
-	end
+
+	elseif trio_rules:same_or_exempt_zone(my_subzone, teammate_subzone_1, teammate_class_1) and 
+			trio_rules:same_or_exempt_zone(my_subzone, teammate_subzone_2, teammate_class_2) then
+		-- otherwise, we must share the same zone
+		trio_rules:ResetWarn()
+
+	elseif checkHardcoreStatus() == true then
+		trio_rules:ResetWarn()
+
+	else
+		Hardcore:Print("Trio check: Partner(s) in another zone!")
+		trio_rules.warning_reason = "Warning - Partner(s() another zone."
+		trio_rules:Warn()
+		return
+    end
+
 end
 
 -- Register Definitions
@@ -332,3 +359,57 @@ trio_rules:SetScript("OnEvent", function(self, event, ...)
 		Hardcore:Print("Failed Trio")
 	end
 end)
+
+function trio_rules:city_or_exempt_subzone (needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle subzone matches haystack subzone or is in exempt subzone, return true
+	local CITY_SUBZONES = {
+		[84] = "Stormwind",
+		[87] = "Ironforge",
+		[88] = "Darnassus",
+		[362] = "Thunder Bluff",
+		[90] = "Undercity",
+		[85] = "Orgrimmar",
+		[161] = "Shattrath City",
+		[125] = "Dalaran",
+	}
+	local EXEMPT_SUBZONES = { -- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return CITY_SUBZONES[needle_subzone]
+	end
+end
+
+function trio_rules:same_or_exempt_subzone (haystack_subzone, needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle subzone matches haystack subzone or is in exempt subzone, return true
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return needle_subzone == haystack_subzone
+	end
+end
+
+function  trio_rules:same_or_exempt_zone (haystack_subzone, needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle zone matches haystack zone, or is in exempt subzone, return true
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return C_Map.GetMapInfo(haystack_subzone).parentMapID == C_Map.GetMapInfo(needle_subzone).parentMapID -- parent zone
+	end
+end

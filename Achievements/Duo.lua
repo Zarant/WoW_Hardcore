@@ -236,8 +236,14 @@ function duo_rules:Check()
 		return
 	end
 
-	local MOONGLADE_SUBZONE = 1450
-	local SCARLET_ENCLAVE_SUBZONE = 124
+	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
+	local teammate_subzone = C_Map.GetBestMapForUnit(member_str) -- subzone
+    
+    local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
+    local teammate_zone = C_Map.GetMapInfo(teammate_subzone).parentMapID -- parent zone
+
+	local my_class = UnitClass("player")
+	local teammate_class = UnitClass(member_str)
 
 	local CITY_SUBZONES = {
 		[84] = "Stormwind",
@@ -250,34 +256,34 @@ function duo_rules:Check()
 		[125] = "Dalaran",
 	}
 
-	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
-	local teammate_subzone = C_Map.GetBestMapForUnit(member_str) -- subzone
-    
-    local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
-    local teammate_zone = C_Map.GetMapInfo(teammate_subzone).parentMapID -- parent zone
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
 
-	-- [RULES] --
-	
-	-- if a duo member is in moonglade/scarlet, they are to be treated as if they're in the same subzone as you
-	-- if a duo member is in a city, pass if both are in the city (r exempt, above)
-	-- duo members must share a zone id (elwynn)
+	local CITY_AND_EXEMPT_SUBZONES = {}
+	for i, v in ipairs(CITY_SUBZONES) do table.insert(COMBINED_SUBZONES, v) end
+	for i, v in ipairs(EXEMPT_SUBZONES) do table.insert(COMBINED_SUBZONES, v) end
 
+	-- note: any exemptions here for Moonglade and Scarlet Enclave take class into account
 
-
-    if my_subzone == MOONGLADE_SUBZONE or teammate_subzone == MOONGLADE_SUBZONE or my_subzone == SCARLET_ENCLAVE_SUBZONE or teammate_subzone == SCARLET_ENCLAVE_SUBZONE then
-		-- Moonglade/Scarlet enclave subzones are exempt
-        duo_rules:ResetWarn()
-	elseif CITY_SUBZONES[my_subzone] and my_zone == teammates_subzone then
+	if duo_rules:city_or_exempt_subzone(my_subzone, my_class) and 
+			duo_rules:city_or_exempt_subzone(teammate_subzone, teammate_class) then
+		-- if I am in a city, my partners must also be in the same city (same subzone)
 		duo_rules:ResetWarn()
-    elseif my_zone ~= teammates_zone then
-		-- important that this check is on zone not subzone
+
+	elseif duo_rules:same_or_exempt_zone(my_subzone, teammate_subzone, teammate_class)  then
+		-- otherwise, we must share the same zone
+		duo_rules:ResetWarn()
+
+	elseif checkHardcoreStatus() == true then
+		duo_rules:ResetWarn()
+	else
         Hardcore:Print("Duo check: Partner is in another zone")
         duo_rules.warning_reason = "Warning - Partner is in another zone."
         duo_rules:Warn()
         return
-    end
-    if checkHardcoreStatus == true then
-        duo_rules:ResetWarn()
     end
 end
 
@@ -289,3 +295,57 @@ duo_rules:SetScript("OnEvent", function(self, event, ...)
 		Hardcore:Print("Failed Duo")
 	end
 end)
+
+function duo_rules:city_or_exempt_subzone (needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle subzone matches haystack subzone or is in exempt subzone, return true
+	local CITY_SUBZONES = {
+		[84] = "Stormwind",
+		[87] = "Ironforge",
+		[88] = "Darnassus",
+		[362] = "Thunder Bluff",
+		[90] = "Undercity",
+		[85] = "Orgrimmar",
+		[161] = "Shattrath City",
+		[125] = "Dalaran",
+	}
+	local EXEMPT_SUBZONES = { -- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return CITY_SUBZONES[needle_subzone]
+	end
+end
+
+function duo_rules:same_or_exempt_subzone (haystack_subzone, needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle subzone matches haystack subzone or is in exempt subzone, return true
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return needle_subzone == haystack_subzone
+	end
+end
+
+function  duo_rules:same_or_exempt_zone (haystack_subzone, needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle zone matches haystack zone, or is in exempt subzone, return true
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return C_Map.GetMapInfo(haystack_subzone).parentMapID == C_Map.GetMapInfo(needle_subzone).parentMapID -- parent zone
+	end
+end
