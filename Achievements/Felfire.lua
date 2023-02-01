@@ -15,22 +15,32 @@ felfire_achievement.forces = {
 	"ImpMaster",
 }
 
+local whitelist = {
+  [16375] = 1, -- Faintly glowing skull
+}
+
+local temporary_disable = false
+
+
 -- Registers
 function felfire_achievement:Register(fail_function_executor)
 	felfire_achievement:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	felfire_achievement:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	felfire_achievement.fail_function_executor = fail_function_executor
 end
 
 function felfire_achievement:Unregister()
 	felfire_achievement:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	felfire_achievement:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 end
 
 -- Register Definitions
 felfire_achievement:SetScript("OnEvent", function(self, event, ...)
 	local arg = { ... }
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		if temporary_disable then return end
 		local combat_log_payload = { CombatLogGetCurrentEventInfo() }
-		-- 2: subevent index, 5: source_name, 14: spell school
+		-- 2: subevent index, 5: source_name, 14: spell school, 12 is spellID but it appears to be broken
 		if not (combat_log_payload[5] == nil) then
 			if combat_log_payload[5] == UnitName("player") then
 				if string.find(combat_log_payload[2], "SPELL_DAMAGE") ~= nil then
@@ -41,5 +51,12 @@ felfire_achievement:SetScript("OnEvent", function(self, event, ...)
 				end
 			end
 		end
+	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+	  if whitelist[arg[3]] then
+	    temporary_disable = true
+	    C_Timer.After(10.0, function()
+	      temporary_disable = false 
+	    end)
+	  end
 	end
 end)

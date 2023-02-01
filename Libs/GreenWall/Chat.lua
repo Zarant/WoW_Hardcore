@@ -106,10 +106,12 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                         gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%q',
                                 frame, event, sender, message)
 
-			local _name, _ = string.split("-", sender)
-			if _G.hc_online_player_ranks[_name] and _G.hc_online_player_ranks[_name] == "officer" then
-			  message = "\124cFFFF0000<MOD>\124r " .. message
+			for banned_tag, _ in pairs(gw_banned_tags) do
+				if message:match("<"..banned_tag..">") then 
+				  return 
+				end
 			end
+
                         gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
                                 sender, language, '', target, flags, 0, 0, '', 0, line, guid)
                     end

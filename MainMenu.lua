@@ -694,48 +694,12 @@ local function DrawRulesTab(container)
 		played_time_label:SetText("|c00FFFF00Max Lvl (WotlK)|r")
 		played_time_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		row_header:AddChild(played_time_label)
+		
+		local max_level_table = DungeonTrackerGetAllDungeonMaxLevels()
+		for i,v in pairs( max_level_table ) do
+			addEntry(scroll_frame, v[1], v[2], v[3])
+		end
 
-		addEntry(scroll_frame, "Ragefire Chasm", 18, 20)
-		addEntry(scroll_frame, "The Deadmines", 26, 24)
-		addEntry(scroll_frame, "Wailing Caverns", 24, 24)
-		addEntry(scroll_frame, "Shadowfang Keep", 30, 25)
-		addEntry(scroll_frame, "Blackfathon Deeps", 32, 28)
-		addEntry(scroll_frame, "Stockades", 32, 29)
-		addEntry(scroll_frame, "Razorfen Kraul", 38, 31)
-		addEntry(scroll_frame, "Gnomeregan", 38, 32)
-		addEntry(scroll_frame, "Razorfen Downs", 46, 41)
-		addEntry(scroll_frame, "Scarlet Monastery", 45, 44)
-		addEntry(scroll_frame, "Uldaman", 51, 44)
-		addEntry(scroll_frame, "Zul'Farrak", 54, 50)
-		addEntry(scroll_frame, "Maraudon", 55, 52)
-		addEntry(scroll_frame, "Sunken Temple", 60, 54)
-		addEntry(scroll_frame, "Blackrock Depths", 60, 60)
-		addEntry(scroll_frame, "Lower Blackrock Spire", 60, 62)
-		addEntry(scroll_frame, "Scholomance", 60, 62)
-		addEntry(scroll_frame, "Dire Maul", 60, 62)
-		addEntry(scroll_frame, "Upper Blackrock Spire", 60, 62)
-		addEntry(scroll_frame, "Stratholme", 60, 62)
-		addEntry(scroll_frame, "Hellfire Ramparts", "---", 64)
-		addEntry(scroll_frame, "Blood Furnace", "---", 65)
-		addEntry(scroll_frame, "The Slave Pens", "---", 66)
-		addEntry(scroll_frame, "The Underbog", "---", 66)
-		addEntry(scroll_frame, "Mana Tombs", "---", 68)
-		addEntry(scroll_frame, "Utgarde Keep", "---", 74)
-		addEntry(scroll_frame, "Nexus", "---", 75)
-		addEntry(scroll_frame, "Azjol-Nerub", "---", 76)
-		addEntry(scroll_frame, "Ahn'kahet", "---", 77)
-		addEntry(scroll_frame, "Drak'Tharon Keep", "---", 78)
-		addEntry(scroll_frame, "Violet Hold", "---", 79)
-		addEntry(scroll_frame, "Grundrak", "---", 80)
-		addEntry(scroll_frame, "Halls of Stone", "---", 80)
-		addEntry(scroll_frame, "Halls of Lightning", "---", 80)
-		addEntry(scroll_frame, "The Culling of Stratholme", "---", 80)
-		addEntry(scroll_frame, "The Oculus", "---", 80)
-		addEntry(scroll_frame, "Utgarde Pinnacle", "---", 80)
-		addEntry(scroll_frame, "Forge of Souls", "---", 80)
-		addEntry(scroll_frame, "Pit of Saron", "---", 80)
-		addEntry(scroll_frame, "Halls of Reflection", "---", 80)
-		addEntry(scroll_frame, "Trial of the Champion", "---", 80)
 		addEntry(scroll_frame, "\n\n\n\n", "", "")
 	end
 	DrawRulesLabel("Dungeon Groups", scroll_frame)
@@ -1183,215 +1147,239 @@ end
 
 local function DrawDungeonsTab(container, _hardcore_character)
 
-	local function DrawNameColumn(_scroll_frame, _dt_runs, _dt_pending, _dt_current, width)
-		local entry = AceGUI:Create("SimpleGroup")
-		entry:SetLayout("List")
-		entry:SetWidth(width)
-		_scroll_frame:AddChild(entry)
+	local name_data
+	local level_data
+	local played_data
+	local date_data
+	local boss_data
+	local show_boss_column = false		-- For Zdeyn's boss kill time statistic, just set to true
+	
+	local function UpdateDungeonsData(_dt_runs, _dt_pending, _dt_current)
 
+		-- Initialise data
 		local name_str = ""
+		local date_str = ""
+		local level_str = ""
+		local played_str = ""
+		local boss_str = ""		
+
+		-- Put some example boss data; this should come from some function call in the speedcore code
+		local boss_kill_data = {
+			["Ragefire Chasm"] = { 3600, { "Oggleflint", 1300 }, { "Bazzalan", 3600 } },
+			["Wailing Caverns"] = { 4000, { "Lady Anacondra", 1200 }, { "Verdan the Everliving", 4000 } },
+			["The Deadmines"] = { 0, { "Sneed's Shredder", 1300 }, { "Edwin Van Cleef", 5000 } },
+			["Blackfathom Deeps"] = { 4500, { "Ghamoo-Ra", 1100 }, { "Aku'mai", 4500 } },
+			["Scarlet Monastery (Lib)"] = { 2300, { "Houndmaster Loksey", 900 }, { "Arcanist Doan", 2300 } },
+		}
+		
+		local function GetBossTimeString( the_boss_data, the_name )
+			if the_boss_data ~= nil and the_name ~= nil and the_boss_data[ the_name ] ~= nil then
+				if the_boss_data[ the_name ][1] > 0 then 
+					return SecondsToTime(the_boss_data[ the_name ][1]) .. "\n"
+				else
+					return "X\n"		-- Dungeon done, but end boss not killed
+				end
+			else
+				return "?\n"			-- No info
+			end
+		end
+
+		local now = GetServerTime()
+		
+		-- Go through the complete, idle and active runs
 		local num_lines = 0
 		for i, v in pairs( _dt_runs ) do
 			name_str = name_str .. v.name .. "\n"
+			if v.level > 0 then
+				level_str = level_str .. v.level .. "\n"
+			else
+				level_str = level_str .. "?\n"
+			end
+			if v.time_inside > 0 then
+				played_str = played_str .. SecondsToTime(v.time_inside) .. "\n"
+			else
+				played_str = played_str .. "?\n"
+			end
+			date_str = date_str .. v.date .. "\n"
+			boss_str = boss_str .. GetBossTimeString( boss_kill_data, v.name )
 			num_lines = num_lines + 1
 		end
 		for i, v in pairs( _dt_pending ) do
-			name_str = name_str .. "|c00FFFF00" .. v.name .. " (idle)\n"
+			name_str = name_str .. "|c00FFFF00" .. v.name .. " (idle, " .. SecondsToTime(v.idle_left) .. ")\n"
+			--name_str = name_str .. "|c00FFFF00" .. v.name .. " (re-entry until " .. date("%H:%M:%S", now +  v.idle_left - 30) .. ")\n"
+			level_str = level_str .. v.level .. "\n"
+			played_str = played_str .. SecondsToTime(v.time_inside) .. "\n"
+			date_str = date_str .. v.date .. "\n"
+			boss_str = boss_str .. GetBossTimeString( boss_kill_data, v.name )
 			num_lines = num_lines + 1
 		end
 		if next( _dt_current ) then
 			name_str = name_str .. "|c0000FF00" .. _dt_current.name .. " (active)\n"
+			level_str = level_str .. _dt_current.level .. "\n"
+			played_str = played_str .. SecondsToTime(_dt_current.time_inside) .. "\n"
+			date_str = date_str .. _dt_current.date .. "\n"
+			boss_str = boss_str .. GetBossTimeString( boss_kill_data, _dt_current.name )
 			num_lines = num_lines + 1
 		end
 		
 		-- Make sure we have at least 10 lines, or Ace moves our dungeons down a line
-		num_lines = 8 - num_lines
+		num_lines = 10 - num_lines
 		for i = 1, num_lines do
 			name_str = name_str .. "\n"
+			level_str = level_str .. "\n"
+			played_str = played_str .. "\n"
+			date_str = date_str .. "\n"
+			boss_str = boss_str .. "\n"
 		end
 
-		local name_label = AceGUI:Create("Label")
-		name_label:SetWidth(width)
-		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(name_label)
+		-- Set the new info in the columns
+		name_data:SetText(name_str)
+		date_data:SetText(date_str)
+		level_data:SetText(level_str)
+		played_data:SetText(played_str)
+		if show_boss_column then
+			boss_data:SetText(boss_str)
+		end
 	end
 
-	local function DrawLevelColumn(_scroll_frame, _dt_runs, _dt_pending, _dt_current, width)
-		local entry = AceGUI:Create("SimpleGroup")
-		entry:SetLayout("Flow")
-		entry:SetWidth(width)
-		_scroll_frame:AddChild(entry)
+	-- Add the banner
+	local first_menu_description_title = AceGUI:Create("Label")
+	first_menu_description_title:SetFullWidth(500)
+	first_menu_description_title:SetText("Dungeon runs\n\n")
+	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	tabcontainer:AddChild(first_menu_description_title)
 
-		local name_str = ""
-		local num_lines = 0
-		for i, v in pairs( _dt_runs ) do
-			if v.level > 0 then
-				name_str = name_str .. v.level .. "\n"
-			else
-				name_str = name_str .. "?" .. "\n"
-			end
-			num_lines = num_lines + 1
-		end
-		for i, v in pairs( _dt_pending ) do
-			name_str = name_str .. v.level .. "\n"
-			num_lines = num_lines + 1
-		end
-		if next( _dt_current) then
-			name_str = name_str .. _dt_current.level .. "\n"
-			num_lines = num_lines + 1
-		end
+	local first_menu_description_title = AceGUI:Create("Label")
+	first_menu_description_title:SetFullWidth(500)
+	first_menu_description_title:SetText(
+				"Dungeons marked with (legacy) are old dungeon runs derived " ..
+				"from completed quests.\nA run marked in white is finalised and the dungeon may not be entered again. " ..
+				"A run marked in|c00FFFF00 yellow|c00FFFFFF is pending, and will be finalised after the timer expires. " ..
+				"A run marked in |c0000FF00 green|c00FFFFFF is the one you are currently on.\n\n")
+	first_menu_description_title:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	tabcontainer:AddChild(first_menu_description_title)
 
-		-- Make sure we have at least 10 lines, or Ace moves our dungeons down a line
-		num_lines = 8 - num_lines
-		for i = 1, num_lines do
-			name_str = name_str .. "\n"
-		end
 
-		local name_label = AceGUI:Create("Label")
-		name_label:SetWidth(width)
-		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(name_label)
-	end
-
-	local function DrawPlayedColumn(_scroll_frame, _dt_runs, _dt_pending, _dt_current, width)
-		local entry = AceGUI:Create("SimpleGroup")
-		entry:SetLayout("Flow")
-		entry:SetWidth(width)
-		_scroll_frame:AddChild(entry)
-
-		local name_str = ""
-		local num_lines = 0
-		for i, v in pairs( _dt_runs ) do
-			if v.time_inside > 0 then
-				name_str = name_str .. SecondsToTime(v.time_inside) .. "\n"
-			else
-				name_str = name_str .. "?" .. "\n"
-			end
-			num_lines = num_lines + 1
-		end
-		for i, v in pairs( _dt_pending ) do
-			name_str = name_str .. SecondsToTime(v.time_inside) .. "\n"
-			num_lines = num_lines + 1
-		end
-		if next( _dt_current) then
-			name_str = name_str .. SecondsToTime(_dt_current.time_inside) .. "\n"
-			num_lines = num_lines + 1
-		end
-
-		-- Make sure we have at least 10 lines, or Ace moves our dungeons down a line
-		num_lines = 8 - num_lines
-		for i = 1, num_lines do
-			name_str = name_str .. "\n"
-		end
-
-		local name_label = AceGUI:Create("Label")
-		name_label:SetWidth(width)
-		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(name_label)
-	end
-
-	local function DrawDateColumn(_scroll_frame, _dt_runs, _dt_pending, _dt_current, width)
-		local entry = AceGUI:Create("SimpleGroup")
-		entry:SetLayout("Flow")
-		entry:SetWidth(width)
-		_scroll_frame:AddChild(entry)
-
-		local name_str = ""
-		local num_lines = 0
-		for i, v in pairs( _dt_runs ) do
-			name_str = name_str .. v.date .. "\n"
-			num_lines = num_lines + 1
-		end
-		for i, v in pairs( _dt_pending ) do
-			name_str = name_str .. v.date .. "\n"
-			num_lines = num_lines + 1
-		end
-		if next( _dt_current ) then
-			name_str = name_str .. _dt_current.date .. "\n"
-			num_lines = num_lines + 1
-		end
-
-		-- Make sure we have at least 10 lines, or Ace moves our dungeons down a line
-		num_lines = 8 - num_lines
-		for i = 1, num_lines do
-			name_str = name_str .. "\n"
-		end
-
-		local name_label = AceGUI:Create("Label")
-		name_label:SetWidth(width)
-		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(name_label)
-	end
-
+	-- Start making the interface, start with a big frame to hold them all
 	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetWidth(700)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("List")
-	container:AddChild(scroll_container)
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetHeight(393)
+	scroll_container:SetLayout("Fill")
+	tabcontainer:AddChild(scroll_container)
 
+	-- Add the scrolling part of the frame
 	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("Flow")
-	scroll_frame:SetHeight(500)
+	scroll_frame:SetLayout("Flow")			-- We want the headers and columns side by side
+	scroll_frame:SetFullWidth(true)
+	scroll_frame:SetFullHeight(true)
 	scroll_container:AddChild(scroll_frame)
 
-	-- Row header
+	-- Row headers next (just the names of the columns)
 	local row_header = AceGUI:Create("SimpleGroup")
 	row_header:SetLayout("Flow")
 	row_header:SetFullWidth(true)
 	scroll_frame:AddChild(row_header)
-
+	-- Name row header
 	local name_label = AceGUI:Create("Label")
-	name_label:SetWidth(530)
+	name_label:SetWidth(405)
 	name_label:SetText("|c00FFFF00Dungeon|r")
 	name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	row_header:AddChild(name_label)
-
-	local level_label = AceGUI:Create("Label")
-	level_label:SetWidth(50)
-	level_label:SetText("|c00FFFF00Lvl|r")
-	level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(level_label)
-
-	local played_time_label = AceGUI:Create("Label")
-	played_time_label:SetWidth(125)
-	played_time_label:SetText("|c00FFFF00Run Time|r")
-	played_time_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	row_header:AddChild(played_time_label)
-
+	-- Date row header
 	local date_label = AceGUI:Create("Label")
 	date_label:SetWidth(125)
 	date_label:SetText("|c00FFFF00Date|r")
 	date_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	row_header:AddChild(date_label)
+	-- Level row header
+	local level_label = AceGUI:Create("Label")
+	level_label:SetWidth(50)
+	level_label:SetText("|c00FFFF00Lvl|r")
+	level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	row_header:AddChild(level_label)
+	-- Run time row header
+	local played_time_label = AceGUI:Create("Label")
+	played_time_label:SetWidth(125)
+	played_time_label:SetText("|c00FFFF00Run Time|r")
+	played_time_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	row_header:AddChild(played_time_label)
+	-- Boss time row header
+	local boss_time_label = AceGUI:Create("Label")
+	boss_time_label:SetWidth(125)
+	if show_boss_column then
+		boss_time_label:SetText("|c00FFFF00Boss Time|r")
+	else
+		boss_time_label:SetText("")			--- Don't write it
+	end
+	boss_time_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	row_header:AddChild(boss_time_label)
 
-	-- Rest of the data
-	DrawNameColumn(scroll_frame, _hardcore_character.dt.runs, _hardcore_character.dt.pending, _hardcore_character.dt.current, 530)
-	DrawLevelColumn(scroll_frame, _hardcore_character.dt.runs, _hardcore_character.dt.pending, _hardcore_character.dt.current, 50)
-	DrawPlayedColumn(scroll_frame, _hardcore_character.dt.runs, _hardcore_character.dt.pending, _hardcore_character.dt.current, 125)
-	DrawDateColumn(scroll_frame, _hardcore_character.dt.runs, _hardcore_character.dt.pending, _hardcore_character.dt.current, 125)
+	-- Create the data fields
+	local data_rows = AceGUI:Create("SimpleGroup")
+	data_rows:SetLayout("Flow")
+	data_rows:SetFullWidth(true)
+	data_rows:SetHeight(500)
+	scroll_frame:AddChild(data_rows)
 
-	-- Some weird shit needed to prevent the last column from moving up
+	-- Name column
+	local entry 		-- Some container that we don't care about
+	name_data = AceGUI:Create("Label")
+	name_data:SetWidth(405)
+	name_data:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	data_rows:AddChild(name_data)
+
+	-- Date column
+	date_data = AceGUI:Create("Label")
+	date_data:SetWidth(125)
+	date_data:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	data_rows:AddChild(date_data)
+
+	-- Level column
+	level_data = AceGUI:Create("Label")
+	level_data:SetWidth(50)
+	level_data:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	data_rows:AddChild(level_data)
+
+	-- Run time column
+	played_data = AceGUI:Create("Label")
+	played_data:SetWidth(125)
+	played_data:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	data_rows:AddChild(played_data)
+	
+	-- Boss column
+	boss_data = AceGUI:Create("Label")
+	boss_data:SetWidth(125)
+	boss_data:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	data_rows:AddChild(boss_data)
+
+	-- Fill in the data into the data fields
+	UpdateDungeonsData( _hardcore_character.dt.runs, _hardcore_character.dt.pending, _hardcore_character.dt.current )
+	
+	-- Some weird stuff needed to prevent the scrollframe from malfunctioning
 	local entry = AceGUI:Create("SimpleGroup")
 	entry:SetLayout("Flow")
-	entry:SetWidth(10)
+	entry:SetFullWidth(true)
 	scroll_frame:AddChild(entry)
 
-	-- Footer below the scroll container
-	local footer_container = AceGUI:Create("SimpleGroup")
+	-- Little bit of empty space below the scroll container
+	local footer_container = AceGUI:Create("Label")
 	footer_container:SetFullWidth(true)
-	footer_container:SetHeight(100)
-	footer_container:SetLayout("Flow")
-	scroll_container:AddChild(footer_container)
+	footer_container:SetHeight(10)
+	footer_container:SetText( "\n" )
+	tabcontainer:AddChild(footer_container)
 
+	-- Status label at the bottom
 	local status_label = AceGUI:Create("Label")
 	status_label:SetWidth(350)
 	status_label:SetText("|c00FFFF00You've run " .. #_hardcore_character.dt.runs .. " dungeons.|r")
 	status_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	footer_container:AddChild(status_label)
+	tabcontainer:AddChild(status_label)
+
+	-- Start the ticker that updates the data in the dungeons tab (it gets cancelled in SelectGroup() when you change tabs)
+	hardcore_modern_menu_state.ticker_handler = C_Timer.NewTicker(1, function()
+		UpdateDungeonsData( _hardcore_character.dt.runs, _hardcore_character.dt.pending, _hardcore_character.dt.current )
+	end)
+
 
 end
 

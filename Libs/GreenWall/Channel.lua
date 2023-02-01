@@ -276,11 +276,7 @@ end
 function GwChannel:tl_send(type, message)
     local opcode
     if type == GW_MTYPE_CHAT then
-    if Hardcore_Settings.rank_type and Hardcore_Settings.rank_type == "officer" then
-      opcode = 'L'
-    else
       opcode = 'C'
-    end
     elseif type == GW_MTYPE_BROADCAST then
         opcode = 'B'
     elseif type == GW_MTYPE_NOTICE then
@@ -302,6 +298,14 @@ function GwChannel:tl_send(type, message)
     -- Send the message
     self:tl_enqueue(segment)
     self:tl_flush()
+
+    -- Format the message segment
+    if (Hardcore_Settings.rank_type and Hardcore_Settings.rank_type == "officer") or 1==1 then
+	    local segment = strsub(strjoin('#', "L", gw.config.guild_id, '', ""), 1, GW_MAX_MESSAGE_LENGTH)
+	    -- Send the message
+	    self:tl_enqueue(segment)
+	    self:tl_flush()
+    end
 end
 
 --- Add a segment to the channel transmit queue.

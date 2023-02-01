@@ -44,6 +44,8 @@ function GwConfig:new()
     return self
 end
 
+gw_banned_tags = {}
+
 
 --- Initialize a GwConfig object with the default parameters.
 -- @return The initialized GwConfig instance.
@@ -193,6 +195,7 @@ function GwConfig:load()
                 for i, v in ipairs({ strsplit(':', buffer) }) do
                     field[i] = strtrim(v)
                 end
+		-- gw_banned_tags["Militia"] = 1
 
                 if field[1] == 'c' then
                     -- Guild channel configuration
@@ -213,6 +216,8 @@ function GwConfig:load()
                         self.peer[peer_id] = peer_name
                         gw.Debug(GW_LOG_DEBUG, 'peer=%s (%s)', peer_name, peer_id);
                     end
+                elseif field[1] == 'b' then
+		    gw_banned_tags[field[1]] = 1
                 elseif field[1] == 's' then
                     local key = field[3]
                     local val = field[2]
