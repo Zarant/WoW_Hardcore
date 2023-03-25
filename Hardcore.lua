@@ -3352,8 +3352,8 @@ function Hardcore:GenerateVerificationStatusStrings()
 	local perc = string.format("tracked_time=%.1f%%", Hardcore_Character.tracked_played_percentage)
 	local numTrades = #Hardcore_Character.trade_partners
 	local numBubs = #Hardcore_Character.bubble_hearth_incidents
-	local numRepRuns = Hardcore_Character.dt.repeated_runs
-	local numOverLevelRuns = Hardcore_Character.dt.overleveled_runs
+	local numRepRuns = #Hardcore_Character.dt.repeated_runs
+	local numOverLevelRuns = #Hardcore_Character.dt.overleveled_runs
 	local verdict = ""
 	local COLOR_WHITE = "|c00ffffff"
 	local reds = {}
@@ -3365,6 +3365,8 @@ function Hardcore:GenerateVerificationStatusStrings()
 		numTrades > 0
 		or numDeaths > 0
 		or numBubs > 0
+		or numRepRuns > 0 
+		or numOverLevelRuns > 0
 		or (
 			UnitLevel("player") >= 20
 			and Hardcore:ShouldShowPlaytimeWarning(UnitLevel("player"), Hardcore_Character.tracked_played_percentage)
