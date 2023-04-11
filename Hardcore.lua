@@ -703,18 +703,24 @@ local function SlashHandler(msg, editbox)
 	elseif cmd == "DuoTrioStatus" then
 		-- Output debugging information to fix up Duo/Trio status
 		local HC = Hardcore_Character
-		local message = "DuoTrioStatus: T1="
-		if HC.team ~= nil and HC.team[1] ~= nil then
-			message = message .. HC.team[1]
+		local message = "DuoTrioStatus: T="
+		if HC.team == nil then
+		  message = message .. "(nil)"
 		else
-			message = message .. "(nil)"
-		end
-		message = message .. " T2="
-		if HC.team ~= nil and HC.team[2] ~= nil then
-			message = message .. HC.team[2]
-		else
-			message = message .. "(nil)"
-		end
+			message = message .. "{T1="
+			if HC.team[1] ~= nil then
+				message = message .. HC.team[1]
+			else
+				message = message .. "(nil)"
+			end		
+			message = message .. ", T2="
+			if HC.team[2] ~= nil then
+				message = message .. HC.team[2]
+			else
+				message = message .. "(nil)"
+			end			
+			message = message .. "}"
+		end  
 		message = message .. " P="
 		if HC.party_mode ~= nil then
 			message = message .. HC.party_mode
