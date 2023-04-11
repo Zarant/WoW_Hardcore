@@ -705,7 +705,7 @@ local function SlashHandler(msg, editbox)
 		local HC = Hardcore_Character
 		local message = "DuoTrioStatus: T="
 		if HC.team == nil then
-		  message = message .. "(nil)"
+			message = message .. "(nil)"
 		else
 			message = message .. "{T1="
 			if HC.team[1] ~= nil then
