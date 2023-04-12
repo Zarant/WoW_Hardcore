@@ -1570,6 +1570,7 @@ local function DungeonTracker()
 			Hardcore:Debug("Looking for missing and mergeable runs...")
 			DungeonTrackerFindMissingRunsFromQuests()
 			DungeonTrackerFindMergeableRuns()
+			DungeonTrackerUpdateInfractions()
 		end)
 	end
 
