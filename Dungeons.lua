@@ -1501,6 +1501,31 @@ local function DungeonTrackerFindMergeableRuns()
 	return something_removed
 end
 
+-- DungeonTrackerGetVerificationData()
+--
+-- Returns the three fields of data that need to go into the verification string
+
+function DungeonTrackerGetVerificationData()
+
+	local overleveled_runs = 0
+	local repeated_runs = 0
+	--local unverified_partners = "Malfino[?],Alice[0.11.15],Bob[?]"
+	local unverified_partners = ""
+
+	if Hardcore_Character.dt ~= nil then
+		if Hardcore_Character.dt.repeated_runs ~= nil then
+			repeated_runs = Hardcore_Character.dt.repeated_runs
+		end
+		if Hardcore_Character.dt.overleveled_runs ~= nil then
+			overleveled_runs = Hardcore_Character.dt.overleveled_runs
+		end
+	end
+
+	return repeated_runs, overleveled_runs, unverified_partners
+
+end
+
+
 
 -- DungeonTracker
 --

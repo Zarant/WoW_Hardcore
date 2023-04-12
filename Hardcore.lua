@@ -3368,6 +3368,8 @@ function Hardcore:GenerateVerificationStatusStrings()
 		numTrades > 0
 		or numDeaths > 0
 		or numBubs > 0
+		or numRepRuns > 0
+		or numOverLevelRuns > 0
 		or (
 			UnitLevel("player") >= 20
 			and Hardcore:ShouldShowPlaytimeWarning(UnitLevel("player"), Hardcore_Character.tracked_played_percentage)
@@ -3455,10 +3457,14 @@ function Hardcore:GenerateVerificationString()
 		Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode), ATTRIBUTE_SEPARATOR)
 	local bubbleHearthIncidentsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.bubble_hearth_incidents)
 	local playedtimeGapsVerificationString = Hardcore_tableToUnicode(Hardcore_Character.played_time_gap_warnings)
+	local d1, d2, d3 = DungeonTrackerGetVerificationData()
 	return Hardcore_join({
 		baseVerificationString,
 		bubbleHearthIncidentsVerificationString,
 		playedtimeGapsVerificationString,
+		Hardcore_stringOrNumberToUnicode(d1),
+		Hardcore_stringOrNumberToUnicode(d2),
+		Hardcore_stringOrNumberToUnicode(d3)
 	}, ATTRIBUTE_SEPARATOR)
 end
 

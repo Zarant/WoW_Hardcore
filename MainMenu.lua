@@ -642,10 +642,14 @@ local function DrawVerifyTab(container, _hardcore_character)
 		local bubbleHearthIncidentsVerificationString =
 			Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
 		local playedtimeGapsVerificationString = Hardcore_tableToUnicode(_hardcore_character.played_time_gap_warnings)
+		local d1, d2, d3 = DungeonTrackerGetVerificationData()
 		return Hardcore_join({
 			baseVerificationString,
 			bubbleHearthIncidentsVerificationString,
 			playedtimeGapsVerificationString,
+			Hardcore_stringOrNumberToUnicode(d1),
+			Hardcore_stringOrNumberToUnicode(d2),
+			Hardcore_stringOrNumberToUnicode(d3)
 		}, ATTRIBUTE_SEPARATOR)
 	end
 
