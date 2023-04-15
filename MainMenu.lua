@@ -696,7 +696,8 @@ local function DrawVerifyTab(container, _hardcore_character)
 			"\n\n" .. name 
 		.. " (lvl " .. level .. " " .. race .. " " .. class .. ") on " .. realm
 		.. "\n [" .. party_mode .. ", " 
-		.. team_1 .. ", " .. team_2 .. "]\n\n"
+		.. team_1 .. ", " .. team_2 .. "]\n"
+		.. "Played: " .. math.floor(0.5 + _hardcore_character.time_played / 360) / 10 .. " hrs\n\n"
 	)
 
 	character_and_level_label:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
