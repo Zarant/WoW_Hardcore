@@ -672,9 +672,9 @@ local function DrawVerifyTab(container, _hardcore_character)
 
 	local max_level = 60
 	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
+		(_hardcore_character.game_version ~= "")
+		and (_hardcore_character.game_version ~= "Era")
+		and (_hardcore_character.game_version ~= "SoM")
 	then
 		max_level = 80
 	end
@@ -1329,6 +1329,15 @@ local function GetSpacelessRealmName()
 end
 
 local function DrawAccountabilityTab(container)
+	local subtitles = {
+	  {"name", 0, "LEFT"},
+	  {"level_label", 105, "RIGHT"},
+	  {"version_label", 160, "LEFT"},
+	  {"party_mode_label", 240, "LEFT"},
+	  {"first_recorded_label", 315, "LEFT"},
+	  {"achievement_label", 400, "LEFT"},
+	  {"hc_tag_label", 720, "LEFT"}
+	}
 	local function updateLabelData(_label_tbls, player_name_short)
 		if other_hardcore_character_cache[player_name_short] ~= nil then
 			_label_tbls["party_mode_label"]:SetText(other_hardcore_character_cache[player_name_short].party_mode)
@@ -1361,7 +1370,7 @@ local function DrawAccountabilityTab(container)
 					end
 				end
 				_label_tbls["achievement_label"]:SetText(inline_text)
-				_label_tbls["achievement_label"]:SetCallback("OnEnter", function(widget)
+				_label_tbls["mouseover_frame"]:SetCallback("OnEnter", function(widget)
 					GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
 					GameTooltip:AddLine("achievements")
 					for i, achievement_name in ipairs(other_hardcore_character_cache[player_name_short].achievements) do
@@ -1378,11 +1387,9 @@ local function DrawAccountabilityTab(container)
 					end
 					GameTooltip:Show()
 				end)
-				_label_tbls["achievement_label"]:SetCallback("OnLeave", function(widget)
+				_label_tbls["mouseover_frame"]:SetCallback("OnLeave", function(widget)
 					GameTooltip:Hide()
 				end)
-			else
-				_label_tbls["achievement_label"]:SetText("")
 			end
 			_label_tbls["hc_tag_label"]:SetText(
 				other_hardcore_character_cache[player_name_short].hardcore_player_name or ""
@@ -1417,55 +1424,39 @@ local function DrawAccountabilityTab(container)
 			_label_tbls["level_label"]:SetText(hardcore_modern_menu_state.guild_online[player_name_long].level)
 		end
 	end
+	local row_idx_counter = 1
 	local function addEntry(_scroll_frame, player_name_short, _self_name)
 		--local _player_name = player_name_short .. "-" .. GetSpacelessRealmName()
-		local entry = AceGUI:Create("SimpleGroup")
-		entry:SetLayout("Flow")
-		entry:SetFullWidth(true)
+		local entry = AceGUI:Create("InteractiveLabel")
+		entry:SetWidth(1200)
+		entry:SetHeight(40)
+		entry:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
+		entry:SetText("                                               ")
 		_scroll_frame:AddChild(entry)
 
-		local name_label = AceGUI:Create("Label")
-		name_label:SetWidth(110)
-		name_label:SetText(player_name_short)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(name_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short] = {}
+		if hardcore_modern_menu_state.entry_tbl[player_name_short] == nil then hardcore_modern_menu_state.entry_tbl[player_name_short] = {} end
+		if hardcore_modern_menu_state.entry_tbl[player_name_short]["background"] == nil then hardcore_modern_menu_state.entry_tbl[player_name_short]["background"] = entry.frame:CreateTexture(nil, "HIGH") end
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:SetPoint("CENTER", entry.frame, "CENTER", 0,0)
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:SetDrawLayer("OVERLAY",2)
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:SetVertexColor(.5, .5, .5, (row_idx_counter%2)/10)
+		row_idx_counter = row_idx_counter + 1
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:SetHeight(16)
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:SetWidth(1200)
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["background"]:Show()
 
-		local level_label = AceGUI:Create("Label")
-		level_label:SetWidth(50)
-		level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(level_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["level_label"] = level_label
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["mouseover_frame"] = entry 
 
-		local version_label = AceGUI:Create("Label")
-		version_label:SetWidth(80)
-		version_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(version_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["version_label"] = version_label
+		for idx,v in ipairs(subtitles) do
+		  hardcore_modern_menu_state.entry_tbl[player_name_short][v[1]] = entry.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		  hardcore_modern_menu_state.entry_tbl[player_name_short][v[1]]:SetPoint("LEFT", entry.frame, "LEFT", v[2], 0)
+		  hardcore_modern_menu_state.entry_tbl[player_name_short][v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		  hardcore_modern_menu_state.entry_tbl[player_name_short][v[1]]:SetJustifyH(v[3])
+		  hardcore_modern_menu_state.entry_tbl[player_name_short][v[1]]:SetTextColor(1,1,1)
+		  hardcore_modern_menu_state.entry_tbl[player_name_short][v[1]]:Show()
+		end
+		hardcore_modern_menu_state.entry_tbl[player_name_short]["name"]:SetText(player_name_short)
 
-		local party_mode_label = AceGUI:Create("Label")
-		party_mode_label:SetWidth(75)
-		party_mode_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(party_mode_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["party_mode_label"] = party_mode_label
-
-		local first_recorded_label = AceGUI:Create("Label")
-		first_recorded_label:SetWidth(85)
-		first_recorded_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(first_recorded_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["first_recorded_label"] = first_recorded_label
-
-		local achievement_label = AceGUI:Create("InteractiveLabel")
-		achievement_label:SetWidth(320)
-		achievement_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(achievement_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["achievement_label"] = achievement_label
-
-		local hc_tag_label = AceGUI:Create("Label")
-		hc_tag_label:SetWidth(75)
-		hc_tag_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(hc_tag_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["hc_tag_label"] = hc_tag_label
 
 		updateLabelData(hardcore_modern_menu_state.entry_tbl[player_name_short], player_name_short) -- , _player_name)
 	end
@@ -1492,7 +1483,6 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(name_label)
 
 	name_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1511,7 +1501,7 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(level_label)
 
 	level_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
+		-- hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1530,7 +1520,7 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(version_label)
 
 	version_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
+		-- hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1549,7 +1539,7 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(mode_label)
 
 	mode_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
+		-- hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1568,7 +1558,7 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(date_started_label)
 
 	date_started_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
+		-- hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1587,7 +1577,7 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(achievements_label)
 
 	achievements_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
+		-- hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1606,7 +1596,7 @@ local function DrawAccountabilityTab(container)
 	row_header:AddChild(hc_tag_label)
 
 	hc_tag_label:SetCallback("OnClick", function(widget)
-		hardcore_modern_menu_state.entry_tbl = {}
+		-- hardcore_modern_menu_state.entry_tbl = {}
 		hardcore_modern_menu_state.ticker_handler:Cancel()
 		hardcore_modern_menu_state.ticker_handler = nil
 		container:ReleaseChildren()
@@ -1664,6 +1654,19 @@ local function DrawAccountabilityTab(container)
 			end
 		end
 	end)
+
+	  scroll_frame.frame:HookScript("OnHide", function()
+	    if hardcore_modern_menu_state and hardcore_modern_menu_state.entry_tbl then
+	      for k,v in pairs(hardcore_modern_menu_state.entry_tbl) do 
+		for k2,v2 in pairs(v) do
+		  if hardcore_modern_menu_state.entry_tbl[k][k2].Hide then  hardcore_modern_menu_state.entry_tbl[k][k2]:Hide() end
+		  -- hardcore_modern_menu_state.entry_tbl[k][k2] = nil
+		end
+		-- v = nil
+	      end
+	      -- hardcore_modern_menu_state.entry_tbl = {}
+	    end
+	  end)
 end
 
 local function DrawAchievementsTab(container)
@@ -2123,6 +2126,105 @@ local function DrawDeathStatisticsTab(container, _hardcore_settings)
 
 end
 
+local function DrawDataRecoveryTab(container, _hardcore_character)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	tabcontainer:AddChild(scroll_container)
+
+	local scroll_frame = AceGUI:Create("ScrollFrame")
+	scroll_frame:SetLayout("List")
+	scroll_container:AddChild(scroll_frame)
+
+	local first_menu_description_title = AceGUI:Create("Label")
+	first_menu_description_title:SetWidth(500)
+	first_menu_description_title:SetText("Data Recovery\n")
+	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	-- first_menu_description_title:SetPoint("TOP", 2,5)
+	scroll_frame:AddChild(first_menu_description_title)
+
+	local first_menu_description = AceGUI:Create("Label")
+	first_menu_description:SetWidth(700)
+	first_menu_description:SetText("\nYou can attempt to recover your saved data by entering a code here.  Data recovery will not remove death infractions or starting achievements.  Data recover will recover your start date, tracked time, and earned achievements.  You can use this mechanism for multiple computer setups.  Every time you level up, a recovery code is printed to your chat.  You may go to your screenshots and look for recovery codes there if you lose your data.  Use the most recent screenshot and recover code that you can find.")
+	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	scroll_frame:AddChild(first_menu_description)
+
+	local recovery_box = AceGUI:Create("EditBox")
+	recovery_box:SetWidth(700)
+	recovery_box:SetHeight(200)
+	recovery_box:SetDisabled(false)
+	recovery_box:SetLabel("Enter Recovery Code")
+	scroll_frame:AddChild(recovery_box)
+
+	recovery_box:SetCallback("OnEnterPressed", function()
+	  local tracked_time, first_recorded, achievements_list, passive_achievements_list = Hardcore_VerifyRecoveryCode(_hardcore_character, recovery_box:GetText())
+	  if tracked_time and _hardcore_character.time_tracked and tracked_time > _hardcore_character.time_tracked then
+	    _hardcore_character.time_tracked = tracked_time
+	     Hardcore:Print("Recovered tracked time.")
+	  end
+
+	  if first_recorded and _hardcore_character.first_recorded == -1 then
+	    _hardcore_character.first_recorded = first_recorded
+	     Hardcore:Print("Recovered start date.")
+	  end
+
+	  if achievements_list then
+	    for _,v in ipairs(achievements_list) do
+	      local found = false
+	      for _,v2 in ipairs(_hardcore_character.achievements) do
+		if v == v2 then found = true end
+	      end
+	      if found == false then 
+		table.insert(_hardcore_character.achievements, v)
+	        Hardcore:Print("Recovered achievement: " .. v)
+	      end
+	    end
+	  end
+
+	  if passive_achievements_list then
+	    for _,v in ipairs(passive_achievements_list) do
+	      local found = false
+	      for _,v2 in ipairs(_hardcore_character.passive_achievements) do
+		if v == v2 then found = true end
+	      end
+	      if found == false then 
+		table.insert(_hardcore_character.passive_achievements, v)
+	        Hardcore:Print("Recovered achievement: " .. v)
+	      end
+	    end
+	  end
+	end)
+
+	local first_menu_description_title = AceGUI:Create("Label")
+	first_menu_description_title:SetWidth(500)
+	first_menu_description_title:SetText("\n\n\n\n\n\nGenerate Recovery Code\n")
+	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
+	scroll_frame:AddChild(first_menu_description_title)
+
+	local first_menu_description = AceGUI:Create("Label")
+	first_menu_description:SetWidth(700)
+	first_menu_description:SetText("\nWrite down, screenshot, or copy-paste and store the following code to backup verification data.  You can use this code to support multi-computer setups.")
+	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	scroll_frame:AddChild(first_menu_description)
+
+	local first_menu_description = AceGUI:Create("MultiLineEditBox")
+	first_menu_description:SetMaxLetters(0)
+	first_menu_description:SetNumLines(2)
+	first_menu_description:SetWidth(700)
+	first_menu_description:SetLabel("Recovery Code")
+	first_menu_description:DisableButton(true)
+	first_menu_description:SetText(Hardcore_GenerateRecoveryCode(_hardcore_character))
+	scroll_frame:AddChild(first_menu_description)
+
+	local copy_tip_label = AceGUI:Create("Label")
+	local text = "Select All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
+	copy_tip_label:SetText(text)
+	copy_tip_label:SetWidth(700)
+	copy_tip_label:SetFontObject(GameFontHighlightSmall)
+	scroll_frame:AddChild(copy_tip_label)
+end
+
 function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_function)
 	hardcore_modern_menu = AceGUI:Create("HardcoreFrameModernMenu")
 	hardcore_modern_menu:SetCallback("OnClose", function(widget)
@@ -2161,6 +2263,7 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 		{ value = "AccountabilityTab", text = "Accountability" },
 		{ value = "AchievementsTab", text = "Achievements" },
 		{ value = "DeathStatisticsTab", text = "Death Statistics" },
+		{ value = "DataRecoveryTab", text = "Data Recovery" },
 	}
 	if hc_guild_rank_index and hc_guild_rank_index < 2 then -- 0 is GM, 1 is generally officer
 	  table.insert(tab_table, { value = "OfficerToolsTab", text = "Officer Tools" })
@@ -2207,6 +2310,8 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 			achievement_tab_handler:DrawAchievementTab(tabcontainer, _hardcore_character, false)
 		elseif group == "DeathStatisticsTab" then
 			DrawDeathStatisticsTab(tabcontainer, _hardcore_settings)
+		elseif group == "DataRecoveryTab" then
+			DrawDataRecoveryTab(tabcontainer, _hardcore_character)
 		elseif group == "OfficerToolsTab" then
 			DrawOfficerToolsTab(container)
 		end

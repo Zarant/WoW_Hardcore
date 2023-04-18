@@ -163,6 +163,7 @@ npc_to_id.lua
 DeathLog.lua
 AutomaticBackups.lua
 Hardcore.lua
+#tests.lua
 
 Libs/GreenWall/Constants.lua
 Libs/GreenWall/Globals.lua

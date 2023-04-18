@@ -13,6 +13,8 @@
 
 embeds.xml
 
+Libs/ascii85/ascii85.lua
+
 CustomLayouts.lua
 utils.lua
 Hardcore.xml
@@ -163,6 +165,7 @@ npc_to_id_classic.lua
 DeathLog.lua
 AutomaticBackups.lua
 Hardcore.lua
+#tests.lua
 
 Libs/GreenWall/Constants.lua
 Libs/GreenWall/Globals.lua
