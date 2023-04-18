@@ -1,0 +1,3 @@
+local _, addon = ...
+
+addon.deathlog:startup()
