@@ -1,12 +1,12 @@
-local deathlog = require('Modules/deathlog/deathlog')
-local ui_mock = require('Modules.deathlog.ui_mock')
-
 _G.hardcore_settings = {}
 _G.hc_peer_guilds = {}
 _G.date = os.date
 _G.bit = require("bit32")
 _G.GetChannelName = function(name) return 1 end
-_G.CTL = {}
+_G.ChatThrottleLib = {}
+
+local deathlog = require('Modules/deathlog/deathlog')
+local ui_mock = require('Modules.deathlog.ui_mock')
 
 local testPlayer = {
 	name = "Zunter",
@@ -94,13 +94,29 @@ describe('Deathlog', function()
 		assert.stub(deathlog.alertIfValid).was_called_with(testPlayerData)
 	end)
 
-	it('should send the next message in the queue', function()
-		stub(_G.CTL, "SendChatMessage")
+	it('should drain the 3 outbox queues, one message sent per action, pioritizing death ping', function()
+		stub(_G.ChatThrottleLib, "SendChatMessage")
 
-		local checksum = "Zunter-17652"
-		table.insert(deathlog.broadcast_death_ping_queue, checksum)
-		deathlog:sendNextInQueue()
-		assert.stub(_G.CTL.SendChatMessage).was_called()
+		local message = "foo" -- the message on the queues is irrelevant for this test
+		table.insert(deathlog.broadcast_death_ping_queue, message)
+		table.insert(deathlog.broadcast_death_ping_queue, message)
+		table.insert(deathlog.death_alert_out_queue, message)
+		table.insert(deathlog.last_words_queue, message)
+
+		-- check that each time we call checkQueuesAndSend the number of chat messages sent only goes up by 1
+		-- first 2 calls will drain death_ping_queue
+		deathlog:checkQueuesAndSend()
+		assert.stub(_G.ChatThrottleLib.SendChatMessage).was.called(1)
+		deathlog:checkQueuesAndSend()
+		assert.stub(_G.ChatThrottleLib.SendChatMessage).was.called(2)
 		assert.are.equal(0, #deathlog.broadcast_death_ping_queue)
+
+		deathlog:checkQueuesAndSend()
+		assert.stub(_G.ChatThrottleLib.SendChatMessage).was.called(3)
+		assert.are.equal(0, #deathlog.death_alert_out_queue)
+
+		deathlog:checkQueuesAndSend()
+		assert.stub(_G.ChatThrottleLib.SendChatMessage).was.called(4)
+		assert.are.equal(0, #deathlog.last_words_queue)
 	end)
 end)

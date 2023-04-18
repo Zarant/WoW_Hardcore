@@ -1,12 +1,16 @@
-local _, addon = ...
 local deathlog = {}
 
+local _, addon = ...
 -- check if we are running in wow
 if type(addon) == "table" then
-	deathlog = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
+	deathlog = CreateFrame("Frame", "Deathlog", nil, "BackdropTemplate")
 	addon.deathlog = deathlog
 end
 
+local debug = false
+
+local CTL = _G.ChatThrottleLib
+local COMM_NAME = "HCDeathAlerts"
 local COMM_COMMANDS = {
 	["BROADCAST_DEATH_PING"] = "1",
 	["BROADCAST_DEATH_PING_CHECKSUM"] = "2",
@@ -30,7 +34,6 @@ deathlog.last_words = ""
 deathlog.broadcast_death_ping_queue = {}
 deathlog.last_words_queue = {}
 deathlog.death_alert_out_queue = {}
-local f_log = {}
 
 function fletcher16(player_name, player_guild, player_level)
 	local data = player_name .. player_guild .. player_level
@@ -43,7 +46,7 @@ function fletcher16(player_name, player_guild, player_level)
 	return player_name .. "-" .. bit.bor(bit.lshift(sum2, 8), sum1)
 end
 
-local function isValidEntry(_player_data)
+function deathlog.isValidEntry(_player_data)
 	if _player_data == nil then return false end
 	if _player_data["source_id"] == nil then return false end
 	if _player_data["race_id"] == nil or tonumber(_player_data["race_id"]) == nil or C_CreatureInfo.GetRaceInfo(_player_data["race_id"]) == nil then return false end
@@ -53,10 +56,10 @@ local function isValidEntry(_player_data)
 	return true
 end
 
-local function shouldCreateEntry(checksum)
+function deathlog.shouldCreateEntry(checksum)
 	if deathlog.death_ping_lru_cache_tbl[checksum] == nil then return false end
 	if deathlog.death_ping_lru_cache_tbl[checksum]["player_data"] == nil then return false end
-	if hardcore_settings.death_log_types == nil or hardcore_settings.death_log_types == "faction_wide" and isValidEntry(deathlog.death_ping_lru_cache_tbl[checksum]["player_data"]) then
+	if hardcore_settings.death_log_types == nil or hardcore_settings.death_log_types == "faction_wide" and deathlog.isValidEntry(deathlog.death_ping_lru_cache_tbl[checksum]["player_data"]) then
 		if deathlog.death_ping_lru_cache_tbl[checksum]["peer_report"] and deathlog.death_ping_lru_cache_tbl[checksum]["peer_report"] > HC_REQUIRED_ACKS then
 			return true
 		else
@@ -72,37 +75,7 @@ local function shouldCreateEntry(checksum)
 	return false
 end
 
-function deathlog.alertIfValid(_player_data)
-	local race_info = C_CreatureInfo.GetRaceInfo(_player_data["race_id"])
-	local race_str = race_info.raceName
-	local class_str, _, _ = GetClassInfo(_player_data["class_id"])
-	if class_str and RAID_CLASS_COLORS[class_str:upper()] then
-		class_str = "|c" .. RAID_CLASS_COLORS[class_str:upper()].colorStr .. class_str .. "|r"
-	end
-
-	local level_str = tostring(_player_data["level"])
-	local level_num = tonumber(_player_data["level"])
-	local min_level = tonumber(hardcore_settings.minimum_show_death_alert_lvl) or 0
-	if level_num < tonumber(min_level) then
-		return
-	end
-
-	local map_info = nil
-	local map_name = "?"
-	if _player_data["map_id"] then
-		map_info = C_Map.GetMapInfo(_player_data["map_id"])
-	end
-	if map_info then
-		map_name = map_info.name
-	end
-
-	local msg = _player_data["name"] ..
-		" the " ..
-		(race_str or "") .. " " .. (class_str or "") .. " has died at level " .. level_str .. " in " .. map_name
-	Hardcore:TriggerDeathAlert(msg)
-end
-
-function deathlog.ApplySettings(_settings)
+function deathlog:ApplySettings(_settings)
 	hardcore_settings = _settings
 
 	if hardcore_settings["death_log_show"] == nil or hardcore_settings["death_log_show"] == true then
@@ -262,7 +235,7 @@ function deathlog.receiveChannelMessage(sender, data)
 	if data == nil then return end
 	local decoded_player_data = deathlog.decodeMessage(data)
 	if sender ~= decoded_player_data["name"] then return end
-	if isValidEntry(decoded_player_data) == false then return end
+	if deathlog.isValidEntry(decoded_player_data) == false then return end
 
 	local checksum = fletcher16(decoded_player_data["name"], decoded_player_data["guild"], decoded_player_data["level"])
 
@@ -294,7 +267,7 @@ function deathlog.receiveChannelMessage(sender, data)
 	-- end
 
 	deathlog.death_ping_lru_cache_tbl[checksum]["self_report"] = 1
-	if shouldCreateEntry(checksum) then
+	if deathlog.shouldCreateEntry(checksum) then
 		deathlog.createEntry(checksum)
 	end
 end
@@ -319,49 +292,68 @@ function deathlog.receiveChannelMessageChecksum(sender, checksum)
 
 	deathlog.death_ping_lru_cache_tbl[checksum]["peer_report"] = deathlog.death_ping_lru_cache_tbl[checksum]
 		["peer_report"] + 1
-	if shouldCreateEntry(checksum) then
+	if deathlog.shouldCreateEntry(checksum) then
 		deathlog.createEntry(checksum)
 	end
 end
 
-function deathlog:sendNextInQueue()
-	if #self.broadcast_death_ping_queue > 0 then
-		local channel_num = GetChannelName(death_alerts_channel)
-		if channel_num == 0 then
-			self:JoinChannel()
-			return
-		end
+function deathlog:sendNextInQueue(command, queue)
+	local channel_num = GetChannelName(death_alerts_channel)
+	if channel_num == 0 then
+		self:JoinChannel()
+		return
+	end
 
-		local commMessage = COMM_COMMANDS["BROADCAST_DEATH_PING_CHECKSUM"] ..
-			COMM_COMMAND_DELIM .. self.broadcast_death_ping_queue[1]
-		CTL:SendChatMessage("BULK", COMM_NAME, commMessage, "CHANNEL", nil, channel_num)
-		table.remove(self.broadcast_death_ping_queue, 1)
+	local commMessage = command .. COMM_COMMAND_DELIM .. queue[1]
+	CTL:SendChatMessage("BULK", COMM_NAME, commMessage, "CHANNEL", nil, channel_num)
+	table.remove(queue, 1)
+end
+
+function deathlog:checkQueuesAndSend()
+	if #self.broadcast_death_ping_queue > 0 then
+		self:sendNextInQueue(COMM_COMMANDS["BROADCAST_DEATH_PING_CHECKSUM"], self.broadcast_death_ping_queue)
 		return
 	end
 
 	if #self.death_alert_out_queue > 0 then
-		local channel_num = GetChannelName(death_alerts_channel)
-		if channel_num == 0 then
-			self:JoinChannel()
-			return
-		end
-		local commMessage = COMM_COMMANDS["BROADCAST_DEATH_PING"] .. COMM_COMMAND_DELIM .. self.death_alert_out_queue[1]
-		CTL:SendChatMessage("BULK", COMM_NAME, commMessage, "CHANNEL", nil, channel_num)
-		table.remove(self.death_alert_out_queue, 1)
+		self:sendNextInQueue(COMM_COMMANDS["BROADCAST_DEATH_PING"], self.death_alert_out_queue)
 		return
 	end
 
 	if #self.last_words_queue > 0 then
-		local channel_num = GetChannelName(death_alerts_channel)
-		if channel_num == 0 then
-			self:JoinChannel()
-			return
-		end
-		local commMessage = COMM_COMMANDS["LAST_WORDS"] .. COMM_COMMAND_DELIM .. self.last_words_queue[1]
-		CTL:SendChatMessage("BULK", COMM_NAME, commMessage, "CHANNEL", nil, channel_num)
-		table.remove(self.last_words_queue, 1)
+		self:sendNextInQueue(COMM_COMMANDS["LAST_WORDS"], self.last_words_queue)
 		return
 	end
+end
+
+function deathlog.alertIfValid(_player_data)
+	local race_info = C_CreatureInfo.GetRaceInfo(_player_data["race_id"])
+	local race_str = race_info.raceName
+	local class_str, _, _ = GetClassInfo(_player_data["class_id"])
+	if class_str and RAID_CLASS_COLORS[class_str:upper()] then
+		class_str = "|c" .. RAID_CLASS_COLORS[class_str:upper()].colorStr .. class_str .. "|r"
+	end
+
+	local level_str = tostring(_player_data["level"])
+	local level_num = tonumber(_player_data["level"])
+	local min_level = tonumber(hardcore_settings.minimum_show_death_alert_lvl) or 0
+	if level_num < tonumber(min_level) then
+		return
+	end
+
+	local map_info = nil
+	local map_name = "?"
+	if _player_data["map_id"] then
+		map_info = C_Map.GetMapInfo(_player_data["map_id"])
+	end
+	if map_info then
+		map_name = map_info.name
+	end
+
+	local msg = _player_data["name"] ..
+		" the " ..
+		(race_str or "") .. " " .. (class_str or "") .. " has died at level " .. level_str .. " in " .. map_name
+	Hardcore:TriggerDeathAlert(msg)
 end
 
 function deathlog:CHAT_MSG_CHANNEL(...)
@@ -452,7 +444,6 @@ function deathlog:PLAYER_DEAD()
 	local position = nil
 	if map then
 		position = C_Map.GetPlayerMapPosition(map, "player")
-		local continentID, worldPosition = C_Map.GetWorldPosFromMapPos(map, position)
 	else
 		local _, _, _, _, _, _, _, _instance_id, _, _ = GetInstanceInfo()
 		instance_id = _instance_id
@@ -474,9 +465,6 @@ function deathlog:PLAYER_DEAD()
 	table.insert(deathlog.death_alert_out_queue, msg)
 
 	if deathlog.last_words == nil then return end
-	local _, _, race_id = UnitRace("player")
-	local _, _, class_id = UnitClass("player")
-	local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
 	if guildName == nil then guildName = "" end
 
 	local player_data = deathlog.PlayerData(UnitName("player"), guildName, nil, nil, nil, UnitLevel("player"), nil, nil,
@@ -484,7 +472,7 @@ function deathlog:PLAYER_DEAD()
 	local checksum = fletcher16(player_data)
 	local msg = checksum .. COMM_FIELD_DELIM .. deathlog.last_words .. COMM_FIELD_DELIM
 
-	table.insert(last_words_queue, msg)
+	table.insert(deathlog.last_words_queue, msg)
 end
 
 function deathlog:setLastWords(...)
@@ -497,7 +485,7 @@ function deathlog:setLastWords(...)
 		return
 	end
 
-	self.last_words["text"] = text
+	self.last_words = text
 end
 
 function deathlog:CHAT_MSG_SAY(...)
@@ -512,6 +500,15 @@ function deathlog:CHAT_MSG_PARTY(...)
 	self:setLastWords(...)
 end
 
+function deathlog:PLAYER_LOGIN()
+	self:RegisterEvent("PLAYER_DEAD")
+	self:RegisterEvent("CHAT_MSG_CHANNEL")
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("CHAT_MSG_PARTY")
+	self:RegisterEvent("CHAT_MSG_SAY")
+	self:RegisterEvent("CHAT_MSG_GUILD")
+end
+
 function deathlog:startup()
 	if type(addon) ~= "table" then
 		-- only bind event listeners if we are inside wow
@@ -522,12 +519,8 @@ function deathlog:startup()
 	self:SetScript("OnEvent", function(self, event, ...)
 		self[event](self, ...)
 	end)
-	self:RegisterEvent("PLAYER_DEAD")
-	self:RegisterEvent("CHAT_MSG_CHANNEL")
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("CHAT_MSG_PARTY")
-	self:RegisterEvent("CHAT_MSG_SAY")
-	self:RegisterEvent("CHAT_MSG_GUILD")
+
+	self:RegisterEvent("PLAYER_LOGIN")
 end
 
 deathlog:startup()

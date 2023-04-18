@@ -1,11 +1,10 @@
-local _, addon = ...
-if addon == nil then
-	-- stubs out for uni test suite
-	addon = {}
-end
-
 local ui = {}
-addon.deathlog.ui = ui
+
+local _, addon = ...
+-- check if we are running in wow
+if type(addon) == "table" then
+	addon.deathlog.ui = ui
+end
 
 local AceGUI = LibStub("AceGUI-3.0")
 
@@ -202,7 +201,6 @@ for i = 1, 20 do
 	local _entry = row_entry[idx]
 	_entry:SetHighlight("Interface\\Glues\\CharacterSelect\\Glues-CharacterSelect-Highlight")
 	_entry.font_strings = {}
-	local next_x = 0
 	local current_column_offset = 15
 	for idx, v in ipairs(subtitle_data) do
 		_entry.font_strings[v[1]] = _entry.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
