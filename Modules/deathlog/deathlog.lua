@@ -513,6 +513,11 @@ function deathlog:CHAT_MSG_PARTY(...)
 end
 
 function deathlog:startup()
+	if type(addon) ~= "table" then
+		-- only bind event listeners if we are inside wow
+		return
+	end
+
 	-- event handling helper
 	self:SetScript("OnEvent", function(self, event, ...)
 		self[event](self, ...)
@@ -524,5 +529,7 @@ function deathlog:startup()
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_GUILD")
 end
+
+deathlog:startup()
 
 return deathlog

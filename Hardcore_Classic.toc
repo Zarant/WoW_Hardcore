@@ -163,7 +163,6 @@ id_to_npc_classic.lua
 npc_to_id_classic.lua
 Modules/deathlog/deathlog.lua
 Modules/deathlog/ui.lua
-Modules/deathlog/init.lua
 Hardcore.lua
 
 Libs/GreenWall/Constants.lua
