@@ -8,6 +8,15 @@ end
 
 local AceGUI = LibStub("AceGUI-3.0")
 
+local environment_damage = {
+	[-2] = "Drowning",
+	[-3] = "Falling",
+	[-4] = "Fatigue",
+	[-5] = "Fire",
+	[-6] = "Lava",
+	[-7] = "Slime",
+  }
+  
 -- Death log icon
 local death_log_icon_frame = CreateFrame("frame")
 death_log_icon_frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
@@ -358,4 +367,15 @@ function ui.InsertEntry(player_data)
 		end
 	end
 	setEntry(player_data, row_entry[20])
+end
+
+
+function ui.SetLastWords(name, last_words)
+	for i = 1, 20 do
+		if row_entry[i].player_data ~= nil then
+			if row_entry[i].player_data["name"] == name then
+				row_entry[i].player_data["last_words"] = msg
+			end
+		end
+	end
 end

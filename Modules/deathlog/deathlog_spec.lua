@@ -1,17 +1,24 @@
 _G.hardcore_settings = {}
+_G.Recorded_Deaths = {}
 _G.hc_peer_guilds = {}
 _G.date = os.date
 _G.bit = require("bit32")
-_G.GetChannelName = function(name) return 1 end
 _G.ChatThrottleLib = {}
+_G.C_Map = {}
+_G.C_Timer = {
+	After = function(_, f) f() end
+}
 
-local deathlog = require('Modules/deathlog/deathlog')
+local deathlog = require('Modules.deathlog.deathlog')
 local ui_mock = require('Modules.deathlog.ui_mock')
+deathlog.ui = ui_mock
+require('npc_to_id_classic')
 
+local last_attack_source = "Blackrock Champion"
 local testPlayer = {
 	name = "Zunter",
 	guild = "Hardcore Academy",
-	source_id = "435",
+	source_id = npc_to_id[last_attack_source],
 	race_id = "1",
 	class_id = 9,
 	level = "17",
@@ -36,15 +43,48 @@ local testPlayerData = deathlog.PlayerData(
 	testPlayer.map_id,
 	deathlog.mapPosToString(testPlayer.map_pos),
 	nil,
-	nil)
+	nil,
+	testPlayer.guid)
+
+_G.GetChannelName = function(name) return 1 end
+_G.GetServerTime = function() return 1681863205 end
+_G.C_Map.GetBestMapForUnit = function(_) return testPlayer.map_id end
+_G.C_Map.GetPlayerMapPosition = function(_, _) return testPlayer.map_pos end
+_G.GetGuildInfo = function(_) return testPlayer.guild end
+_G.UnitRace = function(_) return _, _, testPlayer.race_id end
+_G.UnitClass = function(_) return _, _, testPlayer.class_id end
+_G.UnitName = function(_) return testPlayer.name end
+_G.UnitLevel = function(_) return testPlayer.level end
+_G.UnitGUID = function(_) return testPlayer.guid end
+_G.GetNormalizedRealmName = function() return "BloodsailBuccaneers" end
+_G.GetNumGuildMembers = function() return 10 end
+_G.GetGuildRosterInfo = function(_) return testPlayer.name .. "-BloodsailBuccaneers", _, _, tonumber(testPlayer.level), _, _, _, _, _, _, _ end
 
 describe('Deathlog', function()
-	before_each(function()
-		deathlog.ui = ui_mock
-	end)
-
 	after_each(function()
 		hardcore_settings["death_log_entries"] = {}
+		deathlog.death_ping_lru_cache_tbl = {}
+		deathlog.last_attack_source = ""
+		deathlog.last_words = ""
+		deathlog.broadcast_death_ping_queue = {}
+		deathlog.last_words_queue = {}
+		deathlog.death_alert_out_queue = {}
+		deathlog.death_reports_this_session = {}
+	end)
+
+	it('should decodeMessage with a previous version data (no guid)', function()
+		local message = "Zunter~Hardcore Academy~435~1~9~17~~1433~0.3122,0.1521~"
+		local playerData = deathlog.decodeMessage(message)
+
+		assert.are.equal("Zunter", playerData["name"])
+		assert.are.equal("Hardcore Academy", playerData["guild"])
+		assert.are.equal("435", tostring(playerData["source_id"]))
+		assert.are.equal("1", tostring(playerData["race_id"]))
+		assert.are.equal(9, playerData["class_id"])
+		assert.are.equal("17", tostring(playerData["level"]))
+		assert.are.equal(nil, playerData["instance_id"])
+		assert.are.equal(1433, playerData["map_id"])
+		assert.are.equal("0.3122,0.1521", playerData["map_pos"])
 	end)
 
 	it('should encodeMessage and decodeMessage correct data', function()
@@ -54,7 +94,7 @@ describe('Deathlog', function()
 
 		assert.are.equal(params.name, playerData["name"])
 		assert.are.equal(params.guild, playerData["guild"])
-		assert.are.equal(params.source_id, tostring(playerData["source_id"]))
+		assert.are.equal(params.source_id, playerData["source_id"])
 		assert.are.equal(params.race_id, tostring(playerData["race_id"]))
 		assert.are.equal(params.class_id, playerData["class_id"])
 		assert.are.equal(params.level, tostring(playerData["level"]))
@@ -118,5 +158,36 @@ describe('Deathlog', function()
 		deathlog:checkQueuesAndSend()
 		assert.stub(_G.ChatThrottleLib.SendChatMessage).was.called(4)
 		assert.are.equal(0, #deathlog.last_words_queue)
+	end)
+
+	it('should store the player guid if a valid death message is received', function()
+		stub(deathlog, "isValidEntry")
+		local message = deathlog.encodeMessage(testPlayer)
+		deathlog.receiveChannelMessage(testPlayer.name, message)
+
+		local expectedRecordedTime = _G.GetServerTime()
+		local key = "Player-5139-020C481D-Zunter"
+		assert.are.equal(expectedRecordedTime, Recorded_Deaths[key])
+		assert.is_true(deathlog.death_reports_this_session[testPlayer.name])
+
+		local expectedChecksum = fletcher16(testPlayer.name, testPlayer.guild, testPlayer.level)
+		assert.are.equal(1, #deathlog.broadcast_death_ping_queue)
+		assert.are.equal(expectedChecksum, deathlog.broadcast_death_ping_queue[1])
+	end)
+
+	it('should emit a death message on PLAYER_DEAD event', function()
+		local expectedDeathMsg = deathlog.encodeMessage(testPlayer)
+		local lastWords = "foobar"
+		local expectedLastWordsMsg = fletcher16(testPlayer.name, testPlayer.guild, testPlayer.level) .. "~" .. lastWords .. "~"
+
+		deathlog.last_attack_source = last_attack_source
+		deathlog.last_words = lastWords
+		deathlog:PLAYER_DEAD()
+
+		assert.are.equal(1, #deathlog.death_alert_out_queue)
+		assert.are.equal(expectedDeathMsg, deathlog.death_alert_out_queue[1])
+
+		assert.are.equal(1, #deathlog.last_words_queue)
+		assert.are.equal(expectedLastWordsMsg, deathlog.last_words_queue[1])
 	end)
 end)

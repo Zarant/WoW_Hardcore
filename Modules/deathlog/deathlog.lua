@@ -35,6 +35,10 @@ deathlog.broadcast_death_ping_queue = {}
 deathlog.last_words_queue = {}
 deathlog.death_alert_out_queue = {}
 
+-- store the count of times a player has reported their death, 
+-- prevents a malicious actor from filling up the reported_deaths list
+deathlog.death_reports_this_session = {}
+
 function fletcher16(player_name, player_guild, player_level)
 	local data = player_name .. player_guild .. player_level
 	local sum1 = 0
@@ -104,7 +108,7 @@ function deathlog:JoinChannel()
 end
 
 function deathlog.PlayerData(name, guild, source_id, race_id, class_id, level, instance_id, map_id, map_pos, date,
-							 last_words)
+							 last_words, guid)
 	return {
 		["name"] = name,
 		["guild"] = guild,
@@ -117,6 +121,7 @@ function deathlog.PlayerData(name, guild, source_id, race_id, class_id, level, i
 		["map_pos"] = map_pos,
 		["date"] = date,
 		["last_words"] = last_words,
+		["guid"] = guid
 	}
 end
 
@@ -125,10 +130,10 @@ local encodeMessageParams = {
 	guild = "",
 	source_id = "",
 	race_id = "",
-	class_id = -1,
+	class_id = nil,
 	level = "",
-	instance_id = -1,
-	map_id = -1,
+	instance_id = nil,
+	map_id = nil,
 	map_pos = {},
 	loc_str = "",
 	guid = ""
@@ -141,6 +146,7 @@ function deathlog.encodeMessage(params)
 	if tonumber(params.source_id) == nil then return end
 	if tonumber(params.race_id) == nil then return end
 	if tonumber(params.level) == nil then return end
+
 
 	if params.map_pos then
 		params.loc_str = deathlog.mapPosToString(params.map_pos)
@@ -184,8 +190,9 @@ function deathlog.decodeMessage(msg)
 	local instance_id = tonumber(values[7])
 	local map_id = tonumber(values[8])
 	local map_pos = values[9]
+	local guid = values[10]
 	local player_data = deathlog.PlayerData(name, guild, source_id, race_id, class_id, level, instance_id, map_id,
-		map_pos, date, last_words)
+		map_pos, date, last_words, guid)
 	return player_data
 end
 
@@ -237,6 +244,17 @@ function deathlog.receiveChannelMessage(sender, data)
 	if sender ~= decoded_player_data["name"] then return end
 	if deathlog.isValidEntry(decoded_player_data) == false then return end
 
+	if decoded_player_data["guid"] ~= nil then
+		local guid = decoded_player_data["guid"]
+		local name = decoded_player_data["name"]
+		local key = string.format("%s-%s", guid, name)
+		if Recorded_Deaths[key] ~= nil or deathlog.death_reports_this_session[name] then
+			return -- already recorded this death
+		end
+		deathlog.death_reports_this_session[name] = true
+		Recorded_Deaths[key] = GetServerTime()
+	end
+
 	local checksum = fletcher16(decoded_player_data["name"], decoded_player_data["guild"], decoded_player_data["level"])
 
 	if deathlog.death_ping_lru_cache_tbl[checksum] == nil then
@@ -249,22 +267,22 @@ function deathlog.receiveChannelMessage(sender, data)
 
 	if deathlog.death_ping_lru_cache_tbl[checksum]["committed"] then return end
 
-	-- local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
-	-- if decoded_player_data['guild'] == guildName then
-	-- 	local name_long = sender .. "-" .. GetNormalizedRealmName()
-	-- 	for i = 1, GetNumGuildMembers() do
-	-- 		local name, _, _, level, class_str, _, _, _, _, _, class = GetGuildRosterInfo(i)
-	-- 		if name_long == name and level == decoded_player_data["level"] then
-	-- 			deathlog.death_ping_lru_cache_tbl[checksum]["player_data"]["in_guild"] = 1
-	-- 			local delay = math.random(0, 10)
-	-- 			C_Timer.After(delay, function()
-	-- 				if deathlog.death_ping_lru_cache_tbl[checksum] and deathlog.death_ping_lru_cache_tbl[checksum]["committed"] then return end
-	-- 				table.insert(broadcast_death_ping_queue, checksum) -- Must be added to queue to be broadcasted to network
-	-- 			end)
-	-- 			break
-	-- 		end
-	-- 	end
-	-- end
+	local guildName, _, _ = GetGuildInfo("player");
+	if decoded_player_data['guild'] == guildName then
+		local name_long = sender .. "-" .. GetNormalizedRealmName()
+		for i = 1, GetNumGuildMembers() do
+			local name, _, _, level, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
+			if name_long == name and level == decoded_player_data["level"] then
+				deathlog.death_ping_lru_cache_tbl[checksum]["player_data"]["in_guild"] = 1
+				local delay = math.random(0, 10)
+				C_Timer.After(delay, function()
+					if deathlog.death_ping_lru_cache_tbl[checksum] and deathlog.death_ping_lru_cache_tbl[checksum]["committed"] then return end
+					table.insert(deathlog.broadcast_death_ping_queue, checksum) -- Must be added to queue to be broadcasted to network
+				end)
+				break
+			end
+		end
+	end
 
 	deathlog.death_ping_lru_cache_tbl[checksum]["self_report"] = 1
 	if deathlog.shouldCreateEntry(checksum) then
@@ -294,6 +312,26 @@ function deathlog.receiveChannelMessageChecksum(sender, checksum)
 		["peer_report"] + 1
 	if deathlog.shouldCreateEntry(checksum) then
 		deathlog.createEntry(checksum)
+	end
+end
+
+function deathlog.receiveLastWords(sender, data)
+	if data == nil then return end
+	local values = {}
+	for w in data:gmatch("(.-)~") do table.insert(values, w) end
+	local checksum = values[1]
+	local msg = values[2]
+
+	if checksum == nil or msg == nil then return end
+
+	if deathlog.death_ping_lru_cache_tbl[checksum] == nil then
+		deathlog.death_ping_lru_cache_tbl[checksum] = {}
+	end
+	if deathlog.death_ping_lru_cache_tbl[checksum]["player_data"] ~= nil then
+		deathlog.death_ping_lru_cache_tbl[checksum]["player_data"]["last_words"] = msg
+		deathlog.ui.SetLastWords(sender, msg)
+	else
+		deathlog.death_ping_lru_cache_tbl[checksum]["last_words"] = msg
 	end
 end
 
@@ -401,7 +439,7 @@ function deathlog:CHAT_MSG_CHANNEL(...)
 			shadowbanned[player_name_short] = 1
 		end
 
-		-- deathlogReceiveLastWords(player_name_short, msg)
+		deathlog.receiveLastWords(player_name_short, msg)
 		if debug then print("last words", msg) end
 		return
 	end
@@ -449,7 +487,7 @@ function deathlog:PLAYER_DEAD()
 		instance_id = _instance_id
 	end
 
-	local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
+	local guildName, _, _ = GetGuildInfo("player");
 	local _, _, race_id = UnitRace("player")
 	local _, _, class_id = UnitClass("player")
 	local death_source = "-1"
@@ -457,22 +495,29 @@ function deathlog:PLAYER_DEAD()
 		death_source = npc_to_id[self.last_attack_source]
 	end
 
-	msg = deathlog.encodeMessage(UnitName("player"), guildName, death_source, race_id, class_id, UnitLevel("player"),
-		instance_id,
-		map, position)
-	if msg == nil then return end
+	deathMsg = deathlog.encodeMessage({
+		name = UnitName("player"),
+		guild = guildName,
+		source_id = death_source,
+		race_id = race_id,
+		class_id = class_id,
+		level = UnitLevel("player"),
+		instance_id = instance_id,
+		map_id = map,
+		map_pos = position,
+		guid = UnitGUID("player")
+	})
+	if deathMsg == nil then return end
 
-	table.insert(deathlog.death_alert_out_queue, msg)
+	table.insert(deathlog.death_alert_out_queue, deathMsg)
 
 	if deathlog.last_words == nil then return end
 	if guildName == nil then guildName = "" end
 
-	local player_data = deathlog.PlayerData(UnitName("player"), guildName, nil, nil, nil, UnitLevel("player"), nil, nil,
-		nil, nil, nil)
-	local checksum = fletcher16(player_data)
-	local msg = checksum .. COMM_FIELD_DELIM .. deathlog.last_words .. COMM_FIELD_DELIM
+	local checksum = fletcher16(UnitName("player"), guildName, UnitLevel("player"))
+	local lastWordsMsg = checksum .. COMM_FIELD_DELIM .. deathlog.last_words .. COMM_FIELD_DELIM
 
-	table.insert(deathlog.last_words_queue, msg)
+	table.insert(deathlog.last_words_queue, lastWordsMsg)
 end
 
 function deathlog:setLastWords(...)
