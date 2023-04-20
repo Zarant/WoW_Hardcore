@@ -35,9 +35,9 @@ deathlog.broadcast_death_ping_queue = {}
 deathlog.last_words_queue = {}
 deathlog.death_alert_out_queue = {}
 
--- store the count of times a player has reported their death, 
--- prevents a malicious actor from filling up the reported_deaths list
-deathlog.death_reports_this_session = {}
+-- store the count of times a player has reported their death,
+-- prevents a malicious actor from filling up the Recorded_Deaths list
+deathlog.sender_reported_death_timestamp = {}
 
 function fletcher16(player_name, player_guild, player_level)
 	local data = player_name .. player_guild .. player_level
@@ -244,15 +244,10 @@ function deathlog.receiveChannelMessage(sender, data)
 	if sender ~= decoded_player_data["name"] then return end
 	if deathlog.isValidEntry(decoded_player_data) == false then return end
 
-	if decoded_player_data["guid"] ~= nil then
+	if hardcore_settings["record_other_deaths"] and decoded_player_data["guid"] ~= nil then
 		local guid = decoded_player_data["guid"]
-		local name = decoded_player_data["name"]
-		local key = string.format("%s-%s", guid, name)
-		if Recorded_Deaths[key] ~= nil or deathlog.death_reports_this_session[name] then
-			return -- already recorded this death
-		end
-		deathlog.death_reports_this_session[name] = true
-		Recorded_Deaths[key] = GetServerTime()
+		local source_id = decoded_player_data["source_id"]
+		deathlog.recordDeath(sender, guid, source_id)
 	end
 
 	local checksum = fletcher16(decoded_player_data["name"], decoded_player_data["guild"], decoded_player_data["level"])
@@ -288,6 +283,21 @@ function deathlog.receiveChannelMessage(sender, data)
 	if deathlog.shouldCreateEntry(checksum) then
 		deathlog.createEntry(checksum)
 	end
+end
+
+function deathlog.recordDeath(sender, guid, source_id)
+	local time = GetServerTime()
+	if deathlog.sender_reported_death_timestamp[sender] ~= nil and
+		(time - deathlog.sender_reported_death_timestamp[sender]) < 300 then
+		return -- already recorded this death in the last 5 minutes
+	end
+	deathlog.sender_reported_death_timestamp[sender] = time
+	table.insert(Recorded_Deaths, {
+		sender = sender,
+		guid = guid,
+		source_id = source_id,
+		time = time
+	})
 end
 
 function deathlog.receiveChannelMessageChecksum(sender, checksum)
@@ -552,6 +562,16 @@ function deathlog:PLAYER_LOGIN()
 	self:RegisterEvent("CHAT_MSG_PARTY")
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_GUILD")
+end
+
+function DeathlogToggleRecordOtherDeaths()
+	if hardcore_settings["record_other_deaths"] == nil or hardcore_settings["record_other_deaths"] == false then
+		print("record other deaths: enabled")
+		hardcore_settings["record_other_deaths"] = true
+	else
+		print("record other deaths: disabled")
+		hardcore_settings["record_other_deaths"] = false
+	end
 end
 
 function deathlog:startup()

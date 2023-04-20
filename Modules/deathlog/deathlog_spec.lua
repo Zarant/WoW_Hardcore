@@ -61,6 +61,9 @@ _G.GetNumGuildMembers = function() return 10 end
 _G.GetGuildRosterInfo = function(_) return testPlayer.name .. "-BloodsailBuccaneers", _, _, tonumber(testPlayer.level), _, _, _, _, _, _, _ end
 
 describe('Deathlog', function()
+	before_each(function()
+		stub(deathlog, "isValidEntry")
+	end)
 	after_each(function()
 		hardcore_settings["death_log_entries"] = {}
 		deathlog.death_ping_lru_cache_tbl = {}
@@ -161,15 +164,28 @@ describe('Deathlog', function()
 	end)
 
 	it('should store the player guid if a valid death message is received', function()
-		stub(deathlog, "isValidEntry")
+		_G.hardcore_settings["record_other_deaths"] = true
+		
 		local message = deathlog.encodeMessage(testPlayer)
 		deathlog.receiveChannelMessage(testPlayer.name, message)
 
-		local expectedRecordedTime = _G.GetServerTime()
-		local key = "Player-5139-020C481D-Zunter"
-		assert.are.equal(expectedRecordedTime, Recorded_Deaths[key])
-		assert.is_true(deathlog.death_reports_this_session[testPlayer.name])
+		assert.are.equal(1, #Recorded_Deaths)
+		local recordedDeath = Recorded_Deaths[1]
+		assert.are.equal(testPlayer.name, recordedDeath.sender)
+		assert.are.equal(testPlayer.guid, recordedDeath.guid)
+		assert.are.equal(testPlayer.source_id, recordedDeath.source_id)
+		assert.are.equal(_G.GetServerTime(), recordedDeath.time)
+		assert.are.equal(_G.GetServerTime(), deathlog.sender_reported_death_timestamp[testPlayer.name])
 
+		-- check that receiving the same message again within 5 mins does not record another entry
+		deathlog.receiveChannelMessage(testPlayer.name, message)
+		assert.are.equal(1, #Recorded_Deaths)
+	end)
+
+	it('should broadcast a death ping when receiving a death message', function()
+		local message = deathlog.encodeMessage(testPlayer)
+		deathlog.receiveChannelMessage(testPlayer.name, message)
+		
 		local expectedChecksum = fletcher16(testPlayer.name, testPlayer.guild, testPlayer.level)
 		assert.are.equal(1, #deathlog.broadcast_death_ping_queue)
 		assert.are.equal(expectedChecksum, deathlog.broadcast_death_ping_queue[1])
