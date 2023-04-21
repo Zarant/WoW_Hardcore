@@ -4271,7 +4271,7 @@ local options = {
 				deathlog_require_verification = {
 					type = "toggle",
 					name = "Only verified deaths",
-					desc = "Require deaths to be verified by guildmates",
+					desc = "Only show deaths that have been verified by the player's guildmates",
 					get = function()
 						return Hardcore_Settings.deathlog_require_verification
 					end,
