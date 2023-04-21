@@ -75,6 +75,8 @@ Hardcore_Settings = {
 	ignore_xguild_chat = false,
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
+	deathlog_require_verification = true,
+	deathlog_log_size = 1000,
 }
 
 WARNING = ""
@@ -955,6 +957,8 @@ local settings_saved_variable_meta = {
 	["use_alternative_menu"] = false,
 	["ignore_xguild_chat"] = false,
 	["ignore_xguild_alerts"] = false,
+	["deathlog_require_verification"] = true,
+	["deathlog_log_size"] = 1000,
 }
 
 --[[ Post-utility functions]]
@@ -987,7 +991,9 @@ function Hardcore:InitializeSettingsSavedVariables()
 	end
 
 	for k, v in pairs(settings_saved_variable_meta) do
-		Hardcore_Settings[k] = Hardcore_Settings[k] or v
+		if Hardcore_Settings[k] == nil then
+			Hardcore_Settings[k] = v
+		end
 	end
 
 	if Hardcore_Settings["alert_frame_scale"] <= 0 then
@@ -4262,6 +4268,33 @@ local options = {
 					end,
 					order = 13,
 				},
+				deathlog_require_verification = {
+					type = "toggle",
+					name = "Only verified deaths",
+					desc = "Require deaths to be verified by guildmates",
+					get = function()
+						return Hardcore_Settings.deathlog_require_verification
+					end,
+					set = function(info, value)
+						Hardcore_Settings.deathlog_require_verification = value
+					end,
+					order = 14,
+				},
+				deathlog_log_size = {
+					type = "range",
+					name = "Log Size",
+					desc = "How many deaths to store, increasing this limit can increase load time.",
+					min = 0,
+					max = 100000,
+					step = 1,
+					get = function()
+						return Hardcore_Settings.deathlog_log_size
+					end,
+					set = function(info, value)
+						Hardcore_Settings.deathlog_log_size = value
+					end,
+					order = 15,
+				},
 			},
 		},
 		cross_guild_header = {
@@ -4315,6 +4348,8 @@ local options = {
 				Hardcore_Settings.show_minimap_mailbox_icon = false
 				Hardcore_Settings.ignore_xguild_alerts = false
 				Hardcore_Settings.ignore_xguild_chat = false
+				Hardcore_Settings.deathlog_require_verification = true
+				Hardcore_Settings.deathlog_log_size = 1000
 				Hardcore:ApplyAlertFrameSettings()
 			end,
 			order = 20,

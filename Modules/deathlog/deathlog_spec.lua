@@ -47,7 +47,7 @@ local testPlayerData = deathlog.PlayerData(
 	testPlayer.guid)
 
 _G.GetChannelName = function(name) return 1 end
-_G.GetServerTime = function() return 1681863205 end
+_G.date = function() return "Sat Apr 15 09:12:04 2023" end
 _G.C_Map.GetBestMapForUnit = function(_) return testPlayer.map_id end
 _G.C_Map.GetPlayerMapPosition = function(_, _) return testPlayer.map_pos end
 _G.GetGuildInfo = function(_) return testPlayer.guild end
@@ -164,22 +164,28 @@ describe('Deathlog', function()
 	end)
 
 	it('should store the player guid if a valid death message is received', function()
-		_G.hardcore_settings["record_other_deaths"] = true
+		_G.hardcore_settings["deathlog_require_verification"] = false
 		
 		local message = deathlog.encodeMessage(testPlayer)
+		print(message)
 		deathlog.receiveChannelMessage(testPlayer.name, message)
 
-		assert.are.equal(1, #Recorded_Deaths)
-		local recordedDeath = Recorded_Deaths[1]
-		assert.are.equal(testPlayer.name, recordedDeath.sender)
+		assert.are.equal(1, #hardcore_settings["death_log_entries"])
+		local recordedDeath = hardcore_settings["death_log_entries"][1]
+		assert.are.equal(testPlayer.name, recordedDeath.name)
 		assert.are.equal(testPlayer.guid, recordedDeath.guid)
+		assert.are.equal(testPlayer.guild, recordedDeath.guild)
+		assert.are.equal(testPlayer.race_id, tostring(recordedDeath.race_id))
+		assert.are.equal(testPlayer.class_id, recordedDeath.class_id)
+		assert.are.equal(testPlayer.level, tostring(recordedDeath.level))
 		assert.are.equal(testPlayer.source_id, recordedDeath.source_id)
-		assert.are.equal(_G.GetServerTime(), recordedDeath.time)
-		assert.are.equal(_G.GetServerTime(), deathlog.sender_reported_death_timestamp[testPlayer.name])
+		assert.are.equal(testPlayer.instance_id, recordedDeath.instance_id)
+		assert.are.equal(deathlog.mapPosToString(testPlayer.map_pos), recordedDeath.map_pos)
+		assert.are.equal(date(), recordedDeath.date)
 
-		-- check that receiving the same message again within 5 mins does not record another entry
+		-- check that receiving the same message again does not record another entry
 		deathlog.receiveChannelMessage(testPlayer.name, message)
-		assert.are.equal(1, #Recorded_Deaths)
+		assert.are.equal(1, #hardcore_settings["death_log_entries"])
 	end)
 
 	it('should broadcast a death ping when receiving a death message', function()

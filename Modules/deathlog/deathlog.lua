@@ -19,7 +19,7 @@ local COMM_COMMANDS = {
 local COMM_COMMAND_DELIM = "$"
 local COMM_FIELD_DELIM = "~"
 local HC_REQUIRED_ACKS = 3
-local HC_DEATH_LOG_MAX = 1000
+local HC_DEATH_LOG_MAX_DEFAULT = 1000
 
 local death_alerts_channel = "hcdeathalertschannel"
 local death_alerts_channel_pw = "hcdeathalertschannelpw"
@@ -34,10 +34,6 @@ deathlog.last_words = ""
 deathlog.broadcast_death_ping_queue = {}
 deathlog.last_words_queue = {}
 deathlog.death_alert_out_queue = {}
-
--- store the count of times a player has reported their death,
--- prevents a malicious actor from filling up the Recorded_Deaths list
-deathlog.sender_reported_death_timestamp = {}
 
 function fletcher16(player_name, player_guild, player_level)
 	local data = player_name .. player_guild .. player_level
@@ -64,6 +60,9 @@ function deathlog.shouldCreateEntry(checksum)
 	if deathlog.death_ping_lru_cache_tbl[checksum] == nil then return false end
 	if deathlog.death_ping_lru_cache_tbl[checksum]["player_data"] == nil then return false end
 	if hardcore_settings.death_log_types == nil or hardcore_settings.death_log_types == "faction_wide" and deathlog.isValidEntry(deathlog.death_ping_lru_cache_tbl[checksum]["player_data"]) then
+		if hardcore_settings.deathlog_require_verification == false then
+			return true
+		end
 		if deathlog.death_ping_lru_cache_tbl[checksum]["peer_report"] and deathlog.death_ping_lru_cache_tbl[checksum]["peer_report"] > HC_REQUIRED_ACKS then
 			return true
 		else
@@ -215,8 +214,9 @@ function deathlog.createEntry(checksum)
 	end
 	table.insert(hardcore_settings["death_log_entries"], deathlog.death_ping_lru_cache_tbl[checksum]["player_data"])
 
+	local entry_limit = hardcore_settings["deathlog_log_size"] or HC_DEATH_LOG_MAX_DEFAULT
 	-- Cap list size, otherwise loading time will increase
-	if hardcore_settings["death_log_entries"] and #hardcore_settings["death_log_entries"] > HC_DEATH_LOG_MAX then -- TODO parameterize
+	if hardcore_settings["death_log_entries"] and #hardcore_settings["death_log_entries"] > entry_limit then
 		table.remove(hardcore_settings["death_log_entries"], 1)
 	end
 
@@ -243,12 +243,6 @@ function deathlog.receiveChannelMessage(sender, data)
 	local decoded_player_data = deathlog.decodeMessage(data)
 	if sender ~= decoded_player_data["name"] then return end
 	if deathlog.isValidEntry(decoded_player_data) == false then return end
-
-	if hardcore_settings["record_other_deaths"] and decoded_player_data["guid"] ~= nil then
-		local guid = decoded_player_data["guid"]
-		local source_id = decoded_player_data["source_id"]
-		deathlog.recordDeath(sender, guid, source_id)
-	end
 
 	local checksum = fletcher16(decoded_player_data["name"], decoded_player_data["guild"], decoded_player_data["level"])
 
@@ -283,21 +277,6 @@ function deathlog.receiveChannelMessage(sender, data)
 	if deathlog.shouldCreateEntry(checksum) then
 		deathlog.createEntry(checksum)
 	end
-end
-
-function deathlog.recordDeath(sender, guid, source_id)
-	local time = GetServerTime()
-	if deathlog.sender_reported_death_timestamp[sender] ~= nil and
-		(time - deathlog.sender_reported_death_timestamp[sender]) < 300 then
-		return -- already recorded this death in the last 5 minutes
-	end
-	deathlog.sender_reported_death_timestamp[sender] = time
-	table.insert(Recorded_Deaths, {
-		sender = sender,
-		guid = guid,
-		source_id = source_id,
-		time = time
-	})
 end
 
 function deathlog.receiveChannelMessageChecksum(sender, checksum)
@@ -562,16 +541,6 @@ function deathlog:PLAYER_LOGIN()
 	self:RegisterEvent("CHAT_MSG_PARTY")
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_GUILD")
-end
-
-function DeathlogToggleRecordOtherDeaths()
-	if hardcore_settings["record_other_deaths"] == nil or hardcore_settings["record_other_deaths"] == false then
-		print("record other deaths: enabled")
-		hardcore_settings["record_other_deaths"] = true
-	else
-		print("record other deaths: disabled")
-		hardcore_settings["record_other_deaths"] = false
-	end
 end
 
 function deathlog:startup()
