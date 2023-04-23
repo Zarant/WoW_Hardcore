@@ -20,6 +20,8 @@ along with the Hardcore AddOn. If not, see <http://www.gnu.org/licenses/>.
 --[[ Const variables ]]
 --
 -- ERR_CHAT_PLAYER_NOT_FOUND_S = nil -- Disables warning when pinging non-hc player -- This clashes with other addons
+local _, addon = ...
+
 StaticPopupDialogs["CHAT_CHANNEL_PASSWORD"] = nil
 --CHAT_WRONG_PASSWORD_NOTICE = nil
 local DEATH_ALERT_COOLDOWN = 1800
@@ -73,6 +75,8 @@ Hardcore_Settings = {
 	ignore_xguild_chat = false,
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
+	deathlog_require_verification = true,
+	deathlog_log_size = 1000,
 }
 
 WARNING = ""
@@ -212,7 +216,6 @@ local GENDER_POSSESSIVE_PRONOUN = { "Their", "His", "Her" }
 local recent_levelup = nil
 local recent_msg = {}
 local Last_Attack_Source = nil
-DeathLog_Last_Attack_Source = nil
 local PICTURE_DELAY = 0.65
 local HIDE_RTP_CHAT_MSG_BUFFER = 0 -- number of messages in queue
 local HIDE_RTP_CHAT_MSG_BUFFER_MAX = 2 -- number of maximum messages to wait for
@@ -954,6 +957,8 @@ local settings_saved_variable_meta = {
 	["use_alternative_menu"] = false,
 	["ignore_xguild_chat"] = false,
 	["ignore_xguild_alerts"] = false,
+	["deathlog_require_verification"] = true,
+	["deathlog_log_size"] = 1000,
 }
 
 --[[ Post-utility functions]]
@@ -986,7 +991,9 @@ function Hardcore:InitializeSettingsSavedVariables()
 	end
 
 	for k, v in pairs(settings_saved_variable_meta) do
-		Hardcore_Settings[k] = Hardcore_Settings[k] or v
+		if Hardcore_Settings[k] == nil then
+			Hardcore_Settings[k] = v
+		end
 	end
 
 	if Hardcore_Settings["alert_frame_scale"] <= 0 then
@@ -1694,11 +1701,11 @@ function Hardcore:PLAYER_ENTERING_WORLD()
 	end
 
 	C_Timer.After(1.0, function()
-	  deathlogApplySettings(Hardcore_Settings)
+	  addon.deathlog:ApplySettings(Hardcore_Settings)
 	end)
 
 	C_Timer.After(5.0, function()
-	  deathlogJoinChannel()
+		addon.deathlog:JoinChannel()
 	end)
 end
 
@@ -1817,9 +1824,6 @@ function Hardcore:PLAYER_DEAD()
 	end
 
 	-- Send broadcast text messages to guild and greenwall
-	selfDeathAlert(DeathLog_Last_Attack_Source)
-	selfDeathAlertLastWords(recent_msg["text"])
-
 	SendChatMessage(messageString, "GUILD")
 	startXGuildChatMsgRelay(messageString)
 	startXGuildDeathMsgRelay()
@@ -2576,26 +2580,8 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 		if not (source_name == nil) then
 			if string.find(ev, "DAMAGE") ~= nil then
 				Last_Attack_Source = source_name
-				DeathLog_Last_Attack_Source = source_name
 			end
 		end
-	end
-	if ev == "ENVIRONMENTAL_DAMAGE" then
-	  if target_guid == UnitGUID("player") then
-	    if environmental_type == "Drowning" then
-	      DeathLog_Last_Attack_Source = -2
-	    elseif environmental_type == "Falling" then
-	      DeathLog_Last_Attack_Source = -3
-	    elseif environmental_type == "Fatigue" then
-	      DeathLog_Last_Attack_Source = -4
-	    elseif environmental_type == "Fire" then
-	      DeathLog_Last_Attack_Source = -5
-	    elseif environmental_type == "Lava" then
-	      DeathLog_Last_Attack_Source = -6
-	    elseif environmental_type == "Slime" then
-	      DeathLog_Last_Attack_Source = -7
-	    end
-	  end
 	end
 end
 
@@ -3927,7 +3913,7 @@ local options = {
 						  Hardcore_Settings.death_log_show = true 
 						end
 						Hardcore_Settings.death_log_show = not Hardcore_Settings.death_log_show 
-						deathlogApplySettings(Hardcore_Settings)
+						addon.deathlog:ApplySettings(Hardcore_Settings)
 					end,
 					order = 1,
 				},
@@ -4032,7 +4018,7 @@ local options = {
 					desc = "Reset the death log pos.",
 					func = function(info, value)
 						hardcore_settings["death_log_pos"] = {['x'] = 0, ['y'] = 0}
-						deathlogApplySettings(Hardcore_Settings)
+						addon.deathlog:ApplySettings(Hardcore_Settings)
 					end,
 					order = 5,
 				},
@@ -4283,6 +4269,33 @@ local options = {
 					end,
 					order = 13,
 				},
+				deathlog_require_verification = {
+					type = "toggle",
+					name = "Only verified deaths",
+					desc = "Only show deaths that have been verified by the player's guildmates",
+					get = function()
+						return Hardcore_Settings.deathlog_require_verification
+					end,
+					set = function(info, value)
+						Hardcore_Settings.deathlog_require_verification = value
+					end,
+					order = 14,
+				},
+				deathlog_log_size = {
+					type = "range",
+					name = "Log Size",
+					desc = "How many deaths to store, increasing this limit can increase load time.",
+					min = 0,
+					max = 100000,
+					step = 1,
+					get = function()
+						return Hardcore_Settings.deathlog_log_size
+					end,
+					set = function(info, value)
+						Hardcore_Settings.deathlog_log_size = value
+					end,
+					order = 15,
+				},
 			},
 		},
 		cross_guild_header = {
@@ -4336,6 +4349,8 @@ local options = {
 				Hardcore_Settings.show_minimap_mailbox_icon = false
 				Hardcore_Settings.ignore_xguild_alerts = false
 				Hardcore_Settings.ignore_xguild_chat = false
+				Hardcore_Settings.deathlog_require_verification = true
+				Hardcore_Settings.deathlog_log_size = 1000
 				Hardcore:ApplyAlertFrameSettings()
 			end,
 			order = 20,
