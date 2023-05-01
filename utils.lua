@@ -306,3 +306,7 @@ function Hardcore_AdjustTimeResolutions()
 		end
 	end
 end
+
+function Hardcore_Vector2DDistance(a, b)
+	return math.sqrt((b.x - a.x)^2 + (b.y - a.y)^2)
+end
