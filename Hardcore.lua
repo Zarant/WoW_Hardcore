@@ -298,6 +298,7 @@ local KNOWN_GRIEFERS = {
 	["Lipstiklezbo"] = 1,
 	["Sweatyloser"] = 1,
 	["Elco"] = 1,
+	["Answered"] = 1
 
 }
 
