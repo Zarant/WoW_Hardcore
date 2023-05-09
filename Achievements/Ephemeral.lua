@@ -16,11 +16,11 @@ ephemeral_achievement.description =
 function ephemeral_achievement:Register(fail_function_executor)
 	ephemeral_achievement:RegisterEvent("MERCHANT_SHOW")
 	MerchantRepairAllButton:SetScript("OnClick", function()
-		ephemeral_achievement.fail_function_executor.Fail(ephemeral_achievement.name)
+		--ephemeral_achievement.fail_function_executor.Fail(ephemeral_achievement.name)
 	end)
 
 	MerchantRepairItemButton:SetScript("OnClick", function()
-		ephemeral_achievement.fail_function_executor.Fail(ephemeral_achievement.name)
+		--ephemeral_achievement.fail_function_executor.Fail(ephemeral_achievement.name)
 	end)
 
 	ephemeral_achievement.fail_function_executor = fail_function_executor
