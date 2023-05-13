@@ -298,7 +298,16 @@ local function DrawGeneralTab(container)
 	local first_menu_description = AceGUI:Create("Label")
 	first_menu_description:SetWidth(_menu_width)
 	first_menu_description:SetText(
-		"\n\n Check out the following tabs \n\n\n   |c00FFFF00Rules|r: Compiled list of hardcore challenge rules\n\n   |c00FFFF00Verify|r: Generate a verification string to confirm your max level character\n\n   |c00FFFF00Death Knight|r: Read about Death Knight rules and/or sacrifice/activate\n\n   |c00FFFF00Levels|r: See a list of your recorded character levels\n\n   |c00FFFF00Accountability|r: See whose playing in your Hardcore guild and what addon versions they are using\n\n   |c00FFFF00Achievements|r: Check out all available achievements to try\n\n|c00FFFF00Achievements|r: These are one-time challenges that don't require activation at the start of the run.\n\n"
+		"\n\n Check out the following tabs \n\n\n"
+		.."   |c00FFFF00Rules|r: Compiled list of hardcore challenge rules\n\n"
+		.."   |c00FFFF00Verify|r: Generate a verification string to confirm your max level character\n\n"
+		.."   |c00FFFF00Death Knight|r: Read about Death Knight rules and/or sacrifice/activate\n\n"
+		.."   |c00FFFF00Levels|r: See a list of your recorded character levels\n\n"
+		.."   |c00FFFF00Dungeons|r: See information about your recorded Dungeon runs\n\n"
+		.."   |c00FFFF00Accountability|r: See whose playing in your Hardcore guild and what addon versions they are using\n\n"
+		.."   |c00FFFF00Achievements|r: Check out all available achievements to try.\n\n"
+		.."   |c00FFFF00Death Statistics|r: See a tally of all the other characters that have died while you have played\n\n\n"
+		.."|c00FF0000Don't Forget|r to |c00FFFF00/reload|r your UI regularly, |c00FFFF00Log Out|r properly, and |c00FFFF00Back Up|r your save data regularly!"
 	)
 	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	-- first_menu_description:SetPoint("TOP", 2,5)
@@ -499,7 +508,13 @@ local function DrawRulesTab(container)
 	local general_rules_description = AceGUI:Create("Label")
 	general_rules_description:SetWidth(_inner_menu_width)
 	general_rules_description:SetText(
-		"\nFor more info, rules, news, hall of legends, challenges, and more visit the classichc website. Help is available on discord (link on website) \n\nAll professions allowed\nNo restriction on talents\n\nYou can use gear that you pickup or craft\nNo Auction house, No mailbox, No trading\n\nNo grouping in open world\n\nNo battlegrounds allowed\n\nBuffs from others are allowed, don't ask for others for buffs\n\n\n\n"
+		"\nFor more info, rules, news, hall of legends, challenges, and more visit the classichc website. Help is available on discord (link on website) "
+		.."\n\nAll professions allowed\nNo restriction on talents"
+		.."\n\nYou can use gear that you pickup or craft"
+		.."\nNo Auction house, No mailbox, No trading"
+		.."\n\nNo grouping in open world"
+		.."\n\nNo battlegrounds allowed"
+		.."\n\nBuffs from others are allowed, don't ask for others for buffs\n\n\n\n"
 	)
 	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	scroll_frame:AddChild(general_rules_description)
