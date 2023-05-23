@@ -119,6 +119,7 @@ local speedrun_levels = {
 	[45] = 1,
 	[50] = 1,
 	[60] = 1,
+	[80] = 1,
 }
 local last_received_xguild_chat = ""
 local debug = false

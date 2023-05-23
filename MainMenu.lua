@@ -612,44 +612,63 @@ end
 local function DrawVerifyTab(container, _hardcore_character)
 	local ATTRIBUTE_SEPARATOR = "_"
 	local function GenerateVerificationString()
-		local version = GetAddOnMetadata("Hardcore", "Version")
 		local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
+		local version = GetAddOnMetadata("Hardcore", "Version")
 		local realm = GetRealmName()
 		local level = UnitLevel("player")
 
-		local tradePartners = Hardcore_join(_hardcore_character.trade_partners, ",")
 		local converted_successfully = "FALSE"
 		if _hardcore_character.converted_successfully then
 			converted_successfully = "TRUE"
 		end
+
 		local game_version_checker = _hardcore_character.game_version or { _G["HardcoreBuildLabel"] }
 
-		local baseVerificationData = {
-			version,
-			_hardcore_character.guid,
-			realm,
-			race,
-			class,
-			name,
-			level,
-			_hardcore_character.time_played,
-			_hardcore_character.time_tracked,
-			#_hardcore_character.deaths,
-			tradePartners,
-			_hardcore_character.sacrificed_at,
-			converted_successfully,
-			game_version_checker,
-		}
-		local baseVerificationString =
-			Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode), ATTRIBUTE_SEPARATOR)
-		local bubbleHearthIncidentsVerificationString =
-			Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
-		local playedtimeGapsVerificationString = Hardcore_tableToUnicode(_hardcore_character.played_time_gap_warnings)
-		return Hardcore_join({
-			baseVerificationString,
-			bubbleHearthIncidentsVerificationString,
-			playedtimeGapsVerificationString,
-		}, ATTRIBUTE_SEPARATOR)
+		local data_to_encode = {}
+		data_to_encode["race"] = race
+		data_to_encode["version"] = version
+		data_to_encode["class"] = class
+		data_to_encode["realm"] = realm
+		data_to_encode["level"] = level
+		data_to_encode["trade_parters"] = _hardcore_character.trade_partners 
+
+		local achievement_nums = {}
+		for _,v in ipairs(_hardcore_character.achievements) do
+		  if _G.a_id[v] ~= nil then
+		    achievement_nums[#achievement_nums+1] = _G.a_id[v]
+		  end
+		end
+		data_to_encode["achievements"] = achievement_nums 
+
+		local passive_achievement_nums = {}
+		for _,v in ipairs(_hardcore_character.passive_achievements) do
+		  if _G.pa_id[v] ~= nil then
+		    passive_achievement_nums[#passive_achievement_nums+1] = _G.pa_id[v]
+		  end
+		end
+		data_to_encode["passive_achievements"] = passive_achievement_nums 
+		data_to_encode["converted_successfully"] = converted_successfully 
+		data_to_encode["game_version_checker"] = game_version_checker 
+		data_to_encode["guid"] = _hardcore_character.guid
+		data_to_encode["name"] = name 
+		data_to_encode["time_played"] = _hardcore_character.time_played 
+		data_to_encode["time_tracked"] = _hardcore_character.time_tracked 
+		data_to_encode["deaths"] = #_hardcore_character.deaths 
+		data_to_encode["sacrificed_at"] = _hardcore_character.sacrificed_at 
+		data_to_encode["bubble_hearth_incidents"] = _hardcore_character.bubble_hearth_incidents 
+		data_to_encode["played_time_gap_warnings"] = _hardcore_character.played_time_gap_warnings 
+		data_to_encode["adjusted_time10"] = _hardcore_character.adjusted_time10 
+		data_to_encode["adjusted_time15"] = _hardcore_character.adjusted_time15 
+		data_to_encode["adjusted_time20"] = _hardcore_character.adjusted_time20 
+		data_to_encode["adjusted_time30"] = _hardcore_character.adjusted_time30 
+		data_to_encode["adjusted_time40"] = _hardcore_character.adjusted_time40 
+		data_to_encode["adjusted_time50"] = _hardcore_character.adjusted_time50 
+		data_to_encode["adjusted_time60"] = _hardcore_character.adjusted_time60 
+		data_to_encode["adjusted_time80"] = _hardcore_character.adjusted_time80 
+
+		local json = Hardcore_GetJSONConverter()
+		local base64 = Hardcore_Base64()
+		return base64.encode(json.stringify(data_to_encode))
 	end
 
 	local version = GetAddOnMetadata("Hardcore", "Version")
@@ -704,7 +723,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 
 
 	local extra_lines = ""
-	if UnitLevel("player") < max_level then
+	if UnitLevel("player") < max_level and false then
 		-- local general_rules_description = AceGUI:Create("Label")
 		-- general_rules_description:SetWidth(_menu_width)
 		-- general_rules_description:SetText("\n\nYou must be max level for your chosen expansion (60 or 80) to get a verification string your character.")

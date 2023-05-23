@@ -16,6 +16,8 @@ embeds.xml
 CustomLayouts.lua
 utils.lua
 Security.lua
+JsonConverter.lua
+Base64.lua
 Hardcore.xml
 
 #Tokens
