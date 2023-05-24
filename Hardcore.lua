@@ -2171,7 +2171,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
-	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
+	-- local time, token, hiding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
 	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, environmental_type, _, _, _, _, _ = CombatLogGetCurrentEventInfo()
 
 	if not (source_name == PLAYER_NAME) then

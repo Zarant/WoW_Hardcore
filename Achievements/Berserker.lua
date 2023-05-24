@@ -51,7 +51,7 @@ berserker_achievement:SetScript("OnEvent", function(self, event, ...)
 						return
 					end
 					if time_elapsed > 60 then
-						Hardcore:Print("Equiped " .. item_name .. ".")
+						Hardcore:Print("Equipped " .. item_name .. ".")
 						berserker_achievement.fail_function_executor.Fail(berserker_achievement.name)
 
 						self:Cancel()
@@ -66,7 +66,7 @@ berserker_achievement:SetScript("OnEvent", function(self, event, ...)
 				local item_name, _, _, _, _, item_type, item_subtype, _, _, _, _ = GetItemInfo(item_id)
 				if item_type == "Armor" then
 					if item_subtype == "Shields" or item_subtype == "Mail" or item_subtype == "Plate" then
-						Hardcore:Print("Equiped " .. item_name .. ".")
+						Hardcore:Print("Equipped " .. item_name .. ".")
 						berserker_achievement.fail_function_executor.Fail(berserker_achievement.name)
 					end
 				end

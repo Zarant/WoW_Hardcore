@@ -39,7 +39,7 @@ hammertime_achievement:SetScript("OnEvent", function(self, event, ...)
 					return
 				else
 					if item_subtype ~= "Two-Handed Maces" then
-						Hardcore:Print("Equiped " .. item_name .. ".")
+						Hardcore:Print("Equipped " .. item_name .. ".")
 						hammertime_achievement.fail_function_executor.Fail(hammertime_achievement.name)
 					end
 				end

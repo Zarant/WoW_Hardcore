@@ -192,7 +192,7 @@ self_made_duo_achievement:SetScript("OnEvent", function(self, event, ...)
 		if arg[2] == true then -- this arg[2] is checking if the equippable spot is nil
 			return
 		end
-		if arg[1] == 19 then -- This is checking if what you have equipped is a tabard, we cant make those :D
+		if arg[1] == 19 then -- This is checking if what you have equipped is a tabard, we can't make those :D
 			print("You put on a tabard! You're Stylish.")
 			return
 		end

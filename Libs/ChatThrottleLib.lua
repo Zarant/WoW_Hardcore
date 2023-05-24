@@ -150,7 +150,7 @@ local MsgBin = setmetatable({}, {__mode="k"})
 
 local function DelMsg(msg)
 	msg[1] = nil
-	-- there's more parameters, but they're very repetetive so the string pool doesn't suffer really, and it's faster to just not delete them.
+	-- there's more parameters, but they're very repetitive so the string pool doesn't suffer really, and it's faster to just not delete them.
 	MsgBin[msg] = true
 end
 

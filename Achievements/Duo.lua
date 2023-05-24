@@ -46,7 +46,7 @@ local function checkHardcoreStatus()
 	-- other_hardcore_character_cache[duo_rules.teammate_1].achievements = {"Nudist", "Power From Within"}
 	-- other_hardcore_character_cache[duo_rules.teammate_1].team = {UnitName("player")}
 	------------------------
-	-- Initialized and failes; different party member
+	-- Initialized and fails; different party member
 	-- other_hardcore_character_cache[UnitName("player")] = {}
 	-- other_hardcore_character_cache[UnitName("player")].achievements = {"Nudist", "Power From Within"}
 	-- other_hardcore_character_cache[UnitName("player")].party_mode = "Duo"
@@ -56,7 +56,7 @@ local function checkHardcoreStatus()
 	-- other_hardcore_character_cache[duo_rules.teammate_1].achievements = {"Nudist", "Power From Within"}
 	-- other_hardcore_character_cache[duo_rules.teammate_1].team = {"somewrongplayer"}
 	------------------------
-	-- Initialized and failes; achievement mismatch
+	-- Initialized and fails; achievement mismatch
 	-- other_hardcore_character_cache[UnitName("player")] = {}
 	-- other_hardcore_character_cache[UnitName("player")].achievements = {"Nudist", "Power From Within"}
 	-- other_hardcore_character_cache[UnitName("player")].party_mode = "Duo"

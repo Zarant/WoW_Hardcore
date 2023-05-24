@@ -358,7 +358,7 @@ local function DrawGeneralTab(container)
 
 	CreateDescriptionLabel(
 		"- Fix guild chat crash in WotLK\n"
-			.. "- Ammend Griefer list\n"
+			.. "- Amend Griefer list\n"
 			.. "- LF mode in greenwall\n"
 			.. "- Added officer tools\n"
 			.. "- No longer generate verification strings under max level\n"
