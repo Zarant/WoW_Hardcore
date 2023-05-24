@@ -16,9 +16,9 @@ local faction_indices = { 2, 3, 4, 5 }
 local starting_rep = {
 	["Gnome"] = 13300,
 	["Human"] = 13300,
-	["Night Elf"] = 13300,
+	["NightElf"] = 13300,
 	["Dwarf"] = 13300,
-	["Undead"] = 5500,
+	["Scourge"] = 5500,
 	["Tauren"] = 10700,
 	["Orc"] = 10700,
 	["Troll"] = 10700,
@@ -33,7 +33,8 @@ function no_hit_achievement:UpdateDescription()
 			GetFactionInfo(idx)
 		total_earned_value = total_earned_value + earnedValue
 	end
-	total_earned_value = total_earned_value - starting_rep[UnitRace("player")]
+	local _, raceFile, _ = UnitRace("player")
+	total_earned_value = total_earned_value - starting_rep[raceFile]
 	if total_earned_value > 45000 then
 		no_hit_achievement.description = no_hit_achievement.description .. "\n|c0000FF00Progress: Complete!|r"
 	else
