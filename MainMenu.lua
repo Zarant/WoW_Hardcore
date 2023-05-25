@@ -86,38 +86,34 @@ local sort_functions = {
 		return t1 < t2
 	end,
 	["simpledate"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = ""
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = ""
 		else
-			t1 = other_hardcore_character_cache[player_name_short].first_recorded or ""
+			t1 = other_hardcore_character_cache[a].first_recorded or ""
 		end
 
 		local t2 = ""
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = ""
 		else
-			t2 = other_hardcore_character_cache[player_name_short].first_recorded or ""
+			t2 = other_hardcore_character_cache[b].first_recorded or ""
 		end
 		return t1 > t2
 	end,
 	["rsimpledate"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = ""
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = ""
 		else
-			t1 = other_hardcore_character_cache[player_name_short].first_recorded or ""
+			t1 = other_hardcore_character_cache[a].first_recorded or ""
 		end
 
 		local t2 = ""
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = ""
 		else
-			t2 = other_hardcore_character_cache[player_name_short].first_recorded or ""
+			t2 = other_hardcore_character_cache[b].first_recorded or ""
 		end
 		return t1 < t2
 	end,
@@ -128,110 +124,98 @@ local sort_functions = {
 		return t[b]["playedtime"] < t[a]["playedtime"]
 	end,
 	["achievements"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = 0
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = 0
 		else
-			t1 = #other_hardcore_character_cache[player_name_short].achievements or 0
+			t1 = #other_hardcore_character_cache[a].achievements or 0
 		end
 
 		local t2 = 0
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = 0
 		else
-			t2 = #other_hardcore_character_cache[player_name_short].achievements or 0
+			t2 = #other_hardcore_character_cache[b].achievements or 0
 		end
 		return t1 > t2
 	end,
 	["rachievements"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = 0
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = 0
 		else
-			t1 = #other_hardcore_character_cache[player_name_short].achievements or 0
+			t1 = #other_hardcore_character_cache[a].achievements or 0
 		end
 
 		local t2 = 0
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = 0
 		else
-			t2 = #other_hardcore_character_cache[player_name_short].achievements or 0
+			t2 = #other_hardcore_character_cache[b].achievements or 0
 		end
 		return t1 < t2
 	end,
 	["mode"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = "None"
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = "None"
 		else
-			t1 = other_hardcore_character_cache[player_name_short].party_mode or "None"
+			t1 = other_hardcore_character_cache[a].party_mode or "None"
 		end
 
 		local t2 = "None"
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = "None"
 		else
-			t2 = other_hardcore_character_cache[player_name_short].party_mode or "None"
+			t2 = other_hardcore_character_cache[b].party_mode or "None"
 		end
 		return t1 > t2
 	end,
 	["rmode"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = "None"
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = "None"
 		else
-			t1 = other_hardcore_character_cache[player_name_short].party_mode or "None"
+			t1 = other_hardcore_character_cache[a].party_mode or "None"
 		end
 
 		local t2 = "None"
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = "None"
 		else
-			t2 = other_hardcore_character_cache[player_name_short].party_mode or "None"
+			t2 = other_hardcore_character_cache[b].party_mode or "None"
 		end
 		return t1 < t2
 	end,
 	["hctag"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = "None"
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = "None"
 		else
-			t1 = other_hardcore_character_cache[player_name_short].hardcore_player_name or "None"
+			t1 = other_hardcore_character_cache[a].hardcore_player_name or "None"
 		end
 
 		local t2 = "None"
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = "None"
 		else
-			t2 = other_hardcore_character_cache[player_name_short].hardcore_player_name or "None"
+			t2 = other_hardcore_character_cache[b].hardcore_player_name or "None"
 		end
 		return t1 > t2
 	end,
 	["rhctag"] = function(t, a, b)
-		local player_name_short = string.split("-", a)
 		local t1 = "None"
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[a] == nil then
 			t1 = "None"
 		else
-			t1 = other_hardcore_character_cache[player_name_short].hardcore_player_name or "None"
+			t1 = other_hardcore_character_cache[a].hardcore_player_name or "None"
 		end
 
 		local t2 = "None"
-		player_name_short = string.split("-", b)
-		if other_hardcore_character_cache[player_name_short] == nil then
+		if other_hardcore_character_cache[b] == nil then
 			t2 = "None"
 		else
-			t2 = other_hardcore_character_cache[player_name_short].hardcore_player_name or "None"
+			t2 = other_hardcore_character_cache[b].hardcore_player_name or "None"
 		end
 		return t1 < t2
 	end,
@@ -1340,20 +1324,20 @@ local function GetSpacelessRealmName()
 end
 
 local function DrawAccountabilityTab(container)
-	local function updateLabelData(_label_tbls, player_name_short)
-		if other_hardcore_character_cache[player_name_short] ~= nil then
-			_label_tbls["party_mode_label"]:SetText(other_hardcore_character_cache[player_name_short].party_mode)
+	local function updateLabelData(_label_tbls, player_name)
+		if other_hardcore_character_cache[player_name] ~= nil then
+			_label_tbls["party_mode_label"]:SetText(other_hardcore_character_cache[player_name].party_mode)
 			_label_tbls["first_recorded_label"]:SetText(
-				date("%m/%d/%y", other_hardcore_character_cache[player_name_short].first_recorded or 0)
+				date("%m/%d/%y", other_hardcore_character_cache[player_name].first_recorded or 0)
 			)
 
 			if
-				other_hardcore_character_cache[player_name_short].achievements == nil
-				or #other_hardcore_character_cache[player_name_short].achievements > 0
-				or #other_hardcore_character_cache[player_name_short].passive_achievements > 0
+				other_hardcore_character_cache[player_name].achievements == nil
+				or #other_hardcore_character_cache[player_name].achievements > 0
+				or #other_hardcore_character_cache[player_name].passive_achievements > 0
 			then
 				local inline_text = ""
-				for i, achievement_name in ipairs(other_hardcore_character_cache[player_name_short].achievements) do
+				for i, achievement_name in ipairs(other_hardcore_character_cache[player_name].achievements) do
 					if _G.achievements[achievement_name] then
 						inline_text = inline_text
 							.. "|T"
@@ -1362,7 +1346,7 @@ local function DrawAccountabilityTab(container)
 					end
 				end
 				for i, achievement_name in
-					ipairs(other_hardcore_character_cache[player_name_short].passive_achievements)
+					ipairs(other_hardcore_character_cache[player_name].passive_achievements)
 				do
 					if _G.passive_achievements[achievement_name] then
 						inline_text = inline_text
@@ -1381,7 +1365,7 @@ local function DrawAccountabilityTab(container)
 						end
 					end
 					for i, achievement_name in
-						ipairs(other_hardcore_character_cache[player_name_short].passive_achievements)
+						ipairs(other_hardcore_character_cache[player_name].passive_achievements)
 					do
 						if _G.passive_achievements[achievement_name] then
 							GameTooltip:AddLine(_G.passive_achievements[achievement_name].title)
@@ -1396,26 +1380,25 @@ local function DrawAccountabilityTab(container)
 				_label_tbls["achievement_label"]:SetText("")
 			end
 			_label_tbls["hc_tag_label"]:SetText(
-				other_hardcore_character_cache[player_name_short].hardcore_player_name or ""
+				other_hardcore_character_cache[player_name].hardcore_player_name or ""
 			)
 		end
 
-		local player_name_long = player_name_short .. "-" .. GetSpacelessRealmName()
-		if hardcore_modern_menu_state.guild_online[player_name_long] ~= nil then
+		if hardcore_modern_menu_state.guild_online[player_name] ~= nil then
 			local version_text
 			if
 				(
-					hardcore_modern_menu_state.online_pulsing[player_name_long]
-					and hardcore_modern_menu_state.guild_online[player_name_long]
-				) or player_name_short == UnitName("player")
+					hardcore_modern_menu_state.online_pulsing[player_name]
+					and hardcore_modern_menu_state.guild_online[player_name]
+				) or player_name == UnitName("player") .. "-" .. GetSpacelessRealmName()
 			then
-				if player_name_short == UnitName("player") then
+				if player_name == UnitName("player") .. "-" .. GetSpacelessRealmName() then
 					version_text = GetAddOnMetadata("Hardcore", "Version")
 				else
-					version_text = hardcore_modern_menu_state.guild_versions[player_name_long]
+					version_text = hardcore_modern_menu_state.guild_versions[player_name]
 				end
 
-				if hardcore_modern_menu_state.guild_versions_status[player_name_long] == "updated" then
+				if hardcore_modern_menu_state.guild_versions_status[player_name] == "updated" then
 					version_text = "|c0000ff00" .. version_text .. "|r"
 				else
 					version_text = "|c00ffff00" .. version_text .. "|r"
@@ -1425,11 +1408,12 @@ local function DrawAccountabilityTab(container)
 			end
 			_label_tbls["version_label"]:SetText(version_text)
 
-			_label_tbls["level_label"]:SetText(hardcore_modern_menu_state.guild_online[player_name_long].level)
+			_label_tbls["level_label"]:SetText(hardcore_modern_menu_state.guild_online[player_name].level)
 		end
 	end
-	local function addEntry(_scroll_frame, player_name_short, _self_name)
+	local function addEntry(_scroll_frame, player_name, _self_name)
 		--local _player_name = player_name_short .. "-" .. GetSpacelessRealmName()
+		local player_name_short = string.split("-", player_name)
 		local entry = AceGUI:Create("SimpleGroup")
 		entry:SetLayout("Flow")
 		entry:SetFullWidth(true)
@@ -1440,45 +1424,45 @@ local function DrawAccountabilityTab(container)
 		name_label:SetText(player_name_short)
 		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(name_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short] = {}
+		hardcore_modern_menu_state.entry_tbl[player_name] = {}
 
 		local level_label = AceGUI:Create("Label")
 		level_label:SetWidth(50)
 		level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(level_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["level_label"] = level_label
+		hardcore_modern_menu_state.entry_tbl[player_name]["level_label"] = level_label
 
 		local version_label = AceGUI:Create("Label")
 		version_label:SetWidth(80)
 		version_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(version_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["version_label"] = version_label
+		hardcore_modern_menu_state.entry_tbl[player_name]["version_label"] = version_label
 
 		local party_mode_label = AceGUI:Create("Label")
 		party_mode_label:SetWidth(75)
 		party_mode_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(party_mode_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["party_mode_label"] = party_mode_label
+		hardcore_modern_menu_state.entry_tbl[player_name]["party_mode_label"] = party_mode_label
 
 		local first_recorded_label = AceGUI:Create("Label")
 		first_recorded_label:SetWidth(85)
 		first_recorded_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(first_recorded_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["first_recorded_label"] = first_recorded_label
+		hardcore_modern_menu_state.entry_tbl[player_name]["first_recorded_label"] = first_recorded_label
 
 		local achievement_label = AceGUI:Create("InteractiveLabel")
 		achievement_label:SetWidth(320)
 		achievement_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(achievement_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["achievement_label"] = achievement_label
+		hardcore_modern_menu_state.entry_tbl[player_name]["achievement_label"] = achievement_label
 
 		local hc_tag_label = AceGUI:Create("Label")
 		hc_tag_label:SetWidth(75)
 		hc_tag_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(hc_tag_label)
-		hardcore_modern_menu_state.entry_tbl[player_name_short]["hc_tag_label"] = hc_tag_label
+		hardcore_modern_menu_state.entry_tbl[player_name]["hc_tag_label"] = hc_tag_label
 
-		updateLabelData(hardcore_modern_menu_state.entry_tbl[player_name_short], player_name_short) -- , _player_name)
+		updateLabelData(hardcore_modern_menu_state.entry_tbl[player_name], player_name) -- , _player_name)
 	end
 
 	local scroll_container = AceGUI:Create("SimpleGroup")
@@ -1636,8 +1620,7 @@ local function DrawAccountabilityTab(container)
 			sort_functions[hardcore_modern_menu_state.accountability_sort_state]
 		)
 	do
-		local player_name_short = string.split("-", _player_name)
-		addEntry(scroll_frame, player_name_short, self_name)
+		addEntry(scroll_frame, _player_name, self_name)
 	end
 
 	hardcore_modern_menu_state.ticker_handler = C_Timer.NewTicker(0.1, function()
@@ -1669,9 +1652,8 @@ local function DrawAccountabilityTab(container)
 				sort_functions[hardcore_modern_menu_state.accountability_sort_state]
 			)
 		do
-			local player_name_short = string.split("-", _player_name)
-			if other_hardcore_character_cache[player_name_short] == nil then
-				RequestHCData(player_name_short)
+			if other_hardcore_character_cache[player_name] == nil then
+				RequestHCData(player_name)
 			end
 		end
 	end)

@@ -516,7 +516,8 @@ function selfDeathAlert(death_source_str)
 	  death_source = npc_to_id[death_source_str]
 	end
 
-	msg = encodeMessage(UnitName("player"), guildName, death_source, race_id, class_id, UnitLevel("player"), instance_id, map, position)
+	local name, realm = UnitFullName("player")
+	msg = encodeMessage(name .. "-" .. realm, guildName, death_source, race_id, class_id, UnitLevel("player"), instance_id, map, position)
 	if msg == nil then return end
 	local channel_num = GetChannelName(death_alerts_channel)
 
@@ -615,7 +616,14 @@ end
 local function deathlogReceiveChannelMessage(sender, data)
   if data == nil then return end
   local decoded_player_data = decodeMessage(data)
-  if sender ~= decoded_player_data["name"] then return end
+  local my_realm = GetNormalizedRealmName()
+  local sender_name, sender_realm = string.split("-", sender)
+  -- check for local or connected realms and handle backward compat
+  if sender_realm == nil then
+    sender_realm = my_realm
+    sender = sender_name .. "-" .. my_realm
+  end
+  if sender ~= decoded_player_data["name"] and sender ~= decoded_player_data["name"] .. "-" .. my_realm then return end
   if isValidEntry(decoded_player_data) == false then return end
 
   local checksum = fletcher16(decoded_player_data)
@@ -632,10 +640,9 @@ local function deathlogReceiveChannelMessage(sender, data)
 
   local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
   if decoded_player_data['guild'] == guildName then
-    local name_long = sender .. "-" .. GetNormalizedRealmName()
     for i = 1, GetNumGuildMembers() do
 	    local name, _, _, level, class_str, _, _, _, _, _, class = GetGuildRosterInfo(i)
-	    if name_long == name and level == decoded_player_data["level"] then
+	    if sender == name and level == decoded_player_data["level"] then
 	      death_ping_lru_cache_tbl[checksum]["player_data"]["in_guild"] = 1
 	      local delay = math.random(0,10)
 	      C_Timer.After(delay, function()

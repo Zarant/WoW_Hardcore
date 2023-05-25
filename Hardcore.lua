@@ -2048,8 +2048,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			return
 		end
 		if command == COMM_COMMANDS[5] then -- Received request for hc character data
-			local name, _ = string.split("-", sender)
-			Hardcore:SendCharacterData(name)
+			Hardcore:SendCharacterData(sender)
 			return
 		end
 		if command == COMM_COMMANDS[14] then
@@ -2060,7 +2059,6 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 			end
 		end
 		if command == COMM_COMMANDS[4] then -- Received hc character data
-			local name, _ = string.split("-", sender)
 			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str,
 						 verif_status, verif_details = string.split(COMM_FIELD_DELIM, data)
 			local achievements_l = { string.split(COMM_SUBFIELD_DELIM, achievements_str) }
@@ -2090,7 +2088,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				verif_details = "(unknown - version not supported)"
 			end
 
-			other_hardcore_character_cache[name] = {
+			other_hardcore_character_cache[sender] = {
 				first_recorded = creation_time,
 				achievements = other_achievements_ds,
 				passive_achievements = other_passive_achievements_ds,
@@ -2102,7 +2100,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				verification_status = verif_status,
 				verification_details = verif_details
 			}
-			hardcore_modern_menu_state.changeset[string.split("-", name)] = 1
+			hardcore_modern_menu_state.changeset[sender] = 1
 			return
 		end
 		if command == COMM_COMMANDS[9] then -- Appeal achievement
@@ -2269,7 +2267,7 @@ function Hardcore:GUILD_ROSTER_UPDATE(...)
 				level = level,
 				classDisplayName = classDisplayName,
 			}
-			hardcore_modern_menu_state.changeset[(string.split("-", name))] = 1
+			hardcore_modern_menu_state.changeset[name] = 1
 		end
 	end
 
@@ -3381,7 +3379,7 @@ function Hardcore:CheckVersionsAndUpdate(playername, versionstring)
 	guild_versions[playername] = versionstring
 	hardcore_modern_menu_state.guild_versions[playername] = versionstring
 	hardcore_modern_menu_state.guild_versions_status[playername] = guild_versions_status[playername]
-	hardcore_modern_menu_state.changeset[(string.split("-", playername))] = 1
+	hardcore_modern_menu_state.changeset[playername] = 1
 end
 
 function Hardcore:UpdateGuildRosterRows()
