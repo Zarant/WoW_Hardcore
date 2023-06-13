@@ -238,20 +238,55 @@ function duo_rules:Check()
 		return
 	end
 
-	local my_map = C_Map.GetBestMapForUnit("player")
-	local teammates_map = C_Map.GetBestMapForUnit(member_str)
+	local my_subzone = C_Map.GetBestMapForUnit("player") -- subzone
+	local teammate_subzone = C_Map.GetBestMapForUnit(member_str) -- subzone
+    
+    local my_zone = C_Map.GetMapInfo(my_subzone).parentMapID -- parent zone
+    local teammate_zone = C_Map.GetMapInfo(teammate_subzone).parentMapID -- parent zone
 
-	if my_map == 1450 or teammates_map == 1450 or my_map == 124 or teammates_map == 124 then -- Moonglade/Scarlet enclave
+	local my_class = UnitClass("player")
+	local teammate_class = UnitClass(member_str)
+
+	local CITY_SUBZONES = {
+		[84] = "Stormwind",
+		[87] = "Ironforge",
+		[88] = "Darnassus",
+		[362] = "Thunder Bluff",
+		[90] = "Undercity",
+		[85] = "Orgrimmar",
+		[161] = "Shattrath City",
+		[125] = "Dalaran",
+	}
+
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+
+	local CITY_AND_EXEMPT_SUBZONES = {}
+	for i, v in ipairs(CITY_SUBZONES) do table.insert(COMBINED_SUBZONES, v) end
+	for i, v in ipairs(EXEMPT_SUBZONES) do table.insert(COMBINED_SUBZONES, v) end
+
+	-- note: any exemptions here for Moonglade and Scarlet Enclave take class into account
+
+	if duo_rules:city_or_exempt_subzone(my_subzone, my_class) and 
+			duo_rules:city_or_exempt_subzone(teammate_subzone, teammate_class) then
+		-- if I am in a city, my partners must also be in the same city (same subzone)
 		duo_rules:ResetWarn()
-	elseif my_map ~= teammates_map then
-		Hardcore:Print("Duo check: Partner is in another subzone")
-		duo_rules.warning_reason = "Warning - Partner is in another subzone."
-		duo_rules:Warn()
-		return
-	end
-	if checkHardcoreStatus == true then
+
+	elseif duo_rules:same_or_exempt_zone(my_subzone, teammate_subzone, teammate_class)  then
+		-- otherwise, we must share the same zone
 		duo_rules:ResetWarn()
-	end
+
+	elseif checkHardcoreStatus() == true then
+		duo_rules:ResetWarn()
+	else
+        Hardcore:Print("Duo check: Partner is in another zone")
+        duo_rules.warning_reason = "Warning - Partner is in another zone."
+        duo_rules:Warn()
+        return
+    end
 end
 
 -- Register Definitions
@@ -262,3 +297,57 @@ duo_rules:SetScript("OnEvent", function(self, event, ...)
 		Hardcore:Print("Failed Duo")
 	end
 end)
+
+function duo_rules:city_or_exempt_subzone (needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle subzone matches haystack subzone or is in exempt subzone, return true
+	local CITY_SUBZONES = {
+		[84] = "Stormwind",
+		[87] = "Ironforge",
+		[88] = "Darnassus",
+		[362] = "Thunder Bluff",
+		[90] = "Undercity",
+		[85] = "Orgrimmar",
+		[161] = "Shattrath City",
+		[125] = "Dalaran",
+	}
+	local EXEMPT_SUBZONES = { -- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return CITY_SUBZONES[needle_subzone]
+	end
+end
+
+function duo_rules:same_or_exempt_subzone (haystack_subzone, needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle subzone matches haystack subzone or is in exempt subzone, return true
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return needle_subzone == haystack_subzone
+	end
+end
+
+function  duo_rules:same_or_exempt_zone (haystack_subzone, needle_subzone, needle_class)
+	-- checks needle against haystack
+	-- if needle zone matches haystack zone, or is in exempt subzone, return true
+	local EXEMPT_SUBZONES = {
+		-- subzone, class id
+		[124] = 6, -- DK / "Scarlet Enclave",
+		[1450] = 11, -- Druid / "Moonglade",
+	}
+	if EXEMPT_SUBZONES[needle_subzone] == needle_class then
+		return true
+	else
+		return C_Map.GetMapInfo(haystack_subzone).parentMapID == C_Map.GetMapInfo(needle_subzone).parentMapID -- parent zone
+	end
+end
