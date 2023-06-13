@@ -844,7 +844,7 @@ local function DrawLevelsTab(container, _hardcore_settings)
 		local name_label = AceGUI:Create("Label")
 		name_label:SetWidth(width)
 		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		name_label:SetFont(hardcore_locale_supported_font or "Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(name_label)
 	end
 
@@ -865,7 +865,7 @@ local function DrawLevelsTab(container, _hardcore_settings)
 		local name_label = AceGUI:Create("Label")
 		name_label:SetWidth(width)
 		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		name_label:SetFont(hardcore_locale_supported_font or "Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(name_label)
 	end
 
@@ -890,7 +890,7 @@ local function DrawLevelsTab(container, _hardcore_settings)
 		local name_label = AceGUI:Create("Label")
 		name_label:SetWidth(width)
 		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		name_label:SetFont(hardcore_locale_supported_font or "Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(name_label)
 	end
 
@@ -911,7 +911,7 @@ local function DrawLevelsTab(container, _hardcore_settings)
 		local name_label = AceGUI:Create("Label")
 		name_label:SetWidth(width)
 		name_label:SetText(name_str)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		name_label:SetFont(hardcore_locale_supported_font or "Fonts\\FRIZQT__.TTF", 12, "")
 		entry:AddChild(name_label)
 	end
 

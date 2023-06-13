@@ -73,6 +73,8 @@ Hardcore_Settings = {
 	ignore_xguild_chat = false,
 	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
+	reload_reminder_interval = 0,
+	reload_reminder_show = true
 }
 
 WARNING = ""
@@ -122,6 +124,7 @@ local speedrun_levels = {
 }
 local last_received_xguild_chat = ""
 local debug = false
+local player_logged_out = false
 local dc_recovery_info = nil
 local received_recover_time_ack = nil
 local expecting_achievement_appeal = false
@@ -191,7 +194,8 @@ local COMM_COMMANDS = {
 	"REQUEST_RECOVERY_TIME", -- 16 Used to request recovery segments if detected DC
 	"REQUEST_RECOVERY_TIME_ACK", -- 17 Recovery request ack
 	"SURVEY_REQ",	-- 18 Request for survey info (from GM)
-	"SURVEY_ACK"	-- 19 Answer to survey info (to GM)
+	"SURVEY_ACK",	-- 19 Answer to survey info (to GM)
+	"SHARED_DL",	-- 20 Receive shared deathlog data
 }
 local COMM_SPAM_THRESHOLD = { -- msgs received within durations (s) are flagged as spam
 	PULSE = 3,
@@ -308,6 +312,21 @@ local display = "Rules"
 local displaylist = Hardcore_Settings.level_list
 local icon = nil
 
+
+local locale = GetLocale()
+hardcore_locale_supported_font = nil
+local non_english_locales = {
+  koKR=1,
+  zhCN=1,
+  zhTW=1
+}
+
+if non_english_locales[locale] == 1 then
+	hardcore_locale_supported_font = "Fonts\\2002.TTF"
+	_G["HardcoreFont"]:SetFont(hardcore_locale_supported_font,26, "")
+end
+
+
 -- available alert frame/icon styles
 local MEDIA_DIR = "Interface\\AddOns\\Hardcore\\Media\\"
 local ALERT_STYLES = {
@@ -405,6 +424,17 @@ local function startXGuildChatMsgRelay(msg)
 	for _, v in pairs(hardcore_guild_member_dict) do
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
 	end
+end
+
+function Hardcore:initSendSharedDLMsg(target_player)
+  local publishFunc = function(encoded_msg)
+	local commMessage = COMM_COMMANDS[20]
+		.. COMM_COMMAND_DELIM
+		.. encoded_msg
+
+	CTL:SendAddonMessage("BULK", COMM_NAME, commMessage, "WHISPER", target_player)
+  end
+  HardcoreDeathlog_beginSendSharedMsg(publishFunc)
 end
 
 local function startXGuildDeathMsgRelay()
@@ -544,6 +574,8 @@ local settings_saved_variable_meta = {
 	["use_alternative_menu"] = false,
 	["ignore_xguild_chat"] = false,
 	["ignore_xguild_alerts"] = false,
+	["reload_reminder_interval"] = 0,
+	["reload_reminder_show"] = true,
 }
 
 --[[ Post-utility functions]]
@@ -988,6 +1020,9 @@ function Hardcore:PLAYER_LOGIN()
 	-- initiate survey module (pass Hardcore.lua locals needed for communication)
 	SurveyInitiate(COMM_NAME, COMM_COMMANDS[18], COMM_COMMANDS[19], COMM_COMMAND_DELIM, COMM_FIELD_DELIM)
 
+	-- initiate reload reminder module
+	ReloadReminderInitiate()
+
 	-- check players version against highest version
 	local FULL_PLAYER_NAME = Hardcore_GetPlayerPlusRealmName()
 	Hardcore:CheckVersionsAndUpdate(FULL_PLAYER_NAME, GetAddOnMetadata("Hardcore", "Version"))
@@ -1045,6 +1080,11 @@ function Hardcore:PLAYER_LOGIN()
 end
 
 function Hardcore:PLAYER_LOGOUT()
+
+	-- Stop further updates to the played time and tracked time, don't want them
+	-- changing after the checksum is stored
+	player_logged_out = true
+
 	-- Calculate the data file checksum
 	Hardcore_StoreChecksum()
 
@@ -1612,6 +1652,10 @@ local function initiateRecoverTime(duration_since_last_recording)
 end
 
 function Hardcore:TIME_PLAYED_MSG(...)
+
+	-- Don't update anymore after the data security checksum has been calculated
+	if player_logged_out == true then return end
+
 	local totalTimePlayed, _ = ...
 	Hardcore_Character.time_played = totalTimePlayed or 1
 	-- Check playtime gap percentage
@@ -1624,6 +1668,9 @@ function Hardcore:TIME_PLAYED_MSG(...)
 	end
 
 	Hardcore:Debug(Hardcore_Character.tracked_played_percentage)
+
+	-- Tell the watchdog we are still alive
+	ReloadReminderPlayedTimeUpdate()
 
 	-- Check to see if the gap since the last recording is too long.  When receiving played time for the first time.
 	if RECEIVED_FIRST_PLAYED_TIME_MSG == false and Hardcore_Character.accumulated_time_diff ~= nil then
@@ -2135,6 +2182,10 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 		if command == COMM_COMMANDS[19] then
 			SurveyReceiveResponse(data, sender)
 			return
+		end
+		if command == COMM_COMMANDS[20] then
+		  HardcoreDeathlog_receiveSharedMsg(data)
+		  return
 		end
 		if DEPRECATED_COMMANDS[command] or alert_msg_time[command] == nil then
 			return
@@ -3315,10 +3366,13 @@ function Hardcore:InitiatePulsePlayed()
 
 	--time accumulator
 	C_Timer.NewTicker(TIME_TRACK_PULSE, function()
+		if player_logged_out == true then return end
 		Hardcore_Character.time_tracked = Hardcore_Character.time_tracked + TIME_TRACK_PULSE
 		if RECEIVED_FIRST_PLAYED_TIME_MSG == true then
 			Hardcore_Character.accumulated_time_diff = Hardcore_Character.time_played - Hardcore_Character.time_tracked
 		end
+		-- Tell the watchdog we are still alive
+		ReloadReminderTrackedTimeUpdate()
 	end)
 
 	--played time tracking
@@ -3927,7 +3981,7 @@ local options = {
 						Hardcore_Settings.hardcore_player_name = val
 						Hardcore_Character.hardcore_player_name = val
 					end,
-					order = 11,
+					order = 13,
 				},
 				use_alternative_menu = {
 					type = "toggle",
@@ -3939,7 +3993,7 @@ local options = {
 					set = function()
 						Hardcore_Settings.use_alternative_menu = not Hardcore_Settings.use_alternative_menu
 					end,
-					order = 12,
+					order = 11,
 				},
 				show_minimap_icon_option = {
 					type = "toggle",
@@ -3951,14 +4005,46 @@ local options = {
 					set = function()
 						Hardcore:ToggleMinimapIcon()
 					end,
-					order = 13,
+					order = 12,
+				},
+				reload_reminder_show = {
+					type = "toggle",
+					name = "Show reload reminder",
+					desc = "Show reload reminder",
+					get = function()
+						return Hardcore_Settings.reload_reminder_show
+					end,
+					set = function()
+						Hardcore_Settings.reload_reminder_show = not Hardcore_Settings.reload_reminder_show
+						ReloadReminderEnableWarning(Hardcore_Settings.reload_reminder_show)
+					end,
+					order = 14,
+				},
+				reload_reminder_interval = {
+					type = "input",
+					name = "Reminder interval",
+					desc = "Reload reminder interval (in minutes, 0 = automatic)",
+					get = function()
+						if Hardcore_Settings.reload_reminder_interval then
+							return "" .. Hardcore_Settings.reload_reminder_interval
+						else
+							return "0"
+						end
+					end,
+					set = function(info, val)
+						if tonumber( val ) and tonumber(val) >= 0 then
+							Hardcore_Settings.reload_reminder_interval = tonumber(val)
+							ReloadReminderSetInterval( tonumber(val) )
+						end
+					end,
+					order = 15,
 				},
 			},
 		},
 		cross_guild_header = {
 			type = "group",
 			name = "Cross-Guild",
-			order = 14,
+			order = 16,
 			inline = true,
 			args = {
 				ignore_xguild_chat = {
@@ -3972,7 +4058,7 @@ local options = {
 					set = function()
 						Hardcore_Settings.ignore_xguild_chat = not Hardcore_Settings.ignore_xguild_chat
 					end,
-					order = 15,
+					order = 17,
 				},
 				ignore_xguild_alerts = {
 					type = "toggle",
@@ -3984,7 +4070,7 @@ local options = {
 					set = function()
 						Hardcore_Settings.ignore_xguild_alerts = not Hardcore_Settings.ignore_xguild_alerts
 					end,
-					order = 17,
+					order = 18,
 				},
 			},
 		},
@@ -4006,6 +4092,8 @@ local options = {
 				Hardcore_Settings.show_minimap_mailbox_icon = false
 				Hardcore_Settings.ignore_xguild_alerts = false
 				Hardcore_Settings.ignore_xguild_chat = false
+				Hardcore_Settings.reload_reminder_show = true
+				Hardcore_Settings.reload_reminder_interval = 0				
 				Hardcore:ApplyAlertFrameSettings()
 			end,
 			order = 20,

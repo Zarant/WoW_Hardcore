@@ -545,6 +545,41 @@ local function SlashHandler(msg, editbox)
 			end
 		end
 
+	elseif cmd == "sharedeathlogdata" then
+		local target = nil
+		for substring in args:gmatch("%S+") do
+			target = substring
+		end
+
+		---@diagnostic disable-next-line: undefined-field
+		if target == nil then
+		  Hardcore:Print("Did not start sharing; Provide target player name.")
+		  return
+		end
+		Hardcore:Print("Sharing deathlog data with " .. target .. ". /reload if you want to stop.")
+		Hardcore:initSendSharedDLMsg(target)
+
+	elseif cmd == "receivedeathlogdata" then
+		HardcoreDeathlog_beginReceiveSharedMsg()
+
+	elseif cmd == "renouncepassiveachievement" then
+		local achievement_to_quit = ""
+		for substring in args:gmatch("%S+") do
+			achievement_to_quit = substring
+		end
+
+		---@diagnostic disable-next-line: undefined-field
+		if _G.passive_achievements ~= nil and _G.passive_achievements[achievement_to_quit] ~= nil then
+			for i, achievement in ipairs(Hardcore_Character.passive_achievements) do
+				if achievement == achievement_to_quit then
+					Hardcore:Print("You have renounced: " .. achievement)
+					table.remove( Hardcore_Character.passive_achievements, i)
+					return
+				end
+			end
+		end
+		Hardcore:Print("You cannot renounce a passive achievement that you did not complete.")
+
 	elseif cmd == "dk" then
 		-- sacrifice your current lvl 55 char to allow for making DK
 		local dk_convert_option = ""

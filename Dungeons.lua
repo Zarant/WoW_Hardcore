@@ -1606,6 +1606,9 @@ local function DungeonTracker()
 		DungeonTrackerUpgradeLogVersion3()
 	end
 
+	-- Tell the watchdog we are still alive
+	ReloadReminderDungeonTrackerUpdate()
+
 	-- Sometimes, runs don't get logged correctly, like when they are pending and the addon is updated to a version
 	-- with a different format or when runs are deleted through appeal commands. In those cases, runs might disappear
 	-- entirely, while they should be there. We check for any missing or mergeable runs exactly once per session.
