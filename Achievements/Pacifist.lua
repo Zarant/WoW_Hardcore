@@ -35,7 +35,7 @@ pacifist_achievement:SetScript("OnEvent", function(self, event, ...)
 			if item_subtype == "Fishing Poles" or item_subtype == "Fishing Pole" or item_subtype == "Miscellaneous" then
 				return
 			end
-			Hardcore:Print("Equiped " .. item_name .. ".")
+			Hardcore:Print("Equipped " .. item_name .. ".")
 			pacifist_achievement.fail_function_executor.Fail(pacifist_achievement.name)
 		end
 	end

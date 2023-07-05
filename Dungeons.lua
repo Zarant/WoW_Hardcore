@@ -685,7 +685,7 @@ local function DungeonTrackerIdentifyScarletMonasteryWing( map_id, mob_type_id )
 			{4288, "Scarlet Beastmaster", "Lib"},
 			{4291, "Scarlet Diviner", "Lib"},
 			{4289, "Scarlet Evoker", "Arm"},
-			{4294, "Scarlet Sorceror", "Cath"},
+			{4294, "Scarlet Sorcerer", "Cath"},
 			-- Bosses as a last resort
 			{3983, "Interrogator Vishas", "GY"},
 			{6490, "Azshir the Sleepless", "GY"},
@@ -1169,7 +1169,7 @@ local function DungeonTrackerCombatLogEventHandler( self, event )
 
 	-- Do some checks, to eliminate unexpected results
 	if map_id ~= Hardcore_Character.dt.current.id then
-		Hardcore:Debug( "Error: Got a combat log message witn an NPC " .. mob_name .. " (" .. mob_type_id .. ") in wrong dungeon map " .. map_id .. " -- bailing out!" )
+		Hardcore:Debug( "Error: Got a combat log message with an NPC " .. mob_name .. " (" .. mob_type_id .. ") in wrong dungeon map " .. map_id .. " -- bailing out!" )
 		return
 	end
 
@@ -1602,7 +1602,7 @@ end
 local function DungeonTracker()
 	-- Era/Ogrimmar = Kalimdor, none, 0, , 0, 0, false, 1, 0, {nil}
 	-- Era/RFC = Ragefire Chasm, party, 1, Normal, 5, 0, false, 389, 5, {nil}
-	-- Note that the name is locale-dependent (and will be overrided below)
+	-- Note that the name is locale-dependent (and will be overridden below)
 	local name, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceMapID, instanceGroupSize, LfgDungeonID =
 		GetInstanceInfo()
 
@@ -1853,7 +1853,7 @@ end
 -- /hc AppealDungeonCode <hash> delete <"dungeon name"> ["date"]
 -- /hc AppealDungeonCode <hash> merge  <"dungeon name"> <"date1"> <"date2">
 --
--- This function uses a proprietory cryptographic hash (yes, I know I shouldn't)
+-- This function uses a proprietary cryptographic hash (yes, I know I shouldn't)
 -- different from djb2() in Hardcore.lua, because that one doesn't work for long strings
 
 local function GetCryptoHash(str)

@@ -59,7 +59,7 @@ partner_up_achievement:SetScript("OnEvent", function(self, event, ...)
 		-- other_hardcore_character_cache[other_hardcore_character_cache[UnitName("player")].team[1]].achievements = {"Nudist", "Power From Within"}
 		-- other_hardcore_character_cache[other_hardcore_character_cache[UnitName("player")].team[1]].team = {UnitName("player")}
 		------------------------
-		-- Initialized and failes; different party member
+		-- Initialized and fails; different party member
 		-- other_hardcore_character_cache[UnitName("player")] = {}
 		-- other_hardcore_character_cache[UnitName("player")].achievements = {"Nudist", "Power From Within"}
 		-- other_hardcore_character_cache[UnitName("player")].party_mode = "Duo"
@@ -69,7 +69,7 @@ partner_up_achievement:SetScript("OnEvent", function(self, event, ...)
 		-- other_hardcore_character_cache[other_hardcore_character_cache[UnitName("player")].team[1]].achievements = {"Power From Within"}
 		-- other_hardcore_character_cache[other_hardcore_character_cache[UnitName("player")].team[1]].team = {UnitName("player")}
 		------------------------
-		-- Initialized and failes; different party member
+		-- Initialized and fails; different party member
 		-- other_hardcore_character_cache[UnitName("player")] = {}
 		-- other_hardcore_character_cache[UnitName("player")].achievements = {"Nudist", "Power From Within"}
 		-- other_hardcore_character_cache[UnitName("player")].party_mode = "Duo"

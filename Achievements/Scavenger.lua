@@ -108,7 +108,7 @@ scavenger_achievement:SetScript("OnEvent", function(self, event, ...)
 		local item_id = GetInventoryItemID("player", arg[1])
 		local item_name, _, _, _, _, item_type, item_subtype, _, _, _, _ = GetItemInfo(item_id)
 		if scavenger_achievement.blacklist[item_name] ~= nil then
-			Hardcore:Print("Equiped quest reward " .. item_name .. ".")
+			Hardcore:Print("Equipped quest reward " .. item_name .. ".")
 			scavenger_achievement.fail_function_executor.Fail(scavenger_achievement.name)
 		end
 	end

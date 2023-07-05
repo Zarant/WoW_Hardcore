@@ -35,7 +35,7 @@ close_combat_achievement:SetScript("OnEvent", function(self, event, ...)
 		local item_name, _, _, _, _, item_type, item_subtype, _, _, _, _ = GetItemInfo(item_id)
 		if item_type == "Weapon" then
 			if item_subtype == "Bows" or item_subtype == "Guns" or item_subtype == "Thrown" then
-				Hardcore:Print("Equiped " .. item_name .. ".")
+				Hardcore:Print("Equipped " .. item_name .. ".")
 				close_combat_achievement.fail_function_executor.Fail(close_combat_achievement.name)
 			end
 		end

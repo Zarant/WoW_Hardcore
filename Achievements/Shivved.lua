@@ -58,7 +58,7 @@ shivved_achievement:SetScript("OnEvent", function(self, event, ...)
 							return
 						end
 						if time_elapsed > 60 then
-							Hardcore:Print("Equiped " .. item_name .. ".")
+							Hardcore:Print("Equipped " .. item_name .. ".")
 							shivved_achievement.fail_function_executor.Fail(shivved_achievement.name)
 							self:Cancel()
 						end
