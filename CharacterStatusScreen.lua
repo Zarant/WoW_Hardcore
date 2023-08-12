@@ -383,6 +383,16 @@ function UpdateCharacterHC(
 	achievements_title:SetText("Achievements - " .. _acheivement_pts .. "pts")
 	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
 	achievements_container:AddChild(achievements_title)
+
+	local len_achievements = #_hardcore_character.achievements + #_hardcore_character.passive_achievements
+	ICON_SIZE = 39
+
+	if len_achievements > 16 and len_achievements < 40 then
+		ICON_SIZE = 24
+	elseif len_achievements >= 40 then
+		ICON_SIZE = 15
+	end
+	
 	if _hardcore_character.achievements ~= nil then
 		for i, v in ipairs(_hardcore_character.achievements) do
 			if _G.achievements[v] ~= nil then
