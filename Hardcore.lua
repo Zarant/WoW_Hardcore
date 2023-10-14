@@ -990,6 +990,12 @@ function Hardcore:PLAYER_LOGIN()
 		end
 	end
 
+	if _G["HardcoreBuildLabel"] == "WotLK" then
+		-- Register Wrath-only rules relating to Heirlooms
+		_G.extra_rules["Heirlooms"]:Register(failure_function_executor, Hardcore_Character, Hardcore_Settings)
+	end
+
+
 	-- cache player name
 	PLAYER_NAME, _ = UnitName("player")
 	PLAYERGUID = UnitGUID("player")
