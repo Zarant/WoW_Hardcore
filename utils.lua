@@ -45,9 +45,9 @@ function Hardcore_generateRandomString(character_count)
 end
 
 function Hardcore_generateRandomLetter()
-	local validLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	local randomIndex = math.floor(math.random() * #validLetters)
-	return validLetters:sub(randomIndex, randomIndex)
+    local validLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    local randomIndex = math.random(1, #validLetters)  -- Generates a number between 1 and 52
+    return validLetters:sub(randomIndex, randomIndex)
 end
 
 function Hardcore_generateRandomIntegerInRange(min, max)
