@@ -308,6 +308,18 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.47", scroll_frame)
+	CreateDescriptionLabel(
+		"- Support for SoD (access to string prior to level 60)",
+		scroll_frame
+	)
+
+	CreateHeadingLabel("11.46", scroll_frame)
+	CreateDescriptionLabel(
+		"- Heirloom detection for Wrath version",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.45", scroll_frame)
 	CreateDescriptionLabel(
 		"- Fixed Grounded achievement",
@@ -650,7 +662,7 @@ end
 
 local function DrawVerifyTab(container, _hardcore_character)
 	local ATTRIBUTE_SEPARATOR = "_"
-	local string_format_new = false
+	local string_format_new = true
 	local first_menu_description
 	local function GenerateVerificationString()
 		local version = GetAddOnMetadata("Hardcore", "Version")
@@ -773,52 +785,44 @@ local function DrawVerifyTab(container, _hardcore_character)
 	scroll_frame:AddChild(character_and_level_label)
 
 	local extra_lines = ""
-	if UnitLevel("player") < max_level then
-		-- local general_rules_description = AceGUI:Create("Label")
-		-- general_rules_description:SetWidth(_menu_width)
-		-- general_rules_description:SetText("\n\nYou must be max level for your chosen expansion (60 or 80) to get a verification string your character.")
-		-- general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
-		-- scroll_frame:AddChild(general_rules_description)
-		extra_lines = "\n\n\n"
-	else
-		local general_rules_description = AceGUI:Create("Label")
-		general_rules_description:SetWidth(600)
-		general_rules_description:SetText("\nTo get verified, copy the string below and visit the classichc website.")
-		general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		scroll_frame:AddChild(general_rules_description)
 
-		local switch_format_button = AceGUI:Create("Button")
-		switch_format_button:SetText("Use new format")
-		switch_format_button:SetWidth(130)
-		scroll_frame:AddChild(switch_format_button)
-		switch_format_button:SetCallback("OnClick", function()
-			if string_format_new == false then
-				switch_format_button:SetText("Use old format")
-			else
-				switch_format_button:SetText("Use new format")
-			end
-			string_format_new = not string_format_new
-			first_menu_description:SetText(GenerateVerificationString())
-		end)
+	local general_rules_description = AceGUI:Create("Label")
+	general_rules_description:SetWidth(600)
+	general_rules_description:SetText("\nTo get verified, copy the string below and visit the hardhead website.")
+	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	scroll_frame:AddChild(general_rules_description)
 
-		first_menu_description = AceGUI:Create("MultiLineEditBox")
-		first_menu_description.button:Hide()
-		first_menu_description:SetMaxLetters(0)
-		first_menu_description:SetHeight(850)
-		first_menu_description.button:SetPoint("BOTTOMLEFT", 0, -150)
-		first_menu_description:SetWidth(750)
-		first_menu_description:SetLabel("")
+	local switch_format_button = AceGUI:Create("Button")
+	switch_format_button:SetText("Use new format")
+	switch_format_button:SetWidth(130)
+	scroll_frame:AddChild(switch_format_button)
+	switch_format_button:SetCallback("OnClick", function()
+		if string_format_new == false then
+			switch_format_button:SetText("Use old format")
+		else
+			switch_format_button:SetText("Use new format")
+		end
+		string_format_new = not string_format_new
 		first_menu_description:SetText(GenerateVerificationString())
-		scroll_frame:AddChild(first_menu_description)
+	end)
 
-		local copy_tip_label = AceGUI:Create("Label")
-		local text = extra_lines .. "\n\n\n\n\n\n\n\n\n\n\n\n\nSelect All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
+	first_menu_description = AceGUI:Create("MultiLineEditBox")
+	first_menu_description.button:Hide()
+	first_menu_description:SetMaxLetters(0)
+	first_menu_description:SetHeight(850)
+	first_menu_description.button:SetPoint("BOTTOMLEFT", 0, -150)
+	first_menu_description:SetWidth(750)
+	first_menu_description:SetLabel("")
+	first_menu_description:SetText(GenerateVerificationString())
+	scroll_frame:AddChild(first_menu_description)
 
-		copy_tip_label:SetText(text)
-		copy_tip_label:SetWidth(700)
-		copy_tip_label:SetFontObject(GameFontHighlightSmall)
-		scroll_frame:AddChild(copy_tip_label)
-	end
+	local copy_tip_label = AceGUI:Create("Label")
+	local text = extra_lines .. "\n\n\n\n\n\n\n\n\n\n\n\n\nSelect All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
+
+	copy_tip_label:SetText(text)
+	copy_tip_label:SetWidth(700)
+	copy_tip_label:SetFontObject(GameFontHighlightSmall)
+	scroll_frame:AddChild(copy_tip_label)
 
 	local character_status_label = AceGUI:Create("Label")
 	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
