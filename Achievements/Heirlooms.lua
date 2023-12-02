@@ -72,7 +72,7 @@ heirloom_rules:SetScript("OnEvent", function(self, event, ...)
 end)
 
 function heirloom_rules:HasHeirlooms()
-	print("Heirloom scanning...")
+	-- print("Heirloom scanning...")
 	for i = 2, 15 do
 		local item_id = GetInventoryItemID("player", i)
 		--print(item_id)
