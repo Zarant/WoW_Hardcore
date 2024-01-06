@@ -308,6 +308,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.48", scroll_frame)
+	CreateDescriptionLabel(
+		"- Fixed problem with Achievements tab when used with ElvUI",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.47", scroll_frame)
 	CreateDescriptionLabel(
 		"- Support for SoD (access to string prior to level 60)",
