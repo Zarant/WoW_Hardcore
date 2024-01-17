@@ -406,8 +406,10 @@ local ALERT_STYLES = {
 	},
 }
 Hardcore_Alert_Frame:SetScale(0.7)
+Hardcore_Frame:ApplyBackdrop()
 
 -- the big frame object for our addon
+--- @class Hardcore : BackdropTemplate|Frame
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
 Hardcore.ALERT_STYLES = ALERT_STYLES
 
@@ -436,8 +438,6 @@ Hardcore.isSoD = Hardcore.isClassic and C_Seasons.HasActiveSeason() and (C_Seaso
 
 --- Addon is running on a HardCore realm specifically
 Hardcore.isHardcore = C_GameRules and C_GameRules.IsHardcoreActive()
-
-Hardcore_Frame:ApplyBackdrop()
 
 function Hardcore:GetMaxLevel()
 	-- skipping non-active seasons/expansions
@@ -816,7 +816,11 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 
 	if duo_trio_partner == true then
 		AcceptTrade()
-	elseif (level == max_level) or legacy_duo_support then
+	elseif legacy_duo_support then
+		table.insert(Hardcore_Character.trade_partners, target_trader)
+		Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
+		AcceptTrade()
+	elseif (level == max_level) then
 		table.insert(Hardcore_Character.trade_partners, target_trader)
 		Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
 		AcceptTrade()
