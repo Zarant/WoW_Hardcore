@@ -500,14 +500,7 @@ local function startXGuildDeathMsgRelay()
 end
 
 function FailureFunction(achievement_name)
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
+	local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
 	if UnitLevel("player") == max_level then
 		return
 	end
@@ -810,14 +803,8 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 	local legacy_duo_support = #Hardcore_Character.trade_partners > 0
 	local target_trader = TradeFrameRecipientNameText:GetText()
 	local level = UnitLevel("player")
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
+	local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
+
 	if Hardcore_Character.team ~= nil then
 		for _, name in ipairs(Hardcore_Character.team) do
 			if target_trader == name then

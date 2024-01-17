@@ -747,14 +747,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 	scroll_frame:SetLayout("Flow")
 	scroll_container:AddChild(scroll_frame)
 
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
+	local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
 
 	local first_menu_description_title = AceGUI:Create("Label")
 	first_menu_description_title:SetWidth(500)
