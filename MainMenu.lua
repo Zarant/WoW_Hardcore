@@ -666,6 +666,50 @@ local function DrawRulesTab(container)
 	scroll_frame:AddChild(general_rules_description)
 end
 
+local function confirmEndgameTransition()
+
+	local function OnOkayClick()
+		Hardcore_Character.endgame = true
+		Hardcore:Print("Transition to Endgame Mode COMPLETE")
+		StaticPopup_Hide("ConfirmEndgameTransitionPopup")
+	end
+
+	local function OnCancelClick()
+		Hardcore:Print("Transition to Endgame Mode CANCELLED")
+		StaticPopup_Hide("ConfirmEndgameTransitionPopup")
+	end
+
+	local function OnShowEvent()
+		Hardcore_Frame:Hide()
+		hardcore_modern_menu:Hide()
+	end
+
+	local text =
+		"Once your character has been |cffffcc00verified|r by the " .. 
+		"|cffffcc00Classic Hardcore Challenge|r, " .. 
+		"you may transition to Endgame Mode.\n\n" .. 
+		"|cffff0000YOUR CHARACTER WILL BECOME INELIGABLE FOR FUTURE VERIFICATION BY CLASSIC HC|r\n" ..
+		"|cffff0000THIS CANNOT BE UNDONE|r\n" .. 
+		"\n" ..
+		"\nTransition to Endgame Mode?"
+
+	StaticPopupDialogs["ConfirmEndgameTransitionPopup"] = {
+		text = text,
+		button1 = OKAY,
+		button2 = CANCEL,
+		OnAccept = OnOkayClick,
+		OnCancel = OnCancelClick,
+		OnShow = OnShowEvent,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		showAlert = true,
+		exclusive = true,
+	}
+
+	local dialog = StaticPopup_Show("ConfirmEndgameTransitionPopup")
+end
+
 local function DrawVerifyTab(container, _hardcore_character)
 	local ATTRIBUTE_SEPARATOR = "_"
 	local string_format_new = true
@@ -783,28 +827,48 @@ local function DrawVerifyTab(container, _hardcore_character)
 	character_and_level_label:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
 	scroll_frame:AddChild(character_and_level_label)
 
-	local extra_lines = ""
+	local character_status_label = AceGUI:Create("Label")
+	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
+	local text = "\n" .. statusString1 .. "\n" .. statusString2
 
-	local general_rules_description = AceGUI:Create("Label")
-	general_rules_description:SetWidth(600)
-	general_rules_description:SetText("\nTo get verified, copy the string below and visit the hardhead website.")
-	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(general_rules_description)
+	character_status_label:SetText(text)
+	character_status_label:SetWidth(500)
+	character_status_label:SetFontObject(GameFontHighlightMedium)
+	scroll_frame:AddChild(character_status_label)
 
-	local switch_format_button = AceGUI:Create("Button")
-	switch_format_button:SetText("Use new format")
-	switch_format_button:SetWidth(130)
-	scroll_frame:AddChild(switch_format_button)
-	switch_format_button:SetCallback("OnClick", function()
-		if string_format_new == false then
-			switch_format_button:SetText("Use old format")
-		else
-			switch_format_button:SetText("Use new format")
-		end
-		string_format_new = not string_format_new
-		first_menu_description:SetText(GenerateVerificationString())
-	end)
+	local endgame_text = AceGUI:Create("Label")
+	
+	if Hardcore_Character.endgame == true then
+		text = "|cffffcc00END-GAME MODE IS ENABLED!|r\n"
+	elseif (level == max_level) or (level == 2) then
+		text = "|cffffcc00Once your levelling challenge success has been verified, you may transition to Endgame Mode.\nNote: YOU WILL BE UNABLE TO RETURN TO THE LEVELLING CHALLENGE|r\n"
+	end
 
+	endgame_text:SetText(text)
+	endgame_text:SetWidth(520)
+	endgame_text:SetFontObject(GameFontHighlightNormal)
+	scroll_frame:AddChild(endgame_text)
+
+	if (level == max_level) or (level == 2) and Hardcore_Character.endgame ~= true then
+		local engage_endgame_button = AceGUI:Create("Button")
+		engage_endgame_button:SetText("Transition to Endgame")
+		engage_endgame_button:SetWidth(200)
+		scroll_frame:AddChild(engage_endgame_button)
+		engage_endgame_button:SetCallback("OnClick", function()
+			confirmEndgameTransition()
+		end)
+	end
+	
+	local how_to_verify = AceGUI:Create("Label")
+	how_to_verify:SetWidth(600)
+	how_to_verify:SetText("\nTo get verified, copy the string below and visit |cffffcc00hardhead.io|r or the |cffffcc00Classic Hardcore discord|r")
+	how_to_verify:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	scroll_frame:AddChild(how_to_verify)
+	
+
+	
+	string_format_new = true
+	
 	first_menu_description = AceGUI:Create("MultiLineEditBox")
 	first_menu_description.button:Hide()
 	first_menu_description:SetMaxLetters(0)
@@ -815,6 +879,8 @@ local function DrawVerifyTab(container, _hardcore_character)
 	first_menu_description:SetText(GenerateVerificationString())
 	scroll_frame:AddChild(first_menu_description)
 
+	local extra_lines = ""
+
 	local copy_tip_label = AceGUI:Create("Label")
 	local text = extra_lines .. "\n\n\n\n\n\n\n\n\n\n\n\n\nSelect All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
 
@@ -822,14 +888,6 @@ local function DrawVerifyTab(container, _hardcore_character)
 	copy_tip_label:SetWidth(700)
 	copy_tip_label:SetFontObject(GameFontHighlightSmall)
 	scroll_frame:AddChild(copy_tip_label)
-
-	local character_status_label = AceGUI:Create("Label")
-	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
-	local text = "\n" .. statusString1 .. "\n" .. statusString2
-	character_status_label:SetText(text)
-	character_status_label:SetWidth(700)
-	character_status_label:SetFontObject(GameFontHighlightMedium)
-	scroll_frame:AddChild(character_status_label)
 end
 
 local function DrawDKTab(container, dk_button_function)
