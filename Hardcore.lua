@@ -439,6 +439,17 @@ Hardcore.isHardcore = C_GameRules and C_GameRules.IsHardcoreActive()
 
 Hardcore_Frame:ApplyBackdrop()
 
+function Hardcore:GetMaxLevel()
+	-- skipping non-active seasons/expansions
+	if Hardcore.isWotlk then
+		return 80
+	elseif Hardcore.isSoD then
+		return 25 -- will be 40 soon, update checks then. maybe new season?
+	else
+		return 60
+	end
+end
+
 local function startXGuildChatMsgRelay(msg)
 	local commMessage = COMM_COMMANDS[12] .. COMM_COMMAND_DELIM .. msg
 	for _, v in pairs(hardcore_guild_member_dict) do
