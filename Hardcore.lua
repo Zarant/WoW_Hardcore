@@ -411,6 +411,32 @@ Hardcore_Alert_Frame:SetScale(0.7)
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
 Hardcore.ALERT_STYLES = ALERT_STYLES
 
+--- VERSION CHECKS, stolen artlessly from Questie
+
+--- Addon is running on Classic Wotlk client
+Hardcore.isWotlk = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
+--- Addon is running on Classic TBC client
+Hardcore.isTBC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+
+--- Addon is running on Classic "Vanilla" client: Means Classic Era and its seasons like SoM
+Hardcore.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+
+--- Addon is running on Classic "Vanilla" client and on Era realm (non-seasonal)
+Hardcore.isEra = Hardcore.isClassic and (not C_Seasons.HasActiveSeason())
+
+--- Addon is running on Classic "Vanilla" client and on any Seasonal realm (see: https://wowpedia.fandom.com/wiki/API_C_Seasons.GetActiveSeason )
+Hardcore.isEraSeasonal = Hardcore.isClassic and C_Seasons.HasActiveSeason()
+
+--- Addon is running on Classic "Vanilla" client and on Season of Mastery realm specifically
+Hardcore.isSoM = Hardcore.isClassic and C_Seasons.HasActiveSeason() and (C_Seasons.GetActiveSeason() == Enum.SeasonID.SeasonOfMastery)
+
+--- Addon is running on Classic "Vanilla" client and on Season of Discovery realm specifically
+Hardcore.isSoD = Hardcore.isClassic and C_Seasons.HasActiveSeason() and (C_Seasons.GetActiveSeason() == 2) --- in the list as 'Placeholder' but it's actually SoD
+
+--- Addon is running on a HardCore realm specifically
+Hardcore.isHardcore = C_GameRules and C_GameRules.IsHardcoreActive()
+
 Hardcore_Frame:ApplyBackdrop()
 
 local function startXGuildChatMsgRelay(msg)
@@ -822,6 +848,8 @@ end
 --
 
 function Hardcore:PLAYER_LOGIN()
+
+	
 	Hardcore:HandleLegacyDeaths()
 	Hardcore_Character.hardcore_player_name = Hardcore_Settings.hardcore_player_name or ""
 
