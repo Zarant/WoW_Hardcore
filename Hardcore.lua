@@ -103,6 +103,7 @@ Hardcore_Character = {
 	game_version = "",
 	hardcore_player_name = "",
 	custom_pronoun = false,
+	endgame = false,
 }
 
 Backup_Character_Data = {}
@@ -580,6 +581,7 @@ local saved_variable_meta = {
 	{ key = "converted_time", initial_data = "" },
 	{ key = "game_version", initial_data = "" },
 	{ key = "hardcore_player_name", initial_data = "" },
+	{ key = "endgame", initial_data = false },
 }
 
 local settings_saved_variable_meta = {
