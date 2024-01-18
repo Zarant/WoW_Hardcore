@@ -2196,6 +2196,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				verification_details = verif_details,
 				endgame = endgame_status,
 			}
+
 			hardcore_modern_menu_state.changeset[string.split("-", name)] = 1
 			return
 		end
@@ -3417,12 +3418,12 @@ function Hardcore:SendCharacterData(dest)
 		commMessage = commMessage .. Hardcore_Character.verification_details
 
 		-- Add endgame status
-		local endgame_status = false
-		if Hardcore_Character.endgame ~= nil then
-			endgame_status = Hardcore_Character.endgame
+		local endgame_status = "false"
+		if Hardcore_Character.endgame ~= nil and Hardcore_Character.endgame then
+			endgame_status = "true"
 		end
 		commMessage = commMessage .. COMM_FIELD_DELIM
-		commMessage = commMessage .. (Hardcore_Character.endgame_status or "")
+		commMessage = commMessage .. (endgame_status or "nil")
 
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", dest)
 	end

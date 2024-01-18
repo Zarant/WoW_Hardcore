@@ -292,13 +292,9 @@ function UpdateCharacterHC(
 	local endgame_label = AceGUI:Create("HardcoreClassTitleLabel")
 	endgame_label:SetRelativeWidth(1.0)
 	endgame_label:SetHeight(60)
-	local endgame_status = "(unknown - previous version)"
-	if _hardcore_character.endgame ~= nil then
-		if _hardcore_character.endgame then
-			endgame_status = "TRUE"
-		else
-			endgame_status = "FALSE"
-		end
+	local endgame_status = "false"
+	if _hardcore_character.endgame ~= nil and _hardcore_character.endgame ~= "" then
+		endgame_status = _hardcore_character.endgame
 	end
 	endgame_label:SetText("Endgame status: " .. endgame_status)
 	endgame_label:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
