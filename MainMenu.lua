@@ -865,35 +865,36 @@ local function DrawVerifyTab(container, _hardcore_character)
 		end)
 	end
 	
-	local how_to_verify = AceGUI:Create("Label")
-	how_to_verify:SetWidth(600)
-	how_to_verify:SetText("\nTo get verified, copy the string below and visit |cffffcc00hardhead.io|r or the |cffffcc00Classic Hardcore discord|r")
-	how_to_verify:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(how_to_verify)
 	
-
+	if Hardcore_Character.endgame ~= true then
+		local how_to_verify = AceGUI:Create("Label")
+		how_to_verify:SetWidth(600)
+		how_to_verify:SetText("\nTo get verified, copy the string below and visit |cffffcc00hardhead.io|r or the |cffffcc00Classic Hardcore discord|r")
+		how_to_verify:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		scroll_frame:AddChild(how_to_verify)
 	
-	string_format_new = true
-	
-	first_menu_description = AceGUI:Create("MultiLineEditBox")
-	first_menu_description.button:Hide()
-	first_menu_description:SetMaxLetters(0)
-	first_menu_description:SetHeight(850)
-	first_menu_description.button:SetPoint("BOTTOMLEFT", 0, -150)
-	first_menu_description:SetWidth(750)
-	first_menu_description:SetLabel("")
-	first_menu_description:SetText(GenerateVerificationString())
-	scroll_frame:AddChild(first_menu_description)
+		string_format_new = true
+		
+		first_menu_description = AceGUI:Create("MultiLineEditBox")
+		first_menu_description.button:Hide()
+		first_menu_description:SetMaxLetters(0)
+		first_menu_description:SetHeight(850)
+		first_menu_description.button:SetPoint("BOTTOMLEFT", 0, -150)
+		first_menu_description:SetWidth(750)
+		first_menu_description:SetLabel("")
+		first_menu_description:SetText(GenerateVerificationString())
+		scroll_frame:AddChild(first_menu_description)
 
-	local extra_lines = ""
+		local extra_lines = ""
 
-	local copy_tip_label = AceGUI:Create("Label")
-	local text = extra_lines .. "\n\n\n\n\n\n\n\n\n\n\n\n\nSelect All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
+		local copy_tip_label = AceGUI:Create("Label")
+		local text = extra_lines .. "\n\n\n\n\n\n\n\n\n\n\n\n\nSelect All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
 
-	copy_tip_label:SetText(text)
-	copy_tip_label:SetWidth(700)
-	copy_tip_label:SetFontObject(GameFontHighlightSmall)
-	scroll_frame:AddChild(copy_tip_label)
+		copy_tip_label:SetText(text)
+		copy_tip_label:SetWidth(700)
+		copy_tip_label:SetFontObject(GameFontHighlightSmall)
+		scroll_frame:AddChild(copy_tip_label)
+	end
 end
 
 local function DrawDKTab(container, dk_button_function)
