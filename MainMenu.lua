@@ -842,12 +842,18 @@ local function DrawVerifyTab(container, _hardcore_character)
 		text = "|cffffcc00END-GAME MODE IS ENABLED!|r\n"
 	elseif (level == max_level) or (level == 2) then
 		text = "|cffffcc00Once your levelling challenge success has been verified, you may transition to Endgame Mode.\nNote: YOU WILL BE UNABLE TO RETURN TO THE LEVELLING CHALLENGE|r\n"
+	else
+		text = ""
 	end
 
-	endgame_text:SetText(text)
-	endgame_text:SetWidth(520)
-	endgame_text:SetFontObject(GameFontHighlightNormal)
-	scroll_frame:AddChild(endgame_text)
+	if text ~= "" then
+		endgame_text:SetText(text)
+		endgame_text:SetWidth(520)
+		endgame_text:SetFontObject(GameFontHighlightNormal)
+		scroll_frame:AddChild(endgame_text)
+	end
+
+	-- TODO Remove level 2 debug code
 
 	if (level == max_level) or (level == 2) and Hardcore_Character.endgame ~= true then
 		local engage_endgame_button = AceGUI:Create("Button")
