@@ -1290,6 +1290,7 @@ function Hardcore:INSPECT_READY(...)
 				team = {},
 				first_recorded = -1,
 				version = "?",
+				endgame = false,
 			}
 			ShowInspectHC(_default_hardcore_character, target_name, _default_hardcore_character.version)
 		end
@@ -2153,7 +2154,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 		end
 		if command == COMM_COMMANDS[4] then -- Received hc character data
 			local name, _ = string.split("-", sender)
-			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str, verif_status, verif_details =
+			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str, verif_status, verif_details, endgame_status =
 				string.split(COMM_FIELD_DELIM, data)
 			local achievements_l = { string.split(COMM_SUBFIELD_DELIM, achievements_str) }
 			other_achievements_ds = {}
@@ -2193,6 +2194,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				hardcore_player_name = hc_tag,
 				verification_status = verif_status,
 				verification_details = verif_details,
+				endgame = endgame_status,
 			}
 			hardcore_modern_menu_state.changeset[string.split("-", name)] = 1
 			return
@@ -3413,6 +3415,14 @@ function Hardcore:SendCharacterData(dest)
 		commMessage = commMessage .. Hardcore_Character.verification_status
 		commMessage = commMessage .. COMM_FIELD_DELIM
 		commMessage = commMessage .. Hardcore_Character.verification_details
+
+		-- Add endgame status
+		local endgame_status = false
+		if Hardcore_Character.endgame ~= nil then
+			endgame_status = Hardcore_Character.endgame
+		end
+		commMessage = commMessage .. COMM_FIELD_DELIM
+		commMessage = commMessage .. (Hardcore_Character.endgame_status or "")
 
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", dest)
 	end
