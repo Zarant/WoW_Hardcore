@@ -829,6 +829,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 
 	local character_status_label = AceGUI:Create("Label")
 	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
+	Hardcore:UpdateVerificationStatus()
 	local text = "\n" .. statusString1 .. "\n" .. statusString2
 
 	character_status_label:SetText(text)
@@ -855,12 +856,16 @@ local function DrawVerifyTab(container, _hardcore_character)
 
 	if (level == max_level) and (not Hardcore_Character.endgame) then
 		local engage_endgame_button = AceGUI:Create("Button")
-		engage_endgame_button:SetText("Transition to Endgame")
 		engage_endgame_button:SetWidth(200)
+		if Hardcore_Character.verification_status == "PASS" then
+			engage_endgame_button:SetText("Transition to Endgame")
+			engage_endgame_button:SetCallback("OnClick", function()
+				confirmEndgameTransition()
+			end)			
+		else
+			engage_endgame_button:SetText("|cffff0000INVALID CHARACTER|r")
+		end
 		scroll_frame:AddChild(engage_endgame_button)
-		engage_endgame_button:SetCallback("OnClick", function()
-			confirmEndgameTransition()
-		end)
 	end
 	
 	
