@@ -103,6 +103,7 @@ Hardcore_Character = {
 	game_version = "",
 	hardcore_player_name = "",
 	custom_pronoun = false,
+	endgame = false,
 }
 
 Backup_Character_Data = {}
@@ -406,12 +407,49 @@ local ALERT_STYLES = {
 	},
 }
 Hardcore_Alert_Frame:SetScale(0.7)
+Hardcore_Frame:ApplyBackdrop()
 
 -- the big frame object for our addon
+--- @class Hardcore : BackdropTemplate|Frame
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
 Hardcore.ALERT_STYLES = ALERT_STYLES
 
-Hardcore_Frame:ApplyBackdrop()
+--- VERSION CHECKS, stolen artlessly from Questie
+
+--- Addon is running on Classic Wotlk client
+Hardcore.isWotlk = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
+--- Addon is running on Classic TBC client
+Hardcore.isTBC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+
+--- Addon is running on Classic "Vanilla" client: Means Classic Era and its seasons like SoM
+Hardcore.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+
+--- Addon is running on Classic "Vanilla" client and on Era realm (non-seasonal)
+Hardcore.isEra = Hardcore.isClassic and (not C_Seasons.HasActiveSeason())
+
+--- Addon is running on Classic "Vanilla" client and on any Seasonal realm (see: https://wowpedia.fandom.com/wiki/API_C_Seasons.GetActiveSeason )
+Hardcore.isEraSeasonal = Hardcore.isClassic and C_Seasons.HasActiveSeason()
+
+--- Addon is running on Classic "Vanilla" client and on Season of Mastery realm specifically
+Hardcore.isSoM = Hardcore.isClassic and C_Seasons.HasActiveSeason() and (C_Seasons.GetActiveSeason() == Enum.SeasonID.SeasonOfMastery)
+
+--- Addon is running on Classic "Vanilla" client and on Season of Discovery realm specifically
+Hardcore.isSoD = Hardcore.isClassic and C_Seasons.HasActiveSeason() and (C_Seasons.GetActiveSeason() == 2) --- in the list as 'Placeholder' but it's actually SoD
+
+--- Addon is running on a HardCore realm specifically
+Hardcore.isHardcore = C_GameRules and C_GameRules.IsHardcoreActive()
+
+function Hardcore:GetMaxLevel()
+	-- skipping non-active seasons/expansions
+	if Hardcore.isWotlk then
+		return 80
+	elseif Hardcore.isSoD then
+		return 25 -- will be 40 soon, update checks then. maybe new season?
+	else
+		return 60
+	end
+end
 
 local function startXGuildChatMsgRelay(msg)
 	local commMessage = COMM_COMMANDS[12] .. COMM_COMMAND_DELIM .. msg
@@ -463,14 +501,7 @@ local function startXGuildDeathMsgRelay()
 end
 
 function FailureFunction(achievement_name)
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
+	local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
 	if UnitLevel("player") == max_level then
 		return
 	end
@@ -550,6 +581,7 @@ local saved_variable_meta = {
 	{ key = "converted_time", initial_data = "" },
 	{ key = "game_version", initial_data = "" },
 	{ key = "hardcore_player_name", initial_data = "" },
+	{ key = "endgame", initial_data = false },
 }
 
 local settings_saved_variable_meta = {
@@ -769,18 +801,11 @@ end
 --
 
 TradeFrameTradeButton:SetScript("OnClick", function()
-	local duo_trio_partner = false
-	local legacy_duo_support = #Hardcore_Character.trade_partners > 0
 	local target_trader = TradeFrameRecipientNameText:GetText()
 	local level = UnitLevel("player")
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
+	local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
+	local duo_trio_partner = false
+
 	if Hardcore_Character.team ~= nil then
 		for _, name in ipairs(Hardcore_Character.team) do
 			if target_trader == name then
@@ -790,14 +815,28 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 		end
 	end
 
-	if duo_trio_partner == true then
+	if duo_trio_partner == true then -- always allow with partner
 		AcceptTrade()
-	elseif (level == max_level) or legacy_duo_support then
+	elseif (Hardcore_Character.endgame) then
+		if Hardcore_Character.verification_status ~= "PASS" then
+			Hardcore:Print("|cFFFF0000BLOCKED:|r You may only trade with a 'PASS' status")
+			return
+		end
+		if other_hardcore_character_cache[target_trader].verification_status ~= "PASS" then
+			Hardcore:Print("|cFFFF0000BLOCKED:|r You may only trade with other characters that have a 'PASS' status")
+			return
+		end
+		if tostring(other_hardcore_character_cache[target_trader].endgame) ~= "true" then
+			Hardcore:Print("|cFFFF0000BLOCKED:|r You may only trade with other valid endgame characters")
+			return
+		end
+		-- to reach here, both self and other are both valid endgame characters
 		table.insert(Hardcore_Character.trade_partners, target_trader)
 		Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
 		AcceptTrade()
 	else
-		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios.")
+		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios or endgame")
+		return
 	end
 end)
 
@@ -822,6 +861,8 @@ end
 --
 
 function Hardcore:PLAYER_LOGIN()
+
+	
 	Hardcore:HandleLegacyDeaths()
 	Hardcore_Character.hardcore_player_name = Hardcore_Settings.hardcore_player_name or ""
 
@@ -1258,6 +1299,7 @@ function Hardcore:INSPECT_READY(...)
 				team = {},
 				first_recorded = -1,
 				version = "?",
+				endgame = false,
 			}
 			ShowInspectHC(_default_hardcore_character, target_name, _default_hardcore_character.version)
 		end
@@ -2121,7 +2163,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 		end
 		if command == COMM_COMMANDS[4] then -- Received hc character data
 			local name, _ = string.split("-", sender)
-			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str, verif_status, verif_details =
+			local version_str, creation_time, achievements_str, _, party_mode_str, _, _, team_str, hc_tag, passive_achievements_str, verif_status, verif_details, endgame_status =
 				string.split(COMM_FIELD_DELIM, data)
 			local achievements_l = { string.split(COMM_SUBFIELD_DELIM, achievements_str) }
 			other_achievements_ds = {}
@@ -2161,7 +2203,9 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				hardcore_player_name = hc_tag,
 				verification_status = verif_status,
 				verification_details = verif_details,
+				endgame = endgame_status,
 			}
+
 			hardcore_modern_menu_state.changeset[string.split("-", name)] = 1
 			return
 		end
@@ -3142,10 +3186,8 @@ function Hardcore:GenerateVerificationStatusStrings()
 
 	-- Determine the end verdict. Any trades or deaths or bubs give a fail
 	if
-		numTrades > 0
-		or numDeaths > 0
+		numDeaths > 0
 		or numBubs > 0
-		or numRepRuns > 0
 		or numOverLevelRuns > 0
 		or (dataFileSecurity ~= "OK" and dataFileSecurity ~= "?")
 		or (
@@ -3157,6 +3199,14 @@ function Hardcore:GenerateVerificationStatusStrings()
 	else
 		verdict = COLOR_GREEN .. "PASS"
 	end
+
+	if Hardcore_Character.endgame == false and 
+		(numTrades > 0
+		or numRepRuns > 0)
+	then
+		verdict = COLOR_YELLOW .. "FAIL (SEE DISCORD)"
+	end
+
 	verdict = COLOR_WHITE .. "Verification status: " .. verdict
 
 	-- Group the green, orange and red because for some weird reason we can't switch colours too often in one line
@@ -3169,7 +3219,7 @@ function Hardcore:GenerateVerificationStatusStrings()
 		table.insert(reds, "appeals=" .. numAppeals)
 	end
 
-	if numTrades > 0 then
+	if Hardcore_Character.endgame == false and numTrades > 0 then
 		table.insert(reds, "trades=" .. numTrades)
 	end
 
@@ -3177,9 +3227,10 @@ function Hardcore:GenerateVerificationStatusStrings()
 		table.insert(reds, "bub-hrth=" .. numBubs)
 	end
 
-	if numRepRuns > 0 then
+	if Hardcore_Character.endgame == false and numRepRuns > 0 then
 		table.insert(reds, "repeat_dung=" .. numRepRuns)
 	end
+
 	if numOverLevelRuns > 0 then
 		table.insert(reds, "overlvl_dung=" .. numOverLevelRuns)
 	end
@@ -3381,6 +3432,14 @@ function Hardcore:SendCharacterData(dest)
 		commMessage = commMessage .. Hardcore_Character.verification_status
 		commMessage = commMessage .. COMM_FIELD_DELIM
 		commMessage = commMessage .. Hardcore_Character.verification_details
+
+		-- Add endgame status
+		local endgame_status = "false"
+		if Hardcore_Character.endgame ~= nil and Hardcore_Character.endgame then
+			endgame_status = "true"
+		end
+		commMessage = commMessage .. COMM_FIELD_DELIM
+		commMessage = commMessage .. (endgame_status or "nil")
 
 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", dest)
 	end

@@ -173,7 +173,7 @@ function extractDetails(str, ignoreKeys)
 	str = str:gsub("^%s*%((.+)%)%s*$", "%1")
 	local details_table = {}
 	for key, value in str:gmatch("(%S+)=(%S+)") do
-		Hardcore:Print("extractDetails: " .. key .. " = " .. value)
+		-- Hardcore:Print("extractDetails: " .. key .. " = " .. value)
 	  -- Check if the current key is in the ignoreKeys array
 		local ignore = false
 		for _, ignoreKey in ipairs(ignoreKeys or {}) do
@@ -289,15 +289,38 @@ function UpdateCharacterHC(
 	version_name:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
 	character_meta_data_container:AddChild(version_name)
 
+	-- NOTE: _hardcore_character.endgame will be a boolean if it's you, or a string if it's not you
+
+	-- Hardcore:Print("Value of endgame: !" .. _hardcore_character.endgame .. "!")
+
+	-- local endgame_label = AceGUI:Create("HardcoreClassTitleLabel")
+	-- endgame_label:SetRelativeWidth(1.0)
+	-- endgame_label:SetHeight(60)
+	-- local endgame_status = "false"
+	-- if _hardcore_character.endgame ~= nil and tostring(_hardcore_character.endgame) == "true" then
+	-- 	endgame_status = "true"
+	-- end
+	-- endgame_label:SetText("Endgame status: " .. endgame_status)
+	-- endgame_label:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+	-- character_meta_data_container:AddChild(endgame_label)
+
 	-- SET UP FILTERING
 	local filtered_status = _hardcore_character.verification_status
 	local filtered_details = _hardcore_character.verification_details
 
-	--Hardcore:Print("Status: ".. _hardcore_character.verification_status)
+	-- Hardcore:Print("Status: ".. _hardcore_character.verification_status)
+	-- Hardcore:Print("Details: ".. _hardcore_character.verification_details)
 
 	if _player_name ~= UnitName("player") then
-		-- Remove tracked_time and deaths entries
-		local ignoreKeys = {"tracked_time", "deaths", "appeals", "repeat_dung", "overlvl_dung"}
+		-- Remove tracked_time, deaths and appeals entries
+		local ignoreKeys = {"tracked_time", "deaths", "appeals"} -- "repeat_dung", "overlvl_dung" -- no longer exempt
+
+		if _hardcore_character.endgame ~= nil and tostring(_hardcore_character.endgame) == "true" then
+			-- if endgame, also remove trades and repeat dungeons
+			table.insert(ignoreKeys, "trades")
+			table.insert(ignoreKeys, "repeat_dung")
+		end
+
 		local details_table = extractDetails(_hardcore_character.verification_details, ignoreKeys)
 		filtered_details = formatDetails(details_table)
 
@@ -311,6 +334,11 @@ function UpdateCharacterHC(
 		else
 			filtered_status = "|cff99ff99UNKNOWN|r\n(previous addon version)"
 		end
+
+	end
+
+	if _hardcore_character.endgame ~= nil and tostring(_hardcore_character.endgame) == "true" then
+		filtered_status = filtered_status .. " (endgame)"
 	end
 
 	if _hardcore_character.hardcore_player_name ~= nil and _hardcore_character.hardcore_player_name ~= "" then

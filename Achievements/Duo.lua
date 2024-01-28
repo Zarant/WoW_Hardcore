@@ -188,12 +188,7 @@ end
 function duo_rules:Check()
 	-- this code causes the rules checker to ignore all duo/trio rules at max level
 	if Hardcore_Character.game_version ~= nil then
-		local max_level
-		if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
-			max_level = 60
-		else -- if Hardcore_Character.game_version == "WotLK" or anything else
-			max_level = 80
-		end
+		local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
 		if UnitLevel("player") >= max_level then
 			return
 		end
