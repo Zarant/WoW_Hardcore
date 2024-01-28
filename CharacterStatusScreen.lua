@@ -173,7 +173,7 @@ function extractDetails(str, ignoreKeys)
 	str = str:gsub("^%s*%((.+)%)%s*$", "%1")
 	local details_table = {}
 	for key, value in str:gmatch("(%S+)=(%S+)") do
-		Hardcore:Print("extractDetails: " .. key .. " = " .. value)
+		-- Hardcore:Print("extractDetails: " .. key .. " = " .. value)
 	  -- Check if the current key is in the ignoreKeys array
 		local ignore = false
 		for _, ignoreKey in ipairs(ignoreKeys or {}) do
