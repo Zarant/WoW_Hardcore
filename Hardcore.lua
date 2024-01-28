@@ -442,9 +442,7 @@ Hardcore.isHardcore = C_GameRules and C_GameRules.IsHardcoreActive()
 
 function Hardcore:GetMaxLevel()
 	-- skipping non-active seasons/expansions
-	if true then
-		return 2
-	elseif Hardcore.isWotlk then
+	if Hardcore.isWotlk then
 		return 80
 	elseif Hardcore.isSoD then
 		return 25 -- will be 40 soon, update checks then. maybe new season?
