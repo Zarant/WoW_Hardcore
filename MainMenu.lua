@@ -853,9 +853,7 @@ local function DrawVerifyTab(container, _hardcore_character)
 		scroll_frame:AddChild(endgame_text)
 	end
 
-	-- TODO Remove level 2 debug code
-
-	if (level == max_level) or (level == 2) and Hardcore_Character.endgame ~= true then
+	if (level == max_level) and (not Hardcore_Character.endgame) then
 		local engage_endgame_button = AceGUI:Create("Button")
 		engage_endgame_button:SetText("Transition to Endgame")
 		engage_endgame_button:SetWidth(200)
