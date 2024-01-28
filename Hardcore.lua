@@ -3177,10 +3177,8 @@ function Hardcore:GenerateVerificationStatusStrings()
 
 	-- Determine the end verdict. Any trades or deaths or bubs give a fail
 	if
-		numTrades > 0
-		or numDeaths > 0
+		numDeaths > 0
 		or numBubs > 0
-		or numRepRuns > 0
 		or numOverLevelRuns > 0
 		or (dataFileSecurity ~= "OK" and dataFileSecurity ~= "?")
 		or (
@@ -3192,6 +3190,14 @@ function Hardcore:GenerateVerificationStatusStrings()
 	else
 		verdict = COLOR_GREEN .. "PASS"
 	end
+
+	if Hardcore_Character.endgame == false and 
+		(numTrades > 0
+		or numRepRuns > 0)
+	then
+		verdict = COLOR_YELLOW .. "FAIL (SEE DISCORD)"
+	end
+
 	verdict = COLOR_WHITE .. "Verification status: " .. verdict
 
 	-- Group the green, orange and red because for some weird reason we can't switch colours too often in one line
@@ -3204,7 +3210,7 @@ function Hardcore:GenerateVerificationStatusStrings()
 		table.insert(reds, "appeals=" .. numAppeals)
 	end
 
-	if numTrades > 0 then
+	if Hardcore_Character.endgame == false and numTrades > 0 then
 		table.insert(reds, "trades=" .. numTrades)
 	end
 
@@ -3212,9 +3218,10 @@ function Hardcore:GenerateVerificationStatusStrings()
 		table.insert(reds, "bub-hrth=" .. numBubs)
 	end
 
-	if numRepRuns > 0 then
+	if Hardcore_Character.endgame == false and numRepRuns > 0 then
 		table.insert(reds, "repeat_dung=" .. numRepRuns)
 	end
+
 	if numOverLevelRuns > 0 then
 		table.insert(reds, "overlvl_dung=" .. numOverLevelRuns)
 	end
