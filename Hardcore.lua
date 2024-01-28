@@ -442,7 +442,9 @@ Hardcore.isHardcore = C_GameRules and C_GameRules.IsHardcoreActive()
 
 function Hardcore:GetMaxLevel()
 	-- skipping non-active seasons/expansions
-	if Hardcore.isWotlk then
+	if true then
+		return 2
+	elseif Hardcore.isWotlk then
 		return 80
 	elseif Hardcore.isSoD then
 		return 25 -- will be 40 soon, update checks then. maybe new season?
@@ -801,11 +803,10 @@ end
 --
 
 TradeFrameTradeButton:SetScript("OnClick", function()
-	local duo_trio_partner = false
-	local legacy_duo_support = #Hardcore_Character.trade_partners > 0
 	local target_trader = TradeFrameRecipientNameText:GetText()
 	local level = UnitLevel("player")
 	local max_level = Hardcore:GetMaxLevel() -- 25, 60 or 80
+	local duo_trio_partner = false
 
 	if Hardcore_Character.team ~= nil then
 		for _, name in ipairs(Hardcore_Character.team) do
@@ -816,18 +817,28 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 		end
 	end
 
-	if duo_trio_partner == true then
+	if duo_trio_partner == true then -- always allow with partner
 		AcceptTrade()
-	elseif legacy_duo_support then
-		table.insert(Hardcore_Character.trade_partners, target_trader)
-		Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
-		AcceptTrade()
-	elseif (level == max_level) then
+	elseif (Hardcore_Character.endgame) then
+		if Hardcore_Character.verification_status ~= "PASS" then
+			Hardcore:Print("|cFFFF0000BLOCKED:|r You may only trade with a 'PASS' status")
+			return
+		end
+		if other_hardcore_character_cache[target_trader].verification_status ~= "PASS" then
+			Hardcore:Print("|cFFFF0000BLOCKED:|r You may only trade with other characters that have a 'PASS' status")
+			return
+		end
+		if tostring(other_hardcore_character_cache[target_trader].endgame) ~= "true" then
+			Hardcore:Print("|cFFFF0000BLOCKED:|r You may only trade with other valid endgame characters")
+			return
+		end
+		-- to reach here, both self and other are both valid endgame characters
 		table.insert(Hardcore_Character.trade_partners, target_trader)
 		Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
 		AcceptTrade()
 	else
-		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios.")
+		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios or endgame")
+		return
 	end
 end)
 
