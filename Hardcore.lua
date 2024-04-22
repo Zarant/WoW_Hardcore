@@ -1527,7 +1527,7 @@ function Hardcore:PLAYER_UNGHOST()
 
 	-- check if this is the resurrection of Arthas' mass death event
 	if FuryOfFrostMourneCast == true then
-		message = "Hope remains!" .. playerName " has been resurrected by King Terenas Menethil, and the battle continues!"
+		message = "Hope remains!" .. playerName .. " has been resurrected by King Terenas Menethil, and the battle continues!"
 		FuryOfFrostMourneCast = false
 	-- check if resurrection is authorized
 	elseif authorized_resurrection then
