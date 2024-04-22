@@ -246,6 +246,7 @@ local MOD_CHAR_NAMES = {
 	["Letmefixit"] = 1,
 	["Unarchiver"] = 1,
 }
+local FuryOfFrostMourneCast = false		-- Flag to detect whether Arthas has *just* wiped the raid
 
 -- automagic exemptions for known griefs below level 40
 local authorized_resurrection = nil
@@ -1377,8 +1378,20 @@ function Hardcore:PLAYER_DEAD()
 	end
 	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
 
-	-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
-	if
+	-- Exemption for Arthas' mass wipe event
+	if FuryOfFrostMourneCast == true then
+		local messageString =
+			"Our brave " .. playerGreet .. " " .. name .. " the " .. class .. 
+			" has fallen in battle against the Lich King atop Icecrown Citadel - but there may still be hope!"
+
+		-- Send broadcast text messages to guild and greenwall
+		SendChatMessage(messageString, "GUILD")
+		startXGuildChatMsgRelay(messageString)
+		Hardcore:Print(messageString)
+
+		return -- do not perform standard death actions
+	elseif
+		-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
 		Hardcore_Character.game_version == "Era"
 		and (GRIEFING_MOBS[Last_Attack_Source] or KNOWN_GRIEFERS[Last_Attack_Source])
 		and level <= 40
@@ -1400,6 +1413,7 @@ function Hardcore:PLAYER_DEAD()
 
 		return -- do not perform standard death actions
 	end
+
 
 	-- here we check if that was sacrifice
 	local isSacrifice = false
@@ -1511,10 +1525,13 @@ function Hardcore:PLAYER_UNGHOST()
 
 	local message = playerName .. " has resurrected!"
 
+	-- check if this is the resurrection of Arthas' mass death event
+	if FuryOfFrostMourneCast == true then
+		message = "Hope remains!" .. playerName " has been resurrected by King Terenas Menethil, and the battle continues!"
+		FuryOfFrostMourneCast = false
 	-- check if resurrection is authorized
-	if authorized_resurrection then
+	elseif authorized_resurrection then
 		message = playerName .. " has resurrected after dying to malicious activity."
-
 		-- reset the authorization
 		authorized_resurrection = nil
 	else
@@ -2236,7 +2253,7 @@ end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, environmental_type, _, _, _, _, _ =
+	local _, ev, _, source_guid, source_name, _, _, target_guid, _, _, _, arg12, _, _, _, _, _ =
 		CombatLogGetCurrentEventInfo()
 
 	if not (source_name == PLAYER_NAME) then
@@ -2245,9 +2262,28 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 				Last_Attack_Source = source_name
 				DeathLog_Last_Attack_Source = source_name
 			end
+
+			-- Check for Arthas' event mass death; try to do the cheapest that we can, because this
+			-- check will be done a trillion times for nothing
+			if source_guid ~= nil and string.match( source_guid, "36597") then
+				-- Do a second check if it's really the Big Man himself
+				local mob_type, _, server, map_id, instance_id, mob_type_id = string.split("-", source_guid)
+				if mob_type ~= nil and mob_type == "Creature" and mob_type_id ~= nil and mob_type_id == 36597 then
+					-- Arthas did something... Let's see if he cast his mass death spell
+					if ev == "SPELL_DAMAGE" then
+						if arg12 == 72350 then		-- Fury of Frostmourne
+							FuryOfFrostMourneCast = true
+						end
+					end
+				end
+			end
 		end
 	end
+
+
+	-- Environmental damage for Death Log
 	if ev == "ENVIRONMENTAL_DAMAGE" then
+		local environmental_type = arg12
 		if target_guid == UnitGUID("player") then
 			if environmental_type == "Drowning" then
 				DeathLog_Last_Attack_Source = -2
