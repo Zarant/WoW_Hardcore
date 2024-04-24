@@ -246,7 +246,6 @@ local MOD_CHAR_NAMES = {
 	["Letmefixit"] = 1,
 	["Unarchiver"] = 1,
 }
-local FuryOfFrostMourneCast = false		-- Flag to detect whether Arthas has *just* wiped the raid
 
 -- automagic exemptions for known griefs below level 40
 local authorized_resurrection = nil
@@ -1378,10 +1377,12 @@ function Hardcore:PLAYER_DEAD()
 	end
 	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
 
-	-- Exemption for Arthas' mass wipe event
-	if FuryOfFrostMourneCast == true then
+	-- Exemption for Arthas' mass wipe event, but only 
+	if Hardcore_Character.FuryOfFrostMourneCast ~= nil and
+	   Hardcore_Character.FuryOfFrostMourneTime ~= nil and
+	   (Hardcore_Character.FuryOfFrostMourneTime - GetServerTime() < 10) then
 		local messageString =
-			"Our brave " .. playerGreet .. " " .. name .. " the " .. class .. 
+			"Our brave " .. playerGreet .. ", " .. name .. " the " .. class ..
 			" has fallen in battle against the Lich King atop Icecrown Citadel - but there may still be hope!"
 
 		-- Send broadcast text messages to guild and greenwall
@@ -1526,9 +1527,11 @@ function Hardcore:PLAYER_UNGHOST()
 	local message = playerName .. " has resurrected!"
 
 	-- check if this is the resurrection of Arthas' mass death event
-	if FuryOfFrostMourneCast == true then
-		message = "Hope remains!" .. playerName .. " has been resurrected by King Terenas Menethil, and the battle continues!"
-		FuryOfFrostMourneCast = false
+	if Hardcore_Character.FuryOfFrostMourneCast ~= nil then
+		message = "Hope remains! " .. playerName .. " has been resurrected by King Terenas Menethil, and the battle continues!"
+		Hardcore_Character.FuryOfFrostMourneCast = nil
+		Hardcore_Character.FuryOfFrostMourneTime = nil
+		Hardcore:Print(message)
 	-- check if resurrection is authorized
 	elseif authorized_resurrection then
 		message = playerName .. " has resurrected after dying to malicious activity."
@@ -2263,23 +2266,23 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 				DeathLog_Last_Attack_Source = source_name
 			end
 
-			-- Check for Arthas' event mass death; try to do the cheapest that we can, because this
+			-- Check for Arthas' event mass death; try to do the cheapest check that we can, because this
 			-- check will be done a trillion times for nothing
-			if source_guid ~= nil and string.match( source_guid, "36597") then
+			if source_guid ~= nil and string.match( source_guid, "32184") then			-- 36597 for LK, 32184 for LK, 3101 for Vile Familiar
 				-- Do a second check if it's really the Big Man himself
-				local mob_type, _, server, map_id, instance_id, mob_type_id = string.split("-", source_guid)
-				if mob_type ~= nil and mob_type == "Creature" and mob_type_id ~= nil and mob_type_id == 36597 then
-					-- Arthas did something... Let's see if he cast his mass death spell
+				local mob_type, _, _, _, _, mob_type_id = string.split("-", source_guid)
+				if mob_type ~= nil and mob_type == "Creature" and mob_type_id ~= nil and mob_type_id == "32184" then  -- 36597
+					-- The Lich King did something... Let's see if he cast his mass death spell
 					if ev == "SPELL_DAMAGE" then
-						if arg12 == 72350 then		-- Fury of Frostmourne
-							FuryOfFrostMourneCast = true
+						if arg12 == 60536 then		-- Fury of Frostmourne 72350, Lich King's Fury 60536, Fireball 11921
+							Hardcore_Character.FuryOfFrostMourneCast = true
+							Hardcore_Character.FuryOfFrostMourneTime = GetServerTime()
 						end
 					end
 				end
 			end
 		end
 	end
-
 
 	-- Environmental damage for Death Log
 	if ev == "ENVIRONMENTAL_DAMAGE" then
