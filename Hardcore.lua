@@ -1377,7 +1377,7 @@ function Hardcore:PLAYER_DEAD()
 	end
 	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
 
-	-- Exemption for Arthas' mass wipe event, but only 
+	-- Exemption for Arthas' mass wipe event, but only if it happens fairly quickly (to prevent abuse)
 	if Hardcore_Character.FuryOfFrostMourneCast ~= nil and
 	   Hardcore_Character.FuryOfFrostMourneTime ~= nil and
 	   (Hardcore_Character.FuryOfFrostMourneTime - GetServerTime() < 10) then
@@ -2256,7 +2256,7 @@ end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-	local _, ev, _, source_guid, source_name, _, _, target_guid, _, _, _, arg12, _, _, _, _, _ =
+	local _, ev, _, source_guid, source_name, _, _, target_guid, _, _, _, environmental_type, _, _, _, _, _ =
 		CombatLogGetCurrentEventInfo()
 
 	if not (source_name == PLAYER_NAME) then
@@ -2286,7 +2286,6 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 
 	-- Environmental damage for Death Log
 	if ev == "ENVIRONMENTAL_DAMAGE" then
-		local environmental_type = arg12
 		if target_guid == UnitGUID("player") then
 			if environmental_type == "Drowning" then
 				DeathLog_Last_Attack_Source = -2
