@@ -1394,9 +1394,10 @@ function Hardcore:PLAYER_DEAD()
 			-- Too much time between the spell and the death -- ignore it
 			Hardcore_Character.FuryOfFrostMourneTime = nil
 		end
-	elseif
-		-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
-		Hardcore_Character.game_version == "Era"
+	end
+
+	-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
+	if Hardcore_Character.game_version == "Era"
 		and (GRIEFING_MOBS[Last_Attack_Source] or KNOWN_GRIEFERS[Last_Attack_Source])
 		and level <= 40
 	then
