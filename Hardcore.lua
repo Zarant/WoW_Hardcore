@@ -1281,7 +1281,7 @@ function Hardcore:UNIT_SPELLCAST_STOP(...)
 end
 
 function Hardcore:UNIT_SPELLCAST_SUCCEEDED(...)
-	local unit, _, spell_id, _, _ = ...
+	local unit, cast_guid, spell_id, _, _ = ...
 	-- 8690 is hearth spellid
 	if STARTED_BUBBLE_HEARTH_INFO ~= nil then
 		if unit == "player" and spell_id == bubble_hearth_vars.spell_id then
@@ -2268,19 +2268,11 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 				Last_Attack_Source = source_name
 				DeathLog_Last_Attack_Source = source_name
 			end
-			-- Check for Arthas' event mass death; try to do the cheapest check that we can, because this
-			-- check will be done a trillion times for nothing
-			if source_guid ~= nil and string.match( source_guid, "32184") then			-- 36597 for LK, 32184 for LK test, 3101 for Vile Familiar
-				-- Do a second check if it's really the Big Man himself
-				local mob_type, _, _, _, _, mob_type_id = string.split("-", source_guid)
-				if mob_type ~= nil and mob_type == "Creature" and mob_type_id ~= nil and mob_type_id == "32184" then  -- 36597
-					-- The Lich King did something... Let's see if he cast his mass death spell
-					if ev == "SPELL_DAMAGE" then
-						if arg12 == 60536 then		-- Fury of Frostmourne 72350, Lich King's Fury 60536, Fireball 11921
-							Hardcore_Character.FuryOfFrostMourneTime = GetServerTime()
-						end
-					end
-				end
+
+			-- Check for Arthas' event mass death
+			if ev == "SPELL_DAMAGE" and arg12 == 72350 then -- Fury of Frostmourne 72350, Lich King's Fury 60536, Fireball 11921
+				Hardcore_Character.FuryOfFrostMourneTime = GetServerTime()
+				Hardcore:Debug( "The Fury of Frostmourne has been cast!")
 			end
 		end
 	end
