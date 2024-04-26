@@ -1377,6 +1377,25 @@ function Hardcore:PLAYER_DEAD()
 	end
 	local messageFormat = "Our brave %s, %s the %s, has died at level %d in %s"
 
+	-- Exemption for Arthas' mass wipe event, but only if it happens fairly quickly (to prevent abuse)
+	if Hardcore_Character.FuryOfFrostMourneTime ~= nil then
+		if math.abs(Hardcore_Character.FuryOfFrostMourneTime - GetServerTime()) < 10 then
+			local messageString =
+				"Our brave " .. playerGreet .. ", " .. name .. " the " .. class ..
+				" has fallen in battle against the Lich King atop Icecrown Citadel - but there may still be hope!"
+
+			-- Send broadcast text messages to guild and greenwall
+			SendChatMessage(messageString, "GUILD")
+			startXGuildChatMsgRelay(messageString)
+			Hardcore:Print(messageString)
+
+			return -- do not perform standard death actions
+		else
+			-- Too much time between the spell and the death -- ignore it
+			Hardcore_Character.FuryOfFrostMourneTime = nil
+		end
+	end
+
 	-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
 	if
 		Hardcore_Character.game_version == "Era"
@@ -1511,10 +1530,14 @@ function Hardcore:PLAYER_UNGHOST()
 
 	local message = playerName .. " has resurrected!"
 
+	-- check if this is the resurrection of Arthas' mass death event
+	if Hardcore_Character.FuryOfFrostMourneTime ~= nil then
+		message = "Hope remains! " .. playerName .. " has been resurrected by King Terenas Menethil, and the battle continues!"
+		Hardcore_Character.FuryOfFrostMourneTime = nil
+		Hardcore:Print(message)
 	-- check if resurrection is authorized
-	if authorized_resurrection then
+	elseif authorized_resurrection then
 		message = playerName .. " has resurrected after dying to malicious activity."
-
 		-- reset the authorization
 		authorized_resurrection = nil
 	else
@@ -2236,7 +2259,7 @@ end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, environmental_type, _, _, _, _, _ =
+	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, arg12, _, _, _, _, _ =
 		CombatLogGetCurrentEventInfo()
 
 	if not (source_name == PLAYER_NAME) then
@@ -2245,10 +2268,19 @@ function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 				Last_Attack_Source = source_name
 				DeathLog_Last_Attack_Source = source_name
 			end
+
+			-- Check for Arthas' event mass death
+			if ev == "SPELL_DAMAGE" and arg12 == 72350 then -- Fury of Frostmourne 72350, Lich King's Fury 60536, Fireball 11921
+				Hardcore_Character.FuryOfFrostMourneTime = GetServerTime()
+				Hardcore:Debug( "The Fury of Frostmourne has been cast!")
+			end
 		end
 	end
+
+	-- Environmental damage for Death Log
 	if ev == "ENVIRONMENTAL_DAMAGE" then
 		if target_guid == UnitGUID("player") then
+			local environmental_type = arg12
 			if environmental_type == "Drowning" then
 				DeathLog_Last_Attack_Source = -2
 			elseif environmental_type == "Falling" then
