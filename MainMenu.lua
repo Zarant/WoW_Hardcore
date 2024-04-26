@@ -308,6 +308,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.49", scroll_frame)
+	CreateDescriptionLabel(
+		"- Added handling of Fury of Frostmourne spell (WoTLK)",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.48", scroll_frame)
 	CreateDescriptionLabel(
 		"- Fixed problem with Achievements tab when used with ElvUI",
