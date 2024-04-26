@@ -1281,7 +1281,7 @@ function Hardcore:UNIT_SPELLCAST_STOP(...)
 end
 
 function Hardcore:UNIT_SPELLCAST_SUCCEEDED(...)
-	local unit, cast_guid, spell_id, _, _ = ...
+	local unit, _, spell_id, _, _ = ...
 	-- 8690 is hearth spellid
 	if STARTED_BUBBLE_HEARTH_INFO ~= nil then
 		if unit == "player" and spell_id == bubble_hearth_vars.spell_id then
@@ -1397,7 +1397,8 @@ function Hardcore:PLAYER_DEAD()
 	end
 
 	-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
-	if Hardcore_Character.game_version == "Era"
+	if
+		Hardcore_Character.game_version == "Era"
 		and (GRIEFING_MOBS[Last_Attack_Source] or KNOWN_GRIEFERS[Last_Attack_Source])
 		and level <= 40
 	then
@@ -1418,7 +1419,6 @@ function Hardcore:PLAYER_DEAD()
 
 		return -- do not perform standard death actions
 	end
-
 
 	-- here we check if that was sacrifice
 	local isSacrifice = false
@@ -2259,7 +2259,7 @@ end
 
 function Hardcore:COMBAT_LOG_EVENT_UNFILTERED(...)
 	-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-	local _, ev, _, source_guid, source_name, _, _, target_guid, _, _, _, arg12, _, _, _, _, _ =
+	local _, ev, _, _, source_name, _, _, target_guid, _, _, _, arg12, _, _, _, _, _ =
 		CombatLogGetCurrentEventInfo()
 
 	if not (source_name == PLAYER_NAME) then
