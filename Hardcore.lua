@@ -870,6 +870,10 @@ function Hardcore:PLAYER_LOGIN()
 	-- 	end
 	--     end
 	-- end)
+
+	-- DISABLE CHARACTER TAB FOR CATA PRE-PATCH
+	if _G["HardcoreBuildLabel"] ~= "Cata" then
+
 	-- Adds HC character tab functionality
 	hooksecurefunc("CharacterFrameTab_OnClick", function(self, button)
 		local name = self:GetName()
@@ -912,6 +916,8 @@ function Hardcore:PLAYER_LOGIN()
 		end
 	end)
 
+	end
+
 	-- fires on first loading
 	self:RegisterEvent("PLAYER_UNGHOST")
 	self:RegisterEvent("PLAYER_ALIVE")
@@ -937,7 +943,10 @@ function Hardcore:PLAYER_LOGIN()
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
 	-- For inspecting other player's status
+	-- INSPECT READY DISABLED FOR CATA PRE-PATCH
+	if _G["HardcoreBuildLabel"] ~= "Cata" then
 	self:RegisterEvent("INSPECT_READY")
+	end
 	self:RegisterEvent("UNIT_TARGET")
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 

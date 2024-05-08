@@ -1,6 +1,8 @@
 _G["HardcoreBuildLabel"] = nil
 local build_num = select(4, GetBuildInfo())
-if build_num > 29999 then
+if build_num > 39999 then
+	_G["HardcoreBuildLabel"] = "Cata"
+elseif build_num > 29999 then
 	_G["HardcoreBuildLabel"] = "WotLK"
 elseif build_num > 19999 then
 	_G["HardcoreBuildLabel"] = "TBC"
