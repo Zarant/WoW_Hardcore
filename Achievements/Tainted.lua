@@ -47,6 +47,7 @@ _achievement.pts = 15
 _achievement.description = "Complete 5 dungeons while solo before reaching level 60."
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

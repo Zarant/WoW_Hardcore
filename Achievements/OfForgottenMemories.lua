@@ -22,6 +22,7 @@ of_forgotten_memories.description = HCGeneratePassiveAchievementKillDescription(
 )
 of_forgotten_memories.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

@@ -48,6 +48,7 @@ _achievement.description =
 	"Complete all dungeons until Sunken Temple (excluding RFC and Stockades) before reaching level 60."
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

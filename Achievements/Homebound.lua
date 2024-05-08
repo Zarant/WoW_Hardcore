@@ -32,6 +32,7 @@ homebound_achievement.description =
 
 homebound_achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

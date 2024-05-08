@@ -22,6 +22,7 @@ _achievement.description = HCGeneratePassiveAchievementBasicQuestDescription(
 )
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

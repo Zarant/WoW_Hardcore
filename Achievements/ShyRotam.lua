@@ -12,6 +12,7 @@ _achievement.quest_num = 5056
 _achievement.description = "Complete |cffffff00Shy-Rotam|r before reaching level " .. _achievement.level_cap .. "."
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 _achievement.faction_only = "Horde"
 
