@@ -18,6 +18,7 @@ _achievement.pts = 5
 _achievement.description = "Jump to various hard to reach points in Orgrimmar and do a /flex there."
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 local first_aid_name = "First Aid"		-- Will be overwritten in the local language by UNIT_SPELLCAST_SUCCEEDED

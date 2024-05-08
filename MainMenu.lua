@@ -308,6 +308,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.51", scroll_frame)
+	CreateDescriptionLabel(
+		"- Miscellaneous patches for Cataclysm",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.50", scroll_frame)
 	CreateDescriptionLabel(
 		"- Emergency patch for Cataclysm",
@@ -758,15 +764,6 @@ local function DrawVerifyTab(container, _hardcore_character)
 	local scroll_frame = AceGUI:Create("ScrollFrame")
 	scroll_frame:SetLayout("Flow")
 	scroll_container:AddChild(scroll_frame)
-
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		max_level = 80
-	end
 
 	local first_menu_description_title = AceGUI:Create("Label")
 	first_menu_description_title:SetWidth(500)

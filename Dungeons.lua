@@ -289,7 +289,7 @@ local function DungeonTrackerGetDungeonMaxLevel(name)
 		if Hardcore_Character.game_version ~= nil then
 			if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
 				max_level = dt_db_max_levels[name][1]
-			elseif Hardcore_Character.game_version == "WotLK" then
+			elseif Hardcore_Character.game_version == "WotLK" or Hardcore_Character.game_version == "Cata" then
 				max_level = dt_db_max_levels[name][2]
 			end
 		end
@@ -375,7 +375,7 @@ local function DungeonTrackerFindMissingRunsFromQuests()
 	if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
 		game_version_index = 1
 		game_version_max_level = 60
-	elseif Hardcore_Character.game_version == "WotLK" then
+	elseif Hardcore_Character.game_version == "WotLK" or Hardcore_Character.game_version == "Cata" then
 		game_version_index = 2
 		game_version_max_level = 80
 	else
@@ -525,8 +525,10 @@ local function DungeonTrackerWarnInfraction()
 		local max_level
 		if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
 			max_level = 60
-		else -- if Hardcore_Character.game_version == "WotLK" or anything else
+		elseif Hardcore_Character.game_version == "WotLK" then
 			max_level = 80
+		else -- Cataclysm or anything else
+			max_level = 85
 		end
 		if UnitLevel("player") >= max_level then
 			Hardcore_Character.dt.warn_infractions = false

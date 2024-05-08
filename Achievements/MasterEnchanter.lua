@@ -20,6 +20,7 @@ _achievement.bl_text = "Profession"
 _achievement.pts = 10
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

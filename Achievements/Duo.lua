@@ -191,8 +191,10 @@ function duo_rules:Check()
 		local max_level
 		if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
 			max_level = 60
-		else -- if Hardcore_Character.game_version == "WotLK" or anything else
+		elseif Hardcore_Character.game_version == "WotLK" then
 			max_level = 80
+		else -- Cataclysm or other
+			max_level = 85
 		end
 		if UnitLevel("player") >= max_level then
 			return

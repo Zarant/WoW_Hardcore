@@ -73,7 +73,7 @@ hooksecurefunc(CharacterFrame, "Hide", function(self, button)
 end)
 
 local game_version_offset = 0
-if _G["HardcoreBuildLabel"] == "WotLK" then
+if _G["HardcoreBuildLabel"] == "WotLK" or _G["HardcoreBuildLabel"] == "Cata" then
 	game_version_offset = -72
 end
 local TabGUI = CreateFrame("Button", "nwtab" .. TabID, CharacterFrame)

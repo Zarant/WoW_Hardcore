@@ -469,7 +469,11 @@ function FailureFunction(achievement_name)
 		and (Hardcore_Character.game_version ~= "Era")
 		and (Hardcore_Character.game_version ~= "SoM")
 	then
-		max_level = 80
+		if Hardcore_Character.game_version == "WotLK" then
+			max_level = 80
+		else
+			max_level = 85
+		end
 	end
 	if UnitLevel("player") == max_level then
 		return
@@ -779,7 +783,11 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 		and (Hardcore_Character.game_version ~= "Era")
 		and (Hardcore_Character.game_version ~= "SoM")
 	then
-		max_level = 80
+		if Hardcore_Character.game_version == "WotLK" then
+			max_level = 80
+		else
+			max_level = 85
+		end
 	end
 	if Hardcore_Character.team ~= nil then
 		for _, name in ipairs(Hardcore_Character.team) do
@@ -999,7 +1007,7 @@ function Hardcore:PLAYER_LOGIN()
 		end
 	end
 
-	if _G["HardcoreBuildLabel"] == "WotLK" then
+	if _G["HardcoreBuildLabel"] == "WotLK" or _G["HardcoreBuildLabel"] == "Cata" then
 		-- Register Wrath-only rules relating to Heirlooms
 		_G.extra_rules["Heirlooms"]:Register(failure_function_executor, Hardcore_Character, Hardcore_Settings)
 	end
@@ -1958,7 +1966,11 @@ function Hardcore:ShouldShowPlaytimeWarning(level, percentage)
 		and (Hardcore_Character.game_version ~= "Era")
 		and (Hardcore_Character.game_version ~= "SoM")
 	then
-		level = (level * 60) / 80
+		if Hardcore_Character.game_version == "WotLK" then
+			level = (level * 60) / 80
+		else -- Cataclysm or other
+			level = (level * 60) / 85
+		end
 	end
 
 	if level <= 5 then
