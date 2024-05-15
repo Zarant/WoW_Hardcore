@@ -296,7 +296,14 @@ local function DrawGeneralTab(container)
 	local first_menu_description = AceGUI:Create("Label")
 	first_menu_description:SetWidth(_menu_width)
 	first_menu_description:SetText(
-		"\n\n Check out the following tabs \n\n\n   |c00FFFF00Rules|r: Compiled list of hardcore challenge rules\n\n   |c00FFFF00Verify|r: Generate a verification string to confirm your max level character\n\n   |c00FFFF00Death Knight|r: Read about Death Knight rules and/or sacrifice/activate\n\n   |c00FFFF00Levels|r: See a list of your recorded character levels\n\n   |c00FFFF00Accountability|r: See whose playing in your Hardcore guild and what addon versions they are using\n\n   |c00FFFF00Achievements|r: Check out all available achievements to try\n\n|c00FFFF00Achievements|r: These are one-time challenges that don't require activation at the start of the run.\n\n"
+		"\n\n Check out the following tabs\n" ..
+		"\n\n   |c00FFFF00Rules|r: Compiled list of hardcore challenge rules" ..
+		"\n\n   |c00FFFF00Verify|r: Generate a verification string to confirm your max level character" .. 
+		"\n\n   |c00FFFF00Death Knight|r: Read about Death Knight rules and/or sacrifice/activate" .. 
+		"\n\n   |c00FFFF00Levels|r: See a list of your recorded character levels" .. 
+		"\n\n   |c00FFFF00Accountability|r: See whose playing in your Hardcore guild and what addon versions they are using" .. 
+		"\n\n   |c00FFFF00Achievements|r: Check out all available achievements to try" ..
+		"\n\n   |c00FFFF00Death stats|r: See death statistics (of players using this addon).\n\n"
 	)
 	first_menu_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	-- first_menu_description:SetPoint("TOP", 2,5)
@@ -307,6 +314,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetText("\n\nChangelog")
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
+
+	CreateHeadingLabel("11.52", scroll_frame)
+	CreateDescriptionLabel(
+		"- User interface fixes for Cataclysm",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.51", scroll_frame)
 	CreateDescriptionLabel(
@@ -574,7 +587,14 @@ local function DrawRulesTab(container)
 	local general_rules_description = AceGUI:Create("Label")
 	general_rules_description:SetWidth(_inner_menu_width)
 	general_rules_description:SetText(
-		"\nFor more info, rules, news, hall of legends, challenges, and more visit the classichc website. Help is available on discord (link on website) \n\nAll professions allowed\nNo restriction on talents\n\nYou can use gear that you pickup or craft\nNo Auction house, No mailbox, No trading\n\nNo grouping in open world\n\nNo battlegrounds allowed\n\nBuffs from others are allowed, don't ask for others for buffs\n\n\n\n"
+		"\nFor more info, rules, news, hall of legends, challenges, and more visit the classichc website. Help is available on discord (link on website)" ..
+		"\n\nAll professions allowed" ..
+		"\n\nNo restriction on talents" ..
+		"\n\nYou can use gear that you pickup or craft" ..
+		"\n\nNo Auction house, No mailbox, No trading" ..
+		"\n\nNo grouping in open world" ..
+		"\n\nNo battlegrounds allowed" ..
+		"\n\nBuffs from others are allowed, don't ask for others for buffs\n\n\n\n"
 	)
 	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	scroll_frame:AddChild(general_rules_description)
@@ -1443,6 +1463,7 @@ local function DrawDungeonsTab(container, _hardcore_character)
 	)
 	status_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	tabcontainer:AddChild(status_label)
+	status_label:SetPoint("BOTTOMLEFT", -5, -10)
 
 	-- Start the ticker that updates the data in the dungeons tab (it gets cancelled in SelectGroup() when you change tabs)
 	hardcore_modern_menu_state.ticker_handler = C_Timer.NewTicker(1, function()
@@ -1791,180 +1812,6 @@ local function DrawAccountabilityTab(container)
 			end
 		end
 	end)
-end
-
-local function DrawAchievementsTab(container)
-	local function addEntry(_scroll_frame, _player_name, _self_name) end
-
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("List")
-	tabcontainer:AddChild(scroll_container)
-
-	local achievements_container = AceGUI:Create("SimpleGroup")
-	achievements_container:SetRelativeWidth(1.0)
-	achievements_container:SetHeight(50)
-	achievements_container:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container)
-
-	local achievements_container_second_row = AceGUI:Create("SimpleGroup")
-	achievements_container_second_row:SetRelativeWidth(1.0)
-	achievements_container_second_row:SetHeight(50)
-	achievements_container_second_row:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container_second_row)
-	local function DrawClassContainer(class_container, class, size)
-		local c = 0
-		for k, v in pairs(_G.achievements) do
-			if v.class == class then
-				c = c + 1
-				local achievement_icon = AceGUI:Create("Icon")
-				achievement_icon:SetWidth(size)
-				achievement_icon:SetHeight(size)
-				achievement_icon:SetImage(v.icon_path)
-				achievement_icon:SetImageSize(size, size)
-				achievement_icon.image:SetVertexColor(1, 1, 1)
-				SetAchievementTooltip(achievement_icon, achievement, _player_name)
-				class_container:AddChild(achievement_icon)
-			end
-		end
-
-		local achievement_icon = AceGUI:Create("Icon")
-		achievement_icon:SetWidth(1)
-		achievement_icon:SetHeight(10)
-		class_container:AddChild(achievement_icon)
-	end
-
-	local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
-	achievements_title:SetRelativeWidth(1.0)
-	achievements_title:SetHeight(40)
-	achievements_title:SetText("General Achievements")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
-	achievements_container:AddChild(achievements_title)
-	DrawClassContainer(achievements_container, "All", 50)
-
-	local function DrawClassContainer2(container, class, size)
-		local class_contianer = AceGUI:Create("SimpleGroup")
-		class_contianer:SetWidth(120)
-		class_contianer:SetHeight(50)
-		class_contianer:SetLayout("Flow")
-		container:AddChild(class_contianer)
-
-		local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
-		achievements_title:SetRelativeWidth(1.0)
-		achievements_title:SetHeight(40)
-		achievements_title:SetText(class)
-		achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
-		class_contianer:AddChild(achievements_title)
-		DrawClassContainer(class_contianer, class, size)
-	end
-
-	local achievements_container = AceGUI:Create("SimpleGroup")
-	achievements_container:SetRelativeWidth(1.0)
-	achievements_container:SetHeight(200)
-	achievements_container:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container)
-	local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
-	achievements_title:SetRelativeWidth(1.0)
-	achievements_title:SetHeight(40)
-	achievements_title:SetText("\n\n\n\n")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
-	scroll_container:AddChild(achievements_title)
-
-	local achievements_container = AceGUI:Create("SimpleGroup")
-	achievements_container:SetRelativeWidth(1.0)
-	achievements_container:SetHeight(50)
-	achievements_container:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container)
-	DrawClassContainer2(achievements_container, "Warrior", 36)
-	DrawClassContainer2(achievements_container, "Hunter", 36)
-	DrawClassContainer2(achievements_container, "Warlock", 36)
-	DrawClassContainer2(achievements_container, "Mage", 36)
-	DrawClassContainer2(achievements_container, "Druid", 36)
-	DrawClassContainer2(achievements_container, "Paladin", 36)
-	DrawClassContainer2(achievements_container, "Priest", 36)
-	DrawClassContainer2(achievements_container, "Shaman", 36)
-	DrawClassContainer2(achievements_container, "Rogue", 36)
-end
-
-local function DrawPassiveAchievementsTab(container)
-	local function DrawClassContainer(class_container, class, size)
-		local c = 0
-		for k, v in pairs(_G.passive_achievements) do
-			if v.class == class then
-				c = c + 1
-				local achievement_icon = AceGUI:Create("Icon")
-				achievement_icon:SetWidth(size)
-				achievement_icon:SetHeight(size)
-				achievement_icon:SetImage(v.icon_path)
-				achievement_icon:SetImageSize(size, size)
-				achievement_icon.image:SetVertexColor(1, 1, 1)
-				achievement_icon:SetCallback("OnEnter", function(widget)
-					GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
-					GameTooltip:AddLine(v.title)
-					GameTooltip:AddLine(v.description, 1, 1, 1, true)
-					GameTooltip:Show()
-				end)
-				achievement_icon:SetCallback("OnLeave", function(widget)
-					GameTooltip:Hide()
-				end)
-				class_container:AddChild(achievement_icon)
-			end
-		end
-
-		local achievement_icon = AceGUI:Create("Icon")
-		achievement_icon:SetWidth(1)
-		achievement_icon:SetHeight(10)
-		class_container:AddChild(achievement_icon)
-	end
-
-	local function addEntry(_scroll_frame, _player_name, _self_name) end
-
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("List")
-	tabcontainer:AddChild(scroll_container)
-
-	local achievements_container = AceGUI:Create("SimpleGroup")
-	achievements_container:SetRelativeWidth(1.0)
-	achievements_container:SetHeight(50)
-	achievements_container:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container)
-
-	local achievements_container_second_row = AceGUI:Create("SimpleGroup")
-	achievements_container_second_row:SetRelativeWidth(1.0)
-	achievements_container_second_row:SetHeight(50)
-	achievements_container_second_row:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container_second_row)
-
-	local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
-	achievements_title:SetRelativeWidth(1.0)
-	achievements_title:SetHeight(40)
-	achievements_title:SetText("Passive Achievements")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
-	achievements_container:AddChild(achievements_title)
-	DrawClassContainer(achievements_container, "All", 50)
-
-	local achievements_container = AceGUI:Create("SimpleGroup")
-	achievements_container:SetRelativeWidth(1.0)
-	achievements_container:SetHeight(200)
-	achievements_container:SetLayout("CenteredFlow")
-	scroll_container:AddChild(achievements_container)
-
-	local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
-	achievements_title:SetRelativeWidth(1.0)
-	achievements_title:SetHeight(40)
-	achievements_title:SetText("Alliance Only Achievements")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
-	scroll_container:AddChild(achievements_title)
-
-	local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
-	achievements_title:SetRelativeWidth(1.0)
-	achievements_title:SetHeight(40)
-	achievements_title:SetText("Horde Only Achievements")
-	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
-	scroll_container:AddChild(achievements_title)
 end
 
 local function DrawOfficerToolsTab(container)
