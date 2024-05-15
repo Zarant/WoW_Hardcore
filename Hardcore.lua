@@ -886,9 +886,6 @@ function Hardcore:PLAYER_LOGIN()
 	hooksecurefunc("CharacterFrameTab_OnClick", function(self, button)
 		local name = self:GetName()
 		if name == "CharacterFrameTab6" then
-			if _G["HonorFrame"] ~= nil then
-				_G["HonorFrame"]:Hide()
-			end
 			if _G["PaperDollFrame"] ~= nil then
 				_G["PaperDollFrame"]:Hide()
 			end
@@ -918,11 +915,19 @@ function Hardcore:PLAYER_LOGIN()
 		end
 	end)
 
-	hooksecurefunc("CharacterFrame_ShowSubFrame", function(self, frameName)
-		if name ~= "CharacterFrameTab6" then
-			HideCharacterHC()
-		end
+	-- What to do when an official frame's tab is clicked (not the HC tab!)
+	hooksecurefunc("CharacterFrame_ShowSubFrame", function(frameName)
+		HideCharacterHC()
 	end)
+
+	else
+
+		-- Cataclysm: need to hook the function in a different way
+
+		-- When any of the official Blizz tabs show, we need to hide
+		hooksecurefunc(CharacterFrame, "ShowSubFrame", function(self, param1)
+			HideCharacterHC()
+		end)
 
 	end
 
@@ -1069,7 +1074,10 @@ function Hardcore:PLAYER_LOGIN()
 	CheckForExpiredDKToken(Hardcore_Settings)
 	CheckForExpiredPartyChangeToken(Hardcore_Settings)
 
-	if Hardcore_Character.game_version == "" or Hardcore_Character.game_version == "Era" then
+	-- Set the game_version (saved in the data file) from the addon version
+	-- If we don't do this, toons that went through automatic transfer during WotLK->Cata will remain
+	-- labeled as "WotLK", with the associated L80 / L85 problems.
+	--if Hardcore_Character.game_version == "" or Hardcore_Character.game_version == "Era" then
 		if _G["HardcoreBuildLabel"] == nil then
 		-- pass
 		elseif _G["HardcoreBuildLabel"] == "Classic" then
@@ -1083,7 +1091,7 @@ function Hardcore:PLAYER_LOGIN()
 		else
 			Hardcore_Character.game_version = _G["HardcoreBuildLabel"]
 		end
-	end
+	--end
 
 	if Hardcore_Settings.hardcore_player_name == nil or Hardcore_Settings.hardcore_player_name == "" then
 		Hardcore:Print(

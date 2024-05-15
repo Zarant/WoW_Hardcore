@@ -13,57 +13,73 @@ local CLASS_COLOR_BY_NAME = {
 }
 local AceGUI = LibStub("AceGUI-3.0")
 local ICON_SIZE = 39
-local TabName = "DummyHCTab"
-local TabID = CharacterFrame.numTabs + 1
-local Tab = CreateFrame("Button", "$parentTab" .. TabID, CharacterFrame, "CharacterFrameTabButtonTemplate", TabID)
-Tab:SetPoint("LEFT", "$parentTab" .. (TabID - 1), "RIGHT", -50000, 0) -- Offscreen; we need to have this tab as a dummy
-Tab:SetText(TabName)
-Tab:Show()
+
+-- Make the Reputation and Currency/Token tab smaller so we have room for "HC"
 _G["CharacterFrameTab3Text"]:SetText("Rep.")
+if	_G["TokenFrame"] ~= nil
+	and _G["CharacterFrameTab5Text"] ~= nil
+	and _G["CharacterFrameTab5Text"]:GetText() == "Currency"
+then
+	_G["CharacterFrameTab5Text"]:SetText("Curr.")
+end
 
 local Panel = CreateFrame("Frame", nil, CharacterFrame)
-Panel:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", -50, -200)
-Panel:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -200, 0)
-local f = CreateFrame("Frame", "YourFrameName", Panel)
-f:SetSize(400, 400)
-f:SetPoint("CENTER")
-f:Hide()
-
-local t = f:CreateTexture(nil, "BACKGROUND")
-t:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-TopLeft")
-t:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 2, -1)
-t:SetWidth(256)
-t:SetHeight(256)
-
-local tr = f:CreateTexture(nil, "BACKGROUND")
-tr:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-TopRight")
-tr:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 258, -1)
-tr:SetWidth(128)
-tr:SetHeight(256)
-
-local bl = f:CreateTexture(nil, "BACKGROUND")
-bl:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-BottomLeft")
-bl:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 2, -257)
-bl:SetWidth(256)
-bl:SetHeight(256)
-
-local br = f:CreateTexture(nil, "BACKGROUND")
-br:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-BottomRight")
-br:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 258, -257)
-br:SetWidth(128)
-br:SetHeight(256)
-
-local title_text = f:CreateFontString(nil, "ARTWORK")
-title_text:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 22, "")
-title_text:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 150, -45)
-title_text:SetTextColor(1, 0.82, 0)
-title_text:SetText("Hardcore")
-
 Panel:SetPoint("CENTER", 0, 0)
 Panel:Hide()
 
+-- Cata character frames are a bit higher and to the left for some weird reason
+local frameOffsetX, frameOffsetY
+if _G["HardcoreBuildLabel"] ~= "Cata" then
+	frameOffsetX = 2
+	frameOffsetY = -1
+else
+	frameOffsetX = -13
+	frameOffsetY = 13
+end
+
+-- Make a frame for the outside edges of the HC character frame
+-- This is actually not necessary for Cata, where the only thing changed is the "Mixin",
+-- i.e. the contents of the frame, not the edges
+local f
+if _G["HardcoreBuildLabel"] ~= "Cata" then
+	f = CreateFrame("Frame", "HardcoreOuterFrame", Panel)
+	f:SetSize(400, 400)
+	f:SetPoint("CENTER")
+	f:Hide()
+
+	local t = f:CreateTexture(nil, "BACKGROUND")
+	t:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-TopLeft")
+	t:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", frameOffsetX, frameOffsetY)
+	t:SetWidth(256)
+	t:SetHeight(256)
+
+	local tr = f:CreateTexture(nil, "BACKGROUND")
+	tr:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-TopRight")
+	tr:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", frameOffsetX + 256, frameOffsetY)
+	tr:SetWidth(128)
+	tr:SetHeight(256)
+
+	local bl = f:CreateTexture(nil, "BACKGROUND")
+	bl:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-BottomLeft")
+	bl:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", frameOffsetX, frameOffsetY -256)
+	bl:SetWidth(256)
+	bl:SetHeight(256)
+
+	local br = f:CreateTexture(nil, "BACKGROUND")
+	br:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-General-BottomRight")
+	br:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", frameOffsetX + 256, frameOffsetY - 256)
+	br:SetWidth(128)
+	br:SetHeight(256)
+
+	local title_text = f:CreateFontString(nil, "ARTWORK")
+	title_text:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 22, "")
+	title_text:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", frameOffsetX + 148, frameOffsetY - 44)
+	title_text:SetTextColor(1, 0.82, 0)
+	title_text:SetText("Hardcore")
+end
+
 local f2 = AceGUI:Create("HardcoreFrameEmpty")
-f2:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 8, -38)
+f2:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", frameOffsetX, frameOffsetY - 40)
 f2:SetWidth(360)
 f2:SetHeight(350)
 f2:Hide()
@@ -72,74 +88,66 @@ hooksecurefunc(CharacterFrame, "Hide", function(self, button)
 	HideCharacterHC()
 end)
 
-local game_version_offset = 0
-if _G["HardcoreBuildLabel"] == "WotLK" or _G["HardcoreBuildLabel"] == "Cata" then
-	game_version_offset = -72
-end
-local TabGUI = CreateFrame("Button", "nwtab" .. TabID, CharacterFrame)
+local TabGUI = CreateFrame("Button", "CharacterFrameTab" .. (CharacterFrame.numTabs + 1), CharacterFrame)
 _G["HardcoreCharacterTab"] = TabGUI
-TabGUI:SetPoint("LEFT", "CharacterFrameTab5", "RIGHT", -16 + game_version_offset, 0)
-C_Timer.After(1.0, function() -- Check to see if the currency tab is active, then offset the new tab if it is
-	if
-		_G["TokenFrame"] ~= nil
-		and _G["CharacterFrameTab5Text"] ~= nil
-		and _G["CharacterFrameTab5Text"]:GetText() == "Currency"
-		and _G["CharacterFrameTab5Text"]:IsShown()
-	then
-		for index = 1, GetCurrencyListSize() do
-			name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
-			if not isHeader and count ~= nil and (count > 0) then
-				TabGUI:SetPoint("LEFT", "CharacterFrameTab5", "RIGHT", 56 + game_version_offset, 0)
-				_G["CharacterFrameTab5Text"]:SetText("Curr.")
-			end
-		end
-	end
-end)
+
+-- Cata tab buttons go down, while Classic buttons go up
+local buttonActiveOffset, buttonVertSizeActive, buttonVertSizeInactive
+if _G["HardcoreBuildLabel"] ~= "Cata" then
+	buttonActiveOffset = -5
+	buttonVertSizeActive = 32
+	buttonVertSizeInactive = 32
+else
+	buttonActiveOffset = -9
+	buttonVertSizeActive = 58
+	buttonVertSizeInactive = 32
+end
 
 TabGUI.text = TabGUI:CreateFontString(nil, "OVERLAY")
 TabGUI.text:SetDrawLayer("ARTWORK", 8)
 TabGUI.text:SetFontObject(GameFontNormalSmall)
 TabGUI.text:SetPoint("CENTER", 0, 1)
 TabGUI.text:SetText("HC")
+
 local tab_gui_left = TabGUI:CreateTexture()
 tab_gui_left:SetDrawLayer("ARTWORK", 1)
 tab_gui_left:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ActiveTab")
-tab_gui_left:SetSize(25, 32)
+tab_gui_left:SetSize(25, buttonVertSizeActive)
 tab_gui_left:SetRotation(3.14)
 tab_gui_left:SetTexCoord(0.8, 1.0, 1.0, 0.0)
-tab_gui_left:SetPoint("TOPLEFT", 0, -5)
+tab_gui_left:SetPoint("TOPLEFT", 0, buttonActiveOffset)
 local tab_gui_middle = TabGUI:CreateTexture(nil, "ARTWORK")
 tab_gui_middle:SetDrawLayer("ARTWORK", 1)
 tab_gui_middle:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ActiveTab")
-tab_gui_middle:SetSize(25, 32)
+tab_gui_middle:SetSize(25, buttonVertSizeActive)
 tab_gui_middle:SetRotation(3.14)
 tab_gui_middle:SetTexCoord(0.8, 0.20, 1.0, 0.0)
-tab_gui_middle:SetPoint("TOP", 0, -5)
+tab_gui_middle:SetPoint("TOP", 0, buttonActiveOffset)
 local tab_gui_right = TabGUI:CreateTexture(nil, "ARTWORK")
 tab_gui_right:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ActiveTab")
-tab_gui_right:SetSize(25, 32)
+tab_gui_right:SetSize(25, buttonVertSizeActive)
 tab_gui_right:SetRotation(3.14)
 tab_gui_right:SetTexCoord(0.0, 0.20, 1.0, 0.0)
-tab_gui_right:SetPoint("TOPRIGHT", 0, -5)
+tab_gui_right:SetPoint("TOPRIGHT", 0, buttonActiveOffset)
 tab_gui_left:Hide()
 tab_gui_middle:Hide()
 tab_gui_right:Hide()
 
 local inactive_tab_gui_left = TabGUI:CreateTexture(nil, "ARTWORK")
 inactive_tab_gui_left:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-InactiveTab")
-inactive_tab_gui_left:SetSize(25, 32)
+inactive_tab_gui_left:SetSize(25, buttonVertSizeInactive)
 inactive_tab_gui_left:SetRotation(3.14)
 inactive_tab_gui_left:SetTexCoord(0.8, 1.0, 1.0, 0.0)
 inactive_tab_gui_left:SetPoint("TOPLEFT", 0, -9)
 local inactive_tab_gui_middle = TabGUI:CreateTexture(nil, "ARTWORK")
 inactive_tab_gui_middle:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-InactiveTab")
-inactive_tab_gui_middle:SetSize(25, 32)
+inactive_tab_gui_middle:SetSize(25, buttonVertSizeInactive)
 inactive_tab_gui_middle:SetRotation(3.14)
 inactive_tab_gui_middle:SetTexCoord(0.8, 0.20, 1.0, 0.0)
 inactive_tab_gui_middle:SetPoint("TOP", 0, -9)
 local inactive_tab_gui_right = TabGUI:CreateTexture(nil, "ARTWORK")
 inactive_tab_gui_right:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-InactiveTab")
-inactive_tab_gui_right:SetSize(25, 32)
+inactive_tab_gui_right:SetSize(25, buttonVertSizeInactive)
 inactive_tab_gui_right:SetRotation(3.14)
 inactive_tab_gui_right:SetTexCoord(0.0, 0.20, 1.0, 0.0)
 inactive_tab_gui_right:SetPoint("TOPRIGHT", 0, -9)
@@ -151,16 +159,29 @@ tab_higlight:SetRotation(3.14)
 tab_higlight:SetTexCoord(1.0, 0.0, 1.0, 0.0)
 tab_higlight:SetPoint("TOP", 0, 0)
 TabGUI:SetHighlightTexture(tab_higlight, "ADD")
-
-TabGUI:SetScript("OnClick", function(self, arg1)
-	print(arg1)
-end)
-
 TabGUI:SetWidth(60)
 TabGUI:SetHeight(50)
 TabGUI:Show()
 
 hooksecurefunc(CharacterFrame, "Show", function(self, button)
+
+	-- In different game versions, tabs 1-5 are used in different combinations
+	-- We put the HC tab next to the last actually used tab, but anchor it to the CharacterFrame
+	-- rather than that tab to prevent it from jumping up/down along with the other tab.
+	local rightMostVisible = "CharacterFrameTab1Text"
+	for i = 2, 5 do
+		local tabLabel = "CharacterFrameTab" .. i .. "Text"
+		if _G[tabLabel] ~= nil and _G[tabLabel]:IsVisible() then
+			rightMostVisible = tabLabel
+		end
+	end
+	local x = _G[rightMostVisible]:GetRight() - _G["CharacterFrame"]:GetLeft()
+	local y = _G[rightMostVisible]:GetTop() - _G["CharacterFrame"]:GetTop()
+	if _G["HardcoreBuildLabel"] ~= "Cata" then
+		TabGUI:SetPoint("TOPLEFT", CharacterFrame, x+4, y+19)
+	else
+		TabGUI:SetPoint("TOPLEFT", CharacterFrame, x+10, y+17)
+	end
 	TabGUI:Show()
 end)
 
@@ -173,7 +194,7 @@ function extractDetails(str, ignoreKeys)
 	str = str:gsub("^%s*%((.+)%)%s*$", "%1")
 	local details_table = {}
 	for key, value in str:gmatch("(%S+)=(%S+)") do
-		Hardcore:Print("extractDetails: " .. key .. " = " .. value)
+		Hardcore:Debug("extractDetails: " .. key .. " = " .. value)
 	  -- Check if the current key is in the ignoreKeys array
 		local ignore = false
 		for _, ignoreKey in ipairs(ignoreKeys or {}) do
@@ -357,12 +378,12 @@ function UpdateCharacterHC(
 	.. "|cffff8000PENDING|r - Death or data appeal in progress\n"
 	.. "|cffff3f40FAIL|r - Has failed the challenge - INVALID CHARACTER\n"
 	
-	local hc_tag_g = AceGUI:Create("HardcoreClassTitleLabel")
-	hc_tag_g:SetRelativeWidth(1.0)
-	hc_tag_g:SetHeight(60)
-	hc_tag_g:SetText(explanatory_key_msg)
-	hc_tag_g:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-	character_meta_data_container:AddChild(hc_tag_g)
+	local hc_tag_i = AceGUI:Create("HardcoreClassTitleLabel")
+	hc_tag_i:SetRelativeWidth(1.0)
+	hc_tag_i:SetHeight(60)
+	hc_tag_i:SetText(explanatory_key_msg)
+	hc_tag_i:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+	character_meta_data_container:AddChild(hc_tag_i)
 
 	local v_buffer = AceGUI:Create("Label")
 	v_buffer:SetRelativeWidth(1.0)
@@ -373,16 +394,37 @@ function UpdateCharacterHC(
 	local achievements_container = AceGUI:Create("SimpleGroup")
 	achievements_container:SetRelativeWidth(1.0)
 	achievements_container:SetHeight(50)
-	achievements_container:SetLayout("CenteredFlow")
+	achievements_container:SetLayout("Flow")
 	frame_to_update:AddChild(achievements_container)
 
 	local _acheivement_pts = CalculateHCAchievementPts(_hardcore_character)
 	local achievements_title = AceGUI:Create("HardcoreClassTitleLabel")
 	achievements_title:SetRelativeWidth(1.0)
 	achievements_title:SetHeight(40)
-	achievements_title:SetText("Achievements - " .. _acheivement_pts .. "pts")
+	achievements_title:SetText("Achievements - " .. _acheivement_pts .. " pts")
 	achievements_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 16, "")
 	achievements_container:AddChild(achievements_title)
+
+	-- Some padding on the left of the icons (so that there is 5% space left and right)
+	local padding = AceGUI:Create("Label")
+	padding:SetRelativeWidth(0.05)
+	padding:SetHeight(30)
+	achievements_container:AddChild(padding)
+
+	-- Put achievements in a scroll container in case there are too many achievements
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetRelativeWidth(0.9)
+	scroll_container:SetHeight(100)
+	scroll_container:SetLayout("Fill")
+	achievements_container:AddChild(scroll_container)
+
+	-- Add the scrolling part of the frame
+	local scroll_frame = AceGUI:Create("ScrollFrame")
+	scroll_frame:SetLayout("Flow") -- We want the headers and columns side by side
+	scroll_frame:SetFullWidth(true)
+	scroll_frame:SetFullHeight(true)
+	scroll_container:AddChild(scroll_frame)
+
 	if _hardcore_character.achievements ~= nil then
 		for i, v in ipairs(_hardcore_character.achievements) do
 			if _G.achievements[v] ~= nil then
@@ -393,7 +435,7 @@ function UpdateCharacterHC(
 				achievement_icon:SetImageSize(ICON_SIZE, ICON_SIZE)
 				achievement_icon.image:SetVertexColor(1, 1, 1)
 				SetAchievementTooltip(achievement_icon, _G.achievements[v], _player_name)
-				achievements_container:AddChild(achievement_icon)
+				scroll_frame:AddChild(achievement_icon)
 			end
 		end
 	end
@@ -408,7 +450,7 @@ function UpdateCharacterHC(
 				achievement_icon:SetImageSize(ICON_SIZE, ICON_SIZE)
 				achievement_icon.image:SetVertexColor(1, 1, 1)
 				SetAchievementTooltip(achievement_icon, _G.passive_achievements[v], _player_name)
-				achievements_container:AddChild(achievement_icon)
+				scroll_frame:AddChild(achievement_icon)
 			end
 		end
 	end
@@ -422,7 +464,11 @@ function ShowCharacterHC(_hardcore_character)
 	inactive_tab_gui_middle:Hide()
 	inactive_tab_gui_right:Hide()
 	TabGUI.text:SetFontObject(GameFontHighlightSmall)
-	TabGUI.text:SetPoint("CENTER", 0, 3)
+	if _G["HardcoreBuildLabel"] ~= "Cata" then
+		TabGUI.text:SetPoint("CENTER", 0, 3)
+	else
+		TabGUI.text:SetPoint("CENTER", 0, -1)
+	end
 	TabGUI:SetFrameStrata("HIGH")
 
 	f2:ReleaseChildren()
@@ -438,7 +484,9 @@ function ShowCharacterHC(_hardcore_character)
 		UnitLevel("player")
 	)
 	Panel:Show()
-	f:Show()
+	if _G["HardcoreBuildLabel"] ~= "Cata" then
+		f:Show()
+	end
 	f2:Show()
 end
 
@@ -453,7 +501,9 @@ function HideCharacterHC()
 	TabGUI.text:SetPoint("CENTER", 0, 1)
 	TabGUI:SetFrameStrata("HIGH")
 	Panel:Hide()
-	f:Hide()
+	if _G["HardcoreBuildLabel"] ~= "Cata" then
+		f:Hide()
+	end
 	f2:Hide()
 	f2:ReleaseChildren()
 end
@@ -461,11 +511,17 @@ end
 TabGUI:RegisterEvent("PLAYER_ENTER_COMBAT")
 TabGUI:RegisterEvent("PLAYER_LEAVE_COMBAT")
 
-_G["HardcoreCharacterTab"]:SetScript("OnClick", function(self, arg1)
-	PanelTemplates_SetTab(CharacterFrame, 6)
-	if _G["HonorFrame"] ~= nil then
-		_G["HonorFrame"]:Hide()
+TabGUI:SetScript("OnClick", function(self, arg1)
+
+	-- For Cata, we need to switch to the first tab first, so as to change the character frame size
+	-- back to normal
+	if _G["HardcoreBuildLabel"] == "Cata" then
+		CharacterFrame:ShowSubFrame("PaperDollFrame")
+		ShowUIPanel(CharacterFrame)
+		CharacterFrame:RefreshDisplay()
 	end
+
+	PanelTemplates_SetTab(CharacterFrame, 6)
 	if _G["PaperDollFrame"] ~= nil then
 		_G["PaperDollFrame"]:Hide()
 	end
@@ -492,10 +548,10 @@ TabGUI:SetScript("OnEvent", function(self, event, ...)
 	if event == "PLAYER_ENTER_COMBAT" then
 		TabGUI.text:SetText("|c00808080HC|r")
 		HideCharacterHC()
-		_G["HardcoreCharacterTab"]:SetScript("OnClick", function(self, arg1) end)
+		TabGUI:SetScript("OnClick", function(self, arg1) end)
 	elseif event == "PLAYER_LEAVE_COMBAT" then
 		TabGUI.text:SetText("HC")
-		_G["HardcoreCharacterTab"]:SetScript("OnClick", function(self, arg1)
+		TabGUI:SetScript("OnClick", function(self, arg1)
 			PanelTemplates_SetTab(CharacterFrame, 6)
 			if _G["HonorFrame"] ~= nil then
 				_G["HonorFrame"]:Hide()
