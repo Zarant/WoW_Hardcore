@@ -166,6 +166,7 @@ id_to_npc.lua
 npc_to_id.lua
 DeathLog.lua
 SlashCommands.lua
+LevelToast.lua
 Hardcore.lua
 
 Libs/GreenWall/Constants.lua

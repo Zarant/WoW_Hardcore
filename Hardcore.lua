@@ -1607,9 +1607,9 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 		Screenshot()
 	end)
 
-	-- send a message to the guild if the player's level is divisible by 10
+	-- send a message to the guild if the player's level is divisible by 10 (or max level for Cataclysm)
 	local landmarkLevel = (level % 10) == 0
-	if landmarkLevel then
+	if landmarkLevel or (level == 85 and _G["HardcoreBuildLabel"] == "Cata") then
 		local playerName = UnitName("player")
 		local localizedClass = UnitClass("player")
 
@@ -2343,8 +2343,13 @@ local function levelToast(rea_name, rea_class, rea_level)
 	if rea_name == nil or rea_class == nil or rea_level == nil then
 		return
 	end
-	-- Todo: Parameterize this
-	if tostring(rea_level) ~= "60" then
+	local toastMaxLevel = "60"
+	if _G["HardcoreBuildLabel"] == "Cata" then
+		toastMaxLevel = "85"
+	elseif _G["HardcoreBuildLabel"] == "WotLK" then
+		toastMaxLevel = "80"
+	end
+	if tostring(rea_level) ~= toastMaxLevel then
 		return
 	end
 	if shown_60_toasts[rea_name .. rea_level] then
