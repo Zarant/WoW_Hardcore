@@ -156,6 +156,7 @@ InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
 ReloadReminder.lua
+dungeon-db-cata.lua
 Dungeons.lua
 Survey.lua
 MainMenu.lua
@@ -166,6 +167,7 @@ id_to_npc.lua
 npc_to_id.lua
 DeathLog.lua
 SlashCommands.lua
+LevelToast.lua
 Hardcore.lua
 
 Libs/GreenWall/Constants.lua

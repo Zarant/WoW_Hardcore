@@ -156,6 +156,7 @@ InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
 ReloadReminder.lua
+dungeon-db-wotlk.lua
 Dungeons.lua
 Survey.lua
 MainMenu.lua
