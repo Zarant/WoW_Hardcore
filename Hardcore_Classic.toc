@@ -157,6 +157,7 @@ InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
 ReloadReminder.lua
+dungeon-db-classic.lua
 Dungeons.lua
 Survey.lua
 MainMenu.lua
