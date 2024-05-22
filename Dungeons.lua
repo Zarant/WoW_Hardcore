@@ -101,6 +101,25 @@ local function DungeonTrackerGetDungeonMaxLevel(name)
 	return max_level
 end
 
+-- DungeonTrackerGetDungeonMaxLevelAtRunTime
+--
+-- Returns the max level for a dungeon from the database at the specified run time
+-- This is used to see if previous runs may have been under another version of the
+-- game where the max levels were different
+
+local function DungeonTrackerGetDungeonMaxLevelAtRunTime(run)
+
+	-- If we are in cata now, but the run started before pre-patch day, we use the WotLK max level (if it was differen than Cata)
+	if _G["HardcoreBuildLabel"] == "Cata" and run.start ~= nil and _dt_db_wotlk_max_levels[ run.name ] ~= nil then
+		if run.start < 1714482000 then			-- Wed 30 April 2024, 15:00 PDT
+			return _dt_db_wotlk_max_levels[ run.name ]
+		end
+	end
+
+	-- Default to the current version's max level if not Cata
+	return DungeonTrackerGetDungeonMaxLevel(run.name)
+end
+
 -- DungeonTrackerGetAllDungeonMaxLevels()
 --
 -- Returns a table of dungeons and associated max levels
@@ -280,7 +299,7 @@ local function DungeonTrackerUpdateInfractions()
 
 	for i = 1, #Hardcore_Character.dt.runs do
 		-- Check overleveled run
-		if Hardcore_Character.dt.runs[i].level > DungeonTrackerGetDungeonMaxLevel(Hardcore_Character.dt.runs[i].name) then
+		if Hardcore_Character.dt.runs[i].level > DungeonTrackerGetDungeonMaxLevelAtRunTime(Hardcore_Character.dt.runs[i]) then
 			over_leveled = over_leveled + 1
 		end
 		-- Check if the run is repeated further down in the array (this prevents counting runs twice when i ends up at j)
@@ -820,12 +839,6 @@ end
 local function DungeonTrackerStoreInstanceID( instance_id, event )
 
 	local instance_id_changed = false
-
-	-- Store the source of the instance ID for debugging purposes
-	if Hardcore_Character.dt.current.iid_src == nil then
-		Hardcore_Character.dt.current.iid_src = {}
-	end
-	Hardcore_Character.dt.current.iid_src[instance_id] = event
 
 	-- Count the number of times we saw this instance ID
 	if Hardcore_Character.dt.current.iid_count == nil then

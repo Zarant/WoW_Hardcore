@@ -138,26 +138,71 @@ dt_db = {
 	{ 30, 2597, "Alterac Valley", "B", 40, 1000, { 1000, 1000 }, {} },
 	{ 529, 3358, "Arathi Basin", "B", 15, 1000, { 1000, 1000 }, {} },
 
-	-- TBC dungeons -- TO DO: bosses and quests
+	-- TBC dungeons
 	{ 543, 3562, "Hellfire Ramparts", "D", 5, 1, { 1000, 64 },
 				{ 29529, 29530, 29527, 29528 },
-				{ {"Omor the Unscarred", 17308}, {"Watchkeeper Gargolmar", 17306}, {"Nazan", 17536}, {"Vazruden", 17537} }
+				{ {"Omor the Unscarred",17308}, {"Watchkeeper Gargolmar",17306}, {"Vazruden",17537} }
 	},
-	{ 542, 3713, "The Blood Furnace", "D", 5, 1, { 1000, 65 }, {}, {} },
-	{ 547, 3717, "The Slave Pens", "D", 5, 1, { 1000, 66 }, {}, {} },
-	{ 546, 3716, "The Underbog", "D", 5, 1, { 1000, 67 }, {}, {} },
-	{ 557, 3792, "Mana-Tombs", "D", 5, 1, { 1000, 68 }, {}, {} },
-	{ 558, 3790, "Auchenai Crypts", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 560, 2367, "Old Hillsbrad Foothills", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 556, 3791, "Sethekk Halls", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 553, 3847, "The Botanica", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 555, 3789, "Shadow Labyrinth", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 545, 3715, "The Steamvault", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 540, 3714, "The Shattered Halls", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 554, 3849, "The Mechanar", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 269, 2366, "The Black Morass", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 552, 3848, "The Arcatraz", "D", 5, 1, { 1000, 70 }, {}, {} },
-	{ 585, 4131, "Magisters' Terrace", "D", 5, 1, { 1000, 70 }, {}, {} },
+	{ 542, 3713, "The Blood Furnace", "D", 5, 1, { 1000, 65 },
+				{ 29536, 29539, 29537, 29540 },
+				{ {"Keli'dan the Breaker",17377}, {"The Maker",17381}, {"Broggok",17380} }
+	},
+	{ 547, 3717, "The Slave Pens", "D", 5, 1, { 1000, 66 },
+				{ 29564, 29565 },
+				{ {"Quagmirran",17942 }, {"Rokmar the Crackler",17991}, {"Mennu the Betrayer",17941} }
+	},
+	{ 546, 3716, "The Underbog", "D", 5, 1, { 1000, 67 },
+				{ 29568, 29567 },
+				{ {"The Black Stalker",17882}, {"Hungarfen",17770}, {"Ghaz'an",18105}, {"Swamplord Musel'ek",17826} }
+	},
+	{ 557, 3792, "Mana-Tombs", "D", 5, 1, { 1000, 68 },
+				{ 29574, 29575 },
+				{ {"Nexus-Prince Shaffar",18344}, {"Pandemonius",18341}, {"Tavarok",18343} }
+	},
+	{ 558, 3790, "Auchenai Crypts", "D", 5, 1, { 1000, 70 },
+				{ 29590, 29596 },
+				{ {"Exarch Maladaar",18373}, {"Shirrak the Dead Watcher",18371} }
+	},
+	{ 560, 2367, "Old Hillsbrad Foothills", "D", 5, 1, { 1000, 70 },
+				{},
+				{ {"Epoch Hunter",18096}, {"Lieutenant Drake",17848}, {"Captain Skarloc",17862} }
+	},
+	{ 556, 3791, "Sethekk Halls", "D", 5, 1, { 1000, 70 },
+				{ 29606 },
+				{ {"Talon King Ikiss",18473}, {"Darkweaver Syth",18472} }
+	},
+	{ 553, 3847, "The Botanica", "D", 5, 1, { 1000, 70 },
+				{ 29669, 29660 },
+				{ {"Warp Splinter",17977}, {"Laj",17980}, {"Thorngrin the Tender",17978}, {"High Botanist Freywinn",17975}, {"Commander Sarannis",17976} }
+	},
+	{ 555, 3789, "Shadow Labyrinth", "D", 5, 1, { 1000, 70 },
+				{ 29645, 29644 },
+				{ {"Murmur",18708}, {"Ambassador Hellmaw",18731}, {"Blackheart the Inciter",18667}, {"Grandmaster Vorpil",18732} },
+	},
+	{ 545, 3715, "The Steamvault", "D", 5, 1, { 1000, 70 },
+				{ 29613, 9763, 29615 },
+				{ {"Warlord Kalithresh",17798}, {"Mekgineer Steamrigger",17796}, {"Hydromancer Thespia",17797} }
+	},
+	{ 540, 3714, "The Shattered Halls", "D", 5, 1, { 1000, 70 },
+				{ 29655, 29656, 29653, 29654 },
+				{ {"Warchief Kargath Bladefist",16808}, {"Warbringer O'mrogg",16809}, {"Grand Warlock Nethekurse",16807} }
+	},
+	{ 554, 3849, "The Mechanar", "D", 5, 1, { 1000, 70 },
+				{ 29658, 29657 },
+				{ {"Pathaleon the Calculator",19220}, {"Nethermancer Sepethrea",19221}, {"Mechano-Lord Capacitus",19219} }
+	},
+	{ 269, 2366, "The Black Morass", "D", 5, 1, { 1000, 70 },
+				{ 9837 },
+				{ {"Aeonus", 17881}, {"Chrono Lord Deja",17879}, {"Temporus",17880} }
+	},
+	{ 552, 3848, "The Arcatraz", "D", 5, 1, { 1000, 70 },
+				{ 29675, 29681, 29674 },
+				{ {"Harbinger Skyriss",20912}, {"Zereketh the Unbound",20870}, {"Dalliah the Doomsayer",20885}, {"Wrath-Scryer Soccothrates",20886} }
+	},
+	{ 585, 4131, "Magisters' Terrace", "D", 5, 1, { 1000, 70 },
+				{ 29685, 29687 },
+				{ {"Kael'thas Sunstrider",24664}, {"Selin Fireheart",24723}, {"Vexallus",24744}, {"Priestess Delrissa",24560} }
+	},
 	-- TBC Raids
 	{ 532, 3457, "Karazhan", "R", 10, 1000, { 1000, 1000 }, {}, {} },
 	{ 533, 3456, "Naxxramas", "R", 40, 1000, { 1000, 1000 }, {}, {} },
@@ -213,4 +258,37 @@ dt_db = {
 	{ 938, 5789, "End Time", "D", 5, 1, { 1000, 85 }, {}, {} },
 	{ 939, 5788, "Well of Eternity", "D", 5, 1, { 1000, 85 }, {}, {} },
 	{ 940, 5844, "Hour of Twilight", "D", 5, 1, { 1000, 85 }, {}, {} }
+}
+
+-- List of WotLK dungeons with different max levels than in Cata
+-- Used to see if runs from before the patch were overleveled
+_dt_db_wotlk_max_levels = {
+
+	-- Era dungeons
+	[ "Ragefire Chasm" ] = 20,
+	[ "Wailing Caverns" ] = 24,
+	[ "The Deadmines" ] = 24,
+	[ "Shadowfang Keep" ] = 25,
+	[ "Blackfathom Deeps" ] = 28,
+	[ "The Stockade" ] = 29,
+	[ "Razorfen Kraul" ] = 31,
+	[ "Gnomeregan" ] = 32,
+	[ "Razorfen Downs" ] = 41,
+	[ "Scarlet Monastery" ] = 44,
+	[ "Scarlet Monastery (GY)" ] = 44,
+	[ "Scarlet Monastery (Lib)" ] = 44,
+	[ "Scarlet Monastery (Cath)" ] = 44,
+	[ "Scarlet Monastery (Arm)" ] = 44,
+	[ "Uldaman" ] = 44,
+--	[ "Zul'Farrak" ] = 50,					-- Didn't change
+	[ "Maraudon" ] = 52,
+	[ "The Temple of Atal'Hakkar"] = 54,
+	[ "Blackrock Spire" ] = 62,
+	[ "Blackrock Depths" ] = 60,
+	[ "Scholomance" ] = 62,
+	[ "Dire Maul" ] = 62,
+	[ "Stratholme"] =  62,
+
+	-- TBC dungeons
+	[ "The Underbog" ] = 66
 }
