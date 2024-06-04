@@ -11,6 +11,10 @@ _achievement.bl_text = "Starting Achievement"
 _achievement.description =
 	"Complete the Hardcore challenge without at any point casting two shadow or two flame spells in a row during combat."
 
+_achievement.restricted_game_versions = {
+	["Cata"] = 1,			-- SetPropagateKeyboardInput function is protected in Cataclysm, can't call it from within combat
+}
+
 local shadow_and_flame_frame = nil
 local frame_textures = {}
 
