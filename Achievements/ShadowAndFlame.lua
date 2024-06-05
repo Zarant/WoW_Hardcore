@@ -286,8 +286,8 @@ function _achievement:GatherSpellList()
 	for i = 2, 4 do
 		local name, texture, offset, numSlots, isGuild, offspecID = GetSpellTabInfo(i)
 		for j = offset + 1, offset + numSlots do
-			local _,_,_,_,_,_,id = GetSpellInfo(j, "")
-			if id == nil then goto next_spell end
+		  local _,_,_,_,_,_,id = GetSpellInfo(j, "")
+		  if id ~= nil then 
 			if flame_spells[id] == nil then
 			  shadow_spells[id] = 1
 			  local action_slots = C_ActionBar.FindSpellActionButtons(id)
@@ -304,7 +304,7 @@ function _achievement:GatherSpellList()
 			    end
 			  end
 			end
-			::next_spell::
+		  end
 		end
 	end
 end
