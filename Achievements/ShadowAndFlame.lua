@@ -11,6 +11,10 @@ _achievement.bl_text = "Starting Achievement"
 _achievement.description =
 	"Complete the Hardcore challenge without at any point casting two shadow or two flame spells in a row during combat."
 
+_achievement.restricted_game_versions = {
+	["Cata"] = 1,			-- SetPropagateKeyboardInput function is protected in Cataclysm, can't call it from within combat
+}
+
 local shadow_and_flame_frame = nil
 local frame_textures = {}
 
@@ -282,7 +286,8 @@ function _achievement:GatherSpellList()
 	for i = 2, 4 do
 		local name, texture, offset, numSlots, isGuild, offspecID = GetSpellTabInfo(i)
 		for j = offset + 1, offset + numSlots do
-			local _,_,_,_,_,_,id = GetSpellInfo(j, "")
+		  local _,_,_,_,_,_,id = GetSpellInfo(j, "")
+		  if id ~= nil then 
 			if flame_spells[id] == nil then
 			  shadow_spells[id] = 1
 			  local action_slots = C_ActionBar.FindSpellActionButtons(id)
@@ -299,6 +304,7 @@ function _achievement:GatherSpellList()
 			    end
 			  end
 			end
+		  end
 		end
 	end
 end

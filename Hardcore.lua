@@ -994,7 +994,10 @@ function Hardcore:PLAYER_LOGIN()
 		end
 	end
 	for i, v in pairs(_G.passive_achievements) do
-		v:Register(success_function_executor, Hardcore_Character)
+		-- Only register passive detection for the ones that are actually allowed in this version of the game
+		if v.restricted_game_versions == nil or v.restricted_game_versions[ _G["HardcoreBuildLabel"]] == nil then
+			v:Register(success_function_executor, Hardcore_Character)
+		end
 	end
 	if any_acheivement_registered then
 		Hardcore:Print(
