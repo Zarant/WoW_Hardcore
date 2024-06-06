@@ -315,6 +315,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.54", scroll_frame)
+	CreateDescriptionLabel(
+		"- Dungeon tracker updates for Cataclysm\n- Achievement fixes for Cataclysm",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.53", scroll_frame)
 	CreateDescriptionLabel(
 		"- Level toast and dungeon database patches for Cataclysm",
