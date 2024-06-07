@@ -19,6 +19,7 @@ _achievement.description = "Reach level "
 	.. " hours of play time."
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

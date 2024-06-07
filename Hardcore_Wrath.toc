@@ -1,10 +1,10 @@
-## Interface: 30401
-## Title: Hardcore 0.11.30b2 (GW)
+## Interface: 30403
+## Title: Hardcore 0.11.54
 ## Notes: Supports Classic Hardcore
-## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author 
+## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
 ## X-License: All Rights Reserved
 ## X-Category: Leveling,Guild
-## Version: 0.11.30b3
+## Version: 0.11.54
 
 
 ## DefaultState: enabled
@@ -27,6 +27,7 @@ Achievements/AchievementG.lua
 Achievements/Solo.lua
 Achievements/Duo.lua
 Achievements/Trio.lua
+Achievements/Heirlooms.lua
 #Begin achievement modules
 Achievements/Arcanist.lua
 Achievements/AnimalFriend.lua
@@ -154,7 +155,10 @@ CharacterStatusScreen.lua
 InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
+ReloadReminder.lua
+dungeon-db-wotlk.lua
 Dungeons.lua
+Survey.lua
 MainMenu.lua
 TextureUtils.lua
 TextureInfo.lua

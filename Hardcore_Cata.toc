@@ -1,4 +1,4 @@
-## Interface: 11500
+## Interface: 40400
 ## Title: Hardcore 0.11.54
 ## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
@@ -13,7 +13,6 @@
 
 embeds.xml
 
-Libs/ascii85/ascii85.lua
 CustomLayouts.lua
 utils.lua
 Security.lua
@@ -28,10 +27,9 @@ Achievements/AchievementG.lua
 Achievements/Solo.lua
 Achievements/Duo.lua
 Achievements/Trio.lua
+Achievements/Heirlooms.lua
 #Begin achievement modules
 Achievements/Arcanist.lua
-Achievements/FireAndFrost.lua
-Achievements/ShadowAndFlame.lua
 Achievements/AnimalFriend.lua
 Achievements/Berserker.lua
 Achievements/Bloodbath.lua
@@ -39,6 +37,8 @@ Achievements/CloseCombat.lua
 Achievements/Cyromancer.lua
 Achievements/DruidOfTheClaw.lua
 Achievements/Ephemeral.lua
+Achievements/FireAndFrost.lua
+Achievements/ShadowAndFlame.lua
 Achievements/Felfire.lua
 Achievements/Grounded.lua
 Achievements/Hammertime.lua
@@ -113,7 +113,6 @@ Achievements/MasterHerbalism.lua
 Achievements/MasterFishing.lua
 Achievements/MasterCooking.lua
 Achievements/MasterFirstAid.lua
-Achievements/Parkour.lua
 Achievements/Tainted.lua
 Achievements/TheDungeonCrawler.lua
 Achievements/SpeedrunnerTen.lua
@@ -157,15 +156,15 @@ InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
 ReloadReminder.lua
-dungeon-db-classic.lua
+dungeon-db-cata.lua
 Dungeons.lua
 Survey.lua
 MainMenu.lua
 TextureUtils.lua
 TextureInfo.lua
 AchievementAlertFrame.lua
-id_to_npc_classic.lua
-npc_to_id_classic.lua
+id_to_npc.lua
+npc_to_id.lua
 DeathLog.lua
 SlashCommands.lua
 LevelToast.lua

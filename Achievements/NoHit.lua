@@ -13,27 +13,51 @@ no_hit_achievement.class = "All"
 no_hit_achievement.alert_on_fail = 1
 
 local faction_indices = { 2, 3, 4, 5 }
+
+local faction_ids_horde = { 68, 76, 81, 530}
+local faction_ids_alliance = { 47, 54, 69, 72}
+
 local starting_rep = {
 	["Gnome"] = 13300,
 	["Human"] = 13300,
-	["Night Elf"] = 13300,
+	["NightElf"] = 13300,
 	["Dwarf"] = 13300,
-	["Undead"] = 5500,
+	["Scourge"] = 5500,
 	["Tauren"] = 10700,
 	["Orc"] = 10700,
 	["Troll"] = 10700,
+	["BloodElf"] = 500 + 500 + 500 + 3100,
+	["Goblin"] = 3100 + 3100 + 3100 + 500,
+	["Draenei"] = 3100 + 3100 + 3100 + 3100,
+	["Worgen"] = 3100 + 3100 + 3100 + 3100
 }
 
 function no_hit_achievement:UpdateDescription()
 	no_hit_achievement.description =
 		"Complete the hardcore challenge without taking a point of damage.  Falling, drowning, fatigue and other such sources that count as “Environmental Damage” according to the Combat Log are, as such, Damage. This also means that spells that expend life as a resource, such as the Warlock’s Life Tap, do not cause any 'damage' and are as such perfectly viable.  Futhermore, you must accumulate over 45,000 reputation across the four main factions."
 	local total_earned_value = 0
-	for _, idx in ipairs(faction_indices) do
+	local faction_ids
+	local player_faction_group, _ = UnitFactionGroup( "player")
+	if player_faction_group == "Horde" then
+		faction_ids = faction_ids_horde
+	elseif player_faction_group == "Alliance" then
+		faction_ids = faction_ids_alliance
+	else
+		faction_ids = {}
+		Hardcore:Print( "Warning: player's faction is unexpected")
+	end
+	for _, idx in ipairs(faction_ids) do
 		local name, description, standingId, bottomValue, topValue, earnedValue, atWarWith, canToggleAtWar, isHeader, isCollapsed, hasRep, isWatched, isChild =
-			GetFactionInfo(idx)
+			GetFactionInfoByID(idx)
 		total_earned_value = total_earned_value + earnedValue
 	end
-	total_earned_value = total_earned_value - starting_rep[UnitRace("player")]
+	local _, englishRaceName, _ = UnitRace("player")		-- Use locale-independent name
+	if starting_rep[englishRaceName] == nil then
+		total_earned_value = total_earned_value - starting_rep["Human"]
+		Hardcore:Print( "Warning: no starting reputation for race " .. englishRaceName)
+	else
+		total_earned_value = total_earned_value - starting_rep[englishRaceName]
+	end
 	if total_earned_value > 45000 then
 		no_hit_achievement.description = no_hit_achievement.description .. "\n|c0000FF00Progress: Complete!|r"
 	else

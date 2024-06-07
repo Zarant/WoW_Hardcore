@@ -17,6 +17,9 @@ local death_alerts_channel_pw = "hcdeathalertschannelpw"
 
 local throttle_player = {}
 local shadowbanned = {}
+local shared_checksum_tbl = {}
+local sent_shared_dl_idx = 1
+local receive_shared_dl = false
 
 
 local death_log_icon_frame = CreateFrame("frame")
@@ -101,6 +104,19 @@ death_tomb_frame_tex_glow:SetHeight(55)
 death_tomb_frame_tex_glow:SetWidth(55)
 death_tomb_frame_tex_glow:Hide()
 
+local death_log_frame_font = "Fonts\\FRIZQT__.TTF"
+local locale = GetLocale()
+local non_english_locales = {
+  koKR=1,
+  zhCN=1,
+  zhTW=1
+}
+
+if non_english_locales[locale] == 1 then
+  death_log_frame_font = "Fonts\\2002.TTF"
+end
+
+
 local function encodeMessage(name, guild, source_id, race_id, class_id, level, instance_id, map_id, map_pos)
   if name == nil then return end
   -- if guild == nil then return end -- TODO 
@@ -158,6 +174,53 @@ local function fletcher16(_player_data)
         end
         return _player_data["name"] .. "-" .. bit.bor(bit.lshift(sum2,8), sum1)
 end
+
+function HardcoreDeathlog_beginReceiveSharedMsg()
+  Hardcore:Print("Allowing incoming shared deathlog entries for 1 Hr. Reload to cancel")
+  for _,v in ipairs(hardcore_settings["death_log_entries"]) do
+    shared_checksum_tbl[fletcher16(v)] = 1
+  end
+
+  receive_shared_dl = true
+  C_Timer.After(60*60, function()
+    receive_shared_dl = false
+  end)
+end
+
+function HardcoreDeathlog_beginSendSharedMsg(publish_func)
+  C_Timer.NewTicker(.25, function(self)
+    if sent_shared_dl_idx > #hardcore_settings["death_log_entries"] then
+      self:Cancel()
+    end
+    v = hardcore_settings["death_log_entries"][sent_shared_dl_idx]
+    local map_pos = {} 
+    map_pos.x, map_pos.y = strsplit(",", v['map_pos'], 2)
+    if map_pos.x == nil or map_pos.y == nil then
+      map_pos = nil
+    end
+    msg = encodeMessage(v['name'], v['guild'], v['source_id'], v['race_id'], v['class_id'], v['level'], v['instance_id'], v['map_id'], map_pos)
+    publish_func(msg)
+    sent_shared_dl_idx = sent_shared_dl_idx + 1
+  end)
+end
+
+function HardcoreDeathlog_receiveSharedMsg(msg)
+  if receive_shared_dl == false then return end
+  local player_data = decodeMessage(msg)
+  local checksum = fletcher16(player_data)
+  if shared_checksum_tbl[checksum] == nil then
+    table.insert(hardcore_settings["death_log_entries"], player_data)
+    shared_checksum_tbl[checksum]= 1
+    if debug then
+      print("Received " .. player_data['name'])
+    end
+  else
+    if debug then
+      print("Ignored " .. player_data['name'])
+    end
+  end
+end
+
 
 local death_log_cache = {}
 
@@ -268,7 +331,7 @@ for i=1,20 do
 	    _entry.font_strings[v[1]]:SetWidth(v[2])
 	  end
 	  _entry.font_strings[v[1]]:SetTextColor(1,1,1)
-	  _entry.font_strings[v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
+	  _entry.font_strings[v[1]]:SetFont(death_log_frame_font, 11, "")
 	end
 
 	_entry.background = _entry.frame:CreateTexture(nil, "OVERLAY")
@@ -280,7 +343,7 @@ for i=1,20 do
 	_entry.background:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
 
 	_entry:SetHeight(40)
-	_entry:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
+	_entry:SetFont(death_log_frame_font, 16, "")
 	_entry:SetColor(1,1,1)
 	_entry:SetText(" ")
 
@@ -502,7 +565,7 @@ function selfDeathAlert(death_source_str)
 	local position = nil
 	if map then 
 		position = C_Map.GetPlayerMapPosition(map, "player")
-		local continentID, worldPosition = C_Map.GetWorldPosFromMapPos(map, position)
+		--local continentID, worldPosition = C_Map.GetWorldPosFromMapPos(map, position)   -- BREAKS IN DUNGEONS
 	else
 	  local _, _, _, _, _, _, _, _instance_id, _, _ = GetInstanceInfo()
 	  instance_id = _instance_id
@@ -514,6 +577,10 @@ function selfDeathAlert(death_source_str)
 	local death_source = "-1"
 	if DeathLog_Last_Attack_Source then
 	  death_source = npc_to_id[death_source_str]
+	end
+
+	if DeathLog_Last_Attack_Source and environment_damage[death_source_str] then
+		death_source = death_source_str
 	end
 
 	msg = encodeMessage(UnitName("player"), guildName, death_source, race_id, class_id, UnitLevel("player"), instance_id, map, position)

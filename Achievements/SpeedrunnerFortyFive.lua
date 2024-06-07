@@ -13,6 +13,7 @@ _achievement.bl_text = "Miscellaneous"
 _achievement.description = "Reach level 45 by x time"
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

@@ -14,6 +14,7 @@ _achievement.bl_text = "Miscellaneous"
 _achievement.description = "Reach level 15 by " .. _achievement.played_time_threshold .. " seconds of play time."
 _achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 -- Registers

@@ -13,6 +13,7 @@ speedrunner_achievement.description =
 	"Complete the Hardcore challenge in less than 100 hours (4 days and 4 hours) of played time. Make sure to show your /played time when you hit 60. The run must be completed within eight weeks of real time. You are NOT allowed to log off in rested areas."
 speedrunner_achievement.restricted_game_versions = {
 	["WotLK"] = 1,
+	["Cata"] = 1,
 }
 
 speedrunner_achievement.adjusted_time = nil

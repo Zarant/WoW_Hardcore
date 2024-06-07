@@ -8,6 +8,7 @@ local blacklist_spells_named = {
 	"Dire Bear Form",
 	"Travel Form",
 	"Aquatic Form",
+	"Flight Form",
 }
 
 -- General info

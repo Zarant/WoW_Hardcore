@@ -83,14 +83,14 @@ function achievement_alert_handler:ShowTimed(_time)
 		end
 		if counter > 30 then
 			achievement_title_text:SetTextColor(0.8, 0.8, 0.8, 1)
-			achievement_icon_texture:SetVertexColor(1, 1, 1, counter * 5 / 30)
-			hc_ring_tex:SetVertexColor(1, 1, 1, counter * 5 / 30)
-			achievement_icon_texture_white_ring:SetVertexColor(1, 1, 1, (50 - counter) / 30)
+			achievement_icon_texture:SetVertexColor(1, 1, 1, min(1, counter * 5 / 30))
+			hc_ring_tex:SetVertexColor(1, 1, 1, min(1, counter * 5 / 30))
+			achievement_icon_texture_white_ring:SetVertexColor(1, 1, 1, max(0, min(1, (50 - counter) / 30)))
 		else
 			achievement_title_text:SetTextColor(1, 1, 1, 0)
 			achievement_icon_texture:SetVertexColor(1, 1, 1, 0)
 			hc_ring_tex:SetVertexColor(1, 1, 1, 0)
-			achievement_icon_texture_white_ring:SetVertexColor(1, 1, 1, (counter * 1.5 / 30))
+			achievement_icon_texture_white_ring:SetVertexColor(1, 1, 1, min(1, (counter * 1.5 / 30)))
 		end
 		counter = counter + 1
 		if counter > 59 then

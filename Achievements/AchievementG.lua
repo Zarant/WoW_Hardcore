@@ -137,6 +137,7 @@ _G.pa_id = {
 	SpeedrunnerFifty = 65,
 	Kromgrul = 66,
 	NothingButTheTruth = 67,
+	Parkour = 68
 }
 _G.id_pa = {}
 for k, v in pairs(_G.pa_id) do

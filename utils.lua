@@ -1,6 +1,8 @@
 _G["HardcoreBuildLabel"] = nil
 local build_num = select(4, GetBuildInfo())
-if build_num > 29999 then
+if build_num > 39999 then
+	_G["HardcoreBuildLabel"] = "Cata"
+elseif build_num > 29999 then
 	_G["HardcoreBuildLabel"] = "WotLK"
 elseif build_num > 19999 then
 	_G["HardcoreBuildLabel"] = "TBC"
@@ -46,7 +48,7 @@ end
 
 function Hardcore_generateRandomLetter()
 	local validLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	local randomIndex = math.floor(math.random() * #validLetters)
+	local randomIndex = math.random(1, #validLetters)  -- Generates a number between 1 and 52
 	return validLetters:sub(randomIndex, randomIndex)
 end
 
@@ -255,7 +257,7 @@ function Hardcore_CalcRequiredBits(data)
 		s1 = (s1 + string.byte(string.sub(data,i,i))) % 255;
 		s2 = (s2 + s1) % 255;
 	end
-	return bit.bor(bit.lshift(s2,8), 1)
+	return bit.bor(bit.lshift(s2,8), s1)
 end
 
 function Hardcore_CalculateResolutionChange()
@@ -278,6 +280,8 @@ function Hardcore_ReadjustTimeResolutions()
 		Hardcore_Character.tracked_played_percentage = Hardcore_RecalculateTrackedPercentage()
 		Hardcore_Character.last_segment_start_time = Hardcore_Character.last_segment_start_time * 10 + _h
 		Hardcore_Character.last_segment_end_time = Hardcore_Character.last_segment_end_time * 10 + (9-_h)
+		Hardcore_Character.last_segment_time_res = nil			-- Fix bad habit of shortening variable names
+		Hardcore_Character.last_segment_time_resolution = 10
 	end
 end
 
@@ -286,13 +290,17 @@ function Hardcore_AdjustTimeResolutions()
 		local i = 0
 		local k = 0
 		_h = 0
-		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time > GetServerTime()) then
+		if Hardcore_Character.last_segment_time_resolution == nil or Hardcore_Character.tracked_played_percentage == nil or Hardcore_Character.tracked_played_percentage == 0 then
+			Hardcore_Character.last_segment_time_resolution = 0			-- Fix bad habit of shortening variable names
+			return
+		end
+		if (Hardcore_Character.last_segment_start_time ~= nil and Hardcore_Character.last_segment_start_time >= 9999999999) then
 			-- Undo time resolution increase
 			_h = Hardcore_Character.last_segment_start_time % 10
 			Hardcore_Character.last_segment_start_time = Hardcore_Character.last_segment_start_time / 10
 			i = i + 1
 		end
-		if (Hardcore_Character.last_segment_end_time ~= nil and Hardcore_Character.last_segment_end_time > GetServerTime()) then
+		if (Hardcore_Character.last_segment_end_time ~= nil and Hardcore_Character.last_segment_end_time >= 9999999999) then
 			-- Undo time resolution increase
 			k = Hardcore_Character.last_segment_end_time % 10
 			Hardcore_Character.last_segment_end_time = Hardcore_Character.last_segment_end_time / 10
@@ -301,8 +309,9 @@ function Hardcore_AdjustTimeResolutions()
 		if i == 0 then return end
 
 		local new_tracked = Hardcore_RecalculateTrackedPercentage()
-		if (math.abs(new_tracked - Hardcore_Character.tracked_played_percentage) > 1e-8)  or (_h ~= (9-k)) then
+		if (math.abs(new_tracked - Hardcore_Character.tracked_played_percentage) > 1e-8) or (_h ~= (9-k)) then
 			if _h < 9 then _h = _h + 1 end
 		end
+		Hardcore_Character.last_segment_time_resolution = _h
 	end
 end

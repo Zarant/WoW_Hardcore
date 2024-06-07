@@ -238,8 +238,10 @@ function trio_rules:Check()
 		local max_level
 		if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
 			max_level = 60
-		else -- if Hardcore_Character.game_version == "WotLK" or anything else
+		elseif Hardcore_Character.game_version == "WotLK" then
 			max_level = 80
+		else -- Cataclysm or otherwise
+			max_level = 85
 		end
 		if UnitLevel("player") >= max_level then
 			return
@@ -304,6 +306,30 @@ function trio_rules:Check()
 		or my_map == 124
 		or teammates_map_1 == 124
 		or teammates_map_2 == 124
+		or my_map == 1453
+		or teammates_map_1 == 1453
+		or teammates_map_2 == 1453
+		or my_map == 1454
+		or teammates_map_1 == 1454
+		or teammates_map_2 == 1454
+		or my_map == 1455
+		or teammates_map_1 == 1455
+		or teammates_map_2 == 1455
+		or my_map == 1456
+		or teammates_map_1 == 1456
+		or teammates_map_2 == 1456
+		or my_map == 1457
+		or teammates_map_1 == 1457
+		or teammates_map_2 == 1457
+		or my_map == 1458
+		or teammates_map_1 == 1458
+		or teammates_map_2 == 1458
+		or my_map == 1463
+		or teammates_map_1 == 1463
+		or teammates_map_2 == 1463
+		or my_map == 1464
+		or teammates_map_1 == 1464
+		or teammates_map_2 == 1464
 	then -- Moonglade / Scarlet enclave
 		trio_rules:ResetWarn()
 	elseif my_map ~= teammates_map_1 or teammates_map_1 ~= teammates_map_2 or my_map ~= teammates_map_2 then

@@ -9,7 +9,7 @@ nudist_achievement.class = "All"
 nudist_achievement.pts = 25
 nudist_achievement.icon_path = "Interface\\Addons\\Hardcore\\Media\\icon_nudist.blp"
 nudist_achievement.description =
-	"Complete the Hardcore challenge naked (no armor, no amulets, no rings, and no trinkets). Weapons, shields, and bags are allowed. Upon logging in, unequip every armor piece."
+	"Complete the Hardcore challenge naked (no armor, no amulets, no rings, and no trinkets). Weapons, shields, tabard, shirt and bags are allowed. Upon logging in, unequip every armor piece."
 
 -- Registers
 function nudist_achievement:Register(fail_function_executor)
@@ -33,7 +33,8 @@ end
 nudist_achievement:SetScript("OnEvent", function(self, event, ...)
 	local arg = { ... }
 	if event == "PLAYER_EQUIPMENT_CHANGED" then
-		if arg[1] > 1 and arg[1] < 16 then -- 1 ammo, 16+ weapons
+		-- https://wowwiki-archive.fandom.com/wiki/InventorySlotId
+		if (arg[1] > 1 and arg[1] < 16) and (arg[1] ~= 4) then -- 1 ammo, 4 shirt, 16+ weapons, 
 			-- Equipped an item if true
 			if arg[2] ~= true then
 				-- Timed for accidental equips
@@ -54,7 +55,9 @@ end)
 function nudist_achievement:HasEquipment()
 	for i = 2, 15 do
 		if GetInventoryItemID("player", i) then
-			return true
+			if i ~= 4 then
+				return true
+			end
 		end
 	end
 end

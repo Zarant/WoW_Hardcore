@@ -11,6 +11,10 @@ _achievement.bl_text = "Starting Achievement"
 _achievement.description =
 	"Complete the Hardcore challenge without at any point casting two elemental damage spells of the same element (fire or ice) in a row. Arcane spells that deal damage are not allowed to be cast."
 
+_achievement.restricted_game_versions = {
+	["Cata"] = 1,			-- SetPropagateKeyboardInput function is protected in Cataclysm, can't call it from within combat
+}
+
 local fire_and_frost_frame = nil
 local frame_textures = {}
 
