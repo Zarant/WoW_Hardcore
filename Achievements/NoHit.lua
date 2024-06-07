@@ -20,13 +20,13 @@ local faction_ids_alliance = { 47, 54, 69, 72}
 local starting_rep = {
 	["Gnome"] = 13300,
 	["Human"] = 13300,
-	["Night Elf"] = 13300,
+	["NightElf"] = 13300,
 	["Dwarf"] = 13300,
-	["Undead"] = 5500,
+	["Scourge"] = 5500,
 	["Tauren"] = 10700,
 	["Orc"] = 10700,
 	["Troll"] = 10700,
-	["Blood Elf"] = 500 + 500 + 500 + 3100,
+	["BloodElf"] = 500 + 500 + 500 + 3100,
 	["Goblin"] = 3100 + 3100 + 3100 + 500,
 	["Draenei"] = 3100 + 3100 + 3100 + 3100,
 	["Worgen"] = 3100 + 3100 + 3100 + 3100
@@ -51,11 +51,12 @@ function no_hit_achievement:UpdateDescription()
 			GetFactionInfoByID(idx)
 		total_earned_value = total_earned_value + earnedValue
 	end
-	if starting_rep[UnitRace("player")] == nil then
+	local _, englishRaceName, _ = UnitRace("player")		-- Use locale-independent name
+	if starting_rep[englishRaceName] == nil then
 		total_earned_value = total_earned_value - starting_rep["Human"]
-		Hardcore:Print( "Warning: no starting reputation for race " .. UnitRace("player"))
+		Hardcore:Print( "Warning: no starting reputation for race " .. englishRaceName)
 	else
-		total_earned_value = total_earned_value - starting_rep[UnitRace("player")]
+		total_earned_value = total_earned_value - starting_rep[englishRaceName]
 	end
 	if total_earned_value > 45000 then
 		no_hit_achievement.description = no_hit_achievement.description .. "\n|c0000FF00Progress: Complete!|r"
