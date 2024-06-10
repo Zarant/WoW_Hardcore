@@ -78,7 +78,7 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		second_menu_description:SetFullWidth(1)
 		second_menu_description:SetText(
 			"\n\n"
-				.. "By clicking the button below, you agree to the following statements:\n\n"
+				.. "By clicking Begin Adventure, you agree to the following statements:\n\n"
 				.. '+ "I have read the rules (#hardcore-rules, Discord)"\n\n'
 				.. '+ "I have read the FAQ (#faq, Discord)"\n\n'
 				.. '+ "I understand that disconnect appeal approval requires video of both pre-disconnect activity and the reconnect/login process,"\n\n'

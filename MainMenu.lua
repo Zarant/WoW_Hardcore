@@ -301,7 +301,8 @@ local function DrawGeneralTab(container)
 		"\n\n   |c00FFFF00Verify|r: Generate a verification string to confirm your max level character" .. 
 		"\n\n   |c00FFFF00Death Knight|r: Read about Death Knight rules and/or sacrifice/activate" .. 
 		"\n\n   |c00FFFF00Levels|r: See a list of your recorded character levels" .. 
-		"\n\n   |c00FFFF00Accountability|r: See whose playing in your Hardcore guild and what addon versions they are using" .. 
+		"\n\n   |c00FFFF00Dungeons|r: See information about your recorded Dungeon runs" ..
+		"\n\n   |c00FFFF00Accountability|r: See who is playing in your Hardcore guild and what addon versions they are using" .. 
 		"\n\n   |c00FFFF00Achievements|r: Check out all available achievements to try" ..
 		"\n\n   |c00FFFF00Death stats|r: See death statistics (of players using this addon).\n\n"
 	)
