@@ -315,3 +315,7 @@ function Hardcore_AdjustTimeResolutions()
 		Hardcore_Character.last_segment_time_resolution = _h
 	end
 end
+
+function Hardcore_Vector2DDistance(a, b)
+	return math.sqrt((b.x - a.x)^2 + (b.y - a.y)^2)
+end

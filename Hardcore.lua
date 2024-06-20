@@ -302,6 +302,16 @@ local KNOWN_GRIEFERS = {
 	["Sweatyloser"] = 1,
 	["Elco"] = 1,
 }
+-- map of mobs and world spawn positions
+-- if a player is killed over 300 yards from the position their death is a grief
+local GRIEF_LEASH_DISTANCE_YARDS = 300
+local GRIEFING_MOBS_WITH_POS = {
+	["Black Dragonspawn"] = { CreateVector2D(-8222, -2592) },
+	["Black Wyrmkin"] = { CreateVector2D(-8222, -2592) },
+	["Venomtip Scorpid"] = { CreateVector2D(-8222, -2592) },
+	["Firegut Ogre"] = { CreateVector2D(-8222, -2592) },
+	["Obsidian Elemental"] = { CreateVector2D(-8541, -2561) }
+}
 
 -- frame display
 local display = "Rules"
@@ -1123,6 +1133,32 @@ function Hardcore:PLAYER_LOGOUT()
 	Hardcore_ReadjustTimeResolutions()
 end
 
+local function isGriefDeath(level) 
+	if Hardcore_Character.game_version ~= "Era" then
+		return false
+	end
+	if level >= 40 then
+		return false
+	end
+	if (GRIEFING_MOBS[Last_Attack_Source] or KNOWN_GRIEFERS[Last_Attack_Source]) then
+		return true
+	end
+
+	if GRIEFING_MOBS_WITH_POS[Last_Attack_Source] then
+		local playerX, playerY = UnitPosition("player")
+		local playerPos = CreateVector2D(playerX, playerY)
+		for _, spawnCoord in ipairs(GRIEFING_MOBS_WITH_POS[Last_Attack_Source]) do
+			local distance = Hardcore_Vector2DDistance(spawnCoord, playerPos)
+			if distance < GRIEF_LEASH_DISTANCE_YARDS then
+				return false
+			end
+		end
+		return true
+	end
+
+	return false
+end
+
 local function GiveVidereWarning()
 	Hardcore:Print("|cFFFF0000WARNING:|r drinking the Videre Elixir will kill you. You cannot appeal this death.")
 	Hardcore:ShowAlertFrame(
@@ -1426,9 +1462,7 @@ function Hardcore:PLAYER_DEAD()
 
 	-- Exemptions for deaths below level 40 to the mobs named in GRIEFING_MOBS in Era only
 	if
-		Hardcore_Character.game_version == "Era"
-		and (GRIEFING_MOBS[Last_Attack_Source] or KNOWN_GRIEFERS[Last_Attack_Source])
-		and level <= 40
+		isGriefDeath(level)
 	then
 		local messageTemplate =
 			"%s has died to malicious activity in %s. %s impending resurrection is authorized. Players in %s be on alert."
