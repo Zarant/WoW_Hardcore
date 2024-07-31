@@ -773,39 +773,22 @@ end
 --
 
 TradeFrameTradeButton:SetScript("OnClick", function()
-	local duo_trio_partner = false
-	local legacy_duo_support = #Hardcore_Character.trade_partners > 0
+	local is_teammate = false
 	local target_trader = TradeFrameRecipientNameText:GetText()
-	local level = UnitLevel("player")
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		if Hardcore_Character.game_version == "WotLK" then
-			max_level = 80
-		else
-			max_level = 85
-		end
-	end
+
 	if Hardcore_Character.team ~= nil then
 		for _, name in ipairs(Hardcore_Character.team) do
 			if target_trader == name then
-				duo_trio_partner = true
+				is_teammate = true
 				break
 			end
 		end
 	end
 
-	if duo_trio_partner == true then
-		AcceptTrade()
-	elseif (level == max_level) or legacy_duo_support then
-		table.insert(Hardcore_Character.trade_partners, target_trader)
-		Hardcore_Character.trade_partners = Hardcore_FilterUnique(Hardcore_Character.trade_partners)
+	if is_teammate == true then
 		AcceptTrade()
 	else
-		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of duos/trios.")
+		Hardcore:Print("|cFFFF0000BLOCKED:|r You may not trade outside of your team.")
 	end
 end)
 
@@ -2893,21 +2876,13 @@ function Hardcore_Frame_OnShow()
 		table.insert(f, "Shamans can’t resurrect via Ankh")
 		table.insert(f, "Paladins can’t Bubble Hearth")
 		table.insert(f, "No Light of Elune + Hearthstone")
-		table.insert(f, "")
-		table.insert(f, "You can verify your run using this addon (Get verified tab). Recording or streaming is also")
-		table.insert(f, "recommended to provide evidence for special circumstances such as disconnection deaths.")
-		table.insert(f, "")
 		table.insert(
 			f,
 			"At MAX level you earn your IMMORTALITY and become a full fledged character with insane bragging rights "
 		)
 		table.insert(f, "")
 		table.insert(f, "")
-		table.insert(f, "=============== DUOS ===============")
-		table.insert(f, "")
-		table.insert(f, "You must not leave the same zone as each other")
-		table.insert(f, "*unless you are a Druid going to Moonglade to complete essential class quests")
-		table.insert(f, "You must choose a combo that spawns in the same starting location.")
+		table.insert(f, "=============== GROUPS ===============")
 		table.insert(f, "")
 		table.insert(f, "If one of you dies, the other must fall on the sword and the run is over.")
 		table.insert(f, "")
@@ -2915,7 +2890,7 @@ function Hardcore_Frame_OnShow()
 		table.insert(f, "")
 		table.insert(f, "Multiboxing goes against the spirit of the Hardcore Challenge and is not allowed")
 		table.insert(f, "")
-		table.insert(f, "If playing in a duo or trio, have all members reload ui at level 1")
+		table.insert(f, "If playing in a group, have all members reload ui at level 1")
 		table.insert(f, "and click the 'Party' tab to setup your run.")
 		displaylist = f
 	elseif display == "DeathKnight" then
@@ -2941,7 +2916,7 @@ function Hardcore_Frame_OnShow()
 		table.insert(f, "from level 1, with a fresh toon to perform the sacrifice again. You may create your DK ")
 		table.insert(f, "in advance if you wish to RSVP a name, but do not log onto them. Remember that you need")
 		table.insert(f, "to have a lvl 55 already on the server to create a DK.")
-		table.insert(f, "Duo and Trio groups who wish to have a DK in the party must follow some additional steps")
+		table.insert(f, "Groups who wish to have a DK in the party must follow some additional steps")
 		table.insert(f, "in creating a DK. These steps are listed further below.")
 		table.insert(f, "General achievements will carry over when you activate your DK")
 		table.insert(f, "")
@@ -2959,12 +2934,11 @@ function Hardcore_Frame_OnShow()
 		table.insert(f, "Step 6: Click on “ACTIVATE” below. Then do a /reload. You are now good to go.")
 		table.insert(f, "Survive well out there!")
 		table.insert(f, "")
-		table.insert(f, "=============== DUO/TRIO DK's ===============")
+		table.insert(f, "=============== Group DK's ===============")
 		table.insert(f, "")
-		table.insert(f, "There are some additional things you must do when you wish to create a DK for Duo")
-		table.insert(f, " or Trio groups.")
+		table.insert(f, "There are some additional things you must do when you wish to create a DK for groups.")
 		table.insert(f, "")
-		table.insert(f, "Step 1: Start your Duo/Trio group of the “SAME FACTION” and reach the level range for")
+		table.insert(f, "Step 1: Start your group of the “SAME FACTION” and reach the level range for")
 		table.insert(f, "sacrifice, following the HC rules.")
 		table.insert(
 			f,

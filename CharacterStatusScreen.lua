@@ -253,10 +253,14 @@ function UpdateCharacterHC(
 	local mode_type_str = "unknown"
 	local teammate_1 = "missing_team"
 	local teammate_2 = "unknown"
+	local teammate_3 = "unknown"
+	local teammate_4 = "unknown"
 
 	if _hardcore_character.team ~= nil then
 		teammate_1 = _hardcore_character.team[1] or "unknown"
 		teammate_2 = _hardcore_character.team[2] or "unknown"
+		teammate_3 = _hardcore_character.team[3] or "unknown"
+		teammate_4 = _hardcore_character.team[4] or "unknown"
 	end
 	if _hardcore_character.party_mode ~= nil then
 		if _hardcore_character.party_mode == "Solo" then
@@ -265,6 +269,10 @@ function UpdateCharacterHC(
 			mode_type_str = "Duo with " .. teammate_1
 		elseif _hardcore_character.party_mode == "Trio" then
 			mode_type_str = "Trio with " .. teammate_1 .. " and " .. teammate_2
+		elseif _hardcore_character.party_mode == "Quad" then
+			mode_type_str = "Quad with " .. teammate_1 .. ", " .. teammate_2 .. " and " .. teammate_3
+		elseif _hardcore_character.party_mode == "Penta" then
+			mode_type_str = "Penta with " .. teammate_1 .. ", " .. teammate_2  .. ", " .. teammate_3 .. " and " .. teammate_4
 		else
 			mode_type_str = "|c00FF0000" .. _hardcore_character.party_mode .. "|r"
 		end

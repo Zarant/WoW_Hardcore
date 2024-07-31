@@ -701,188 +701,6 @@ local function DrawRulesTab(container)
 	)
 	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 	scroll_frame:AddChild(general_rules_description)
-
-	DrawRulesLabel("Verification", scroll_frame)
-	local general_rules_description = AceGUI:Create("Label")
-	general_rules_description:SetWidth(_inner_menu_width)
-	general_rules_description:SetText(
-		"\nYou can verify your run using this addon (Get verified tab). Recording or streaming is also recommended to provide evidence for special circumstances such as disconnection deaths.\n\nAt MAX level you earn your IMMORTALITY and become a full fledged character with insane bragging rights.\n\n\n\n"
-	)
-	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(general_rules_description)
-
-	DrawRulesLabel("Duos/Trios", scroll_frame)
-	local general_rules_description = AceGUI:Create("Label")
-	general_rules_description:SetWidth(_inner_menu_width)
-	general_rules_description:SetText(
-		"\nYou must not leave the same zone as each other, unless you are a Druid going to Moonglade to complete essential class quests.\nYou must choose a combo that spawns in the same starting location.\nIf one of you dies, the other must fall on the sword and the run is over.\nYou can trade your duo partner found or crafted items, including gold.\nMultiboxing goes against the spirit of the Hardcore Challenge and is not allowed.\nIf playing in a duo or trio, have all members reload ui at level 1 and click the 'Party' tab to setup your run.\n\n\n\n"
-	)
-	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(general_rules_description)
-end
-
-local function DrawVerifyTab(container, _hardcore_character)
-	local ATTRIBUTE_SEPARATOR = "_"
-	local string_format_new = true
-	local first_menu_description
-	local function GenerateVerificationString()
-		local version = GetAddOnMetadata("Hardcore", "Version")
-		local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
-		local realm = GetRealmName()
-		local level = UnitLevel("player")
-
-		local tradePartners = Hardcore_join(_hardcore_character.trade_partners, ",")
-		local converted_successfully = "FALSE"
-		if _hardcore_character.converted_successfully then
-			converted_successfully = "TRUE"
-		end
-		local game_version_checker = _hardcore_character.game_version or { _G["HardcoreBuildLabel"] }
-
-		local baseVerificationData = {
-			version,
-			_hardcore_character.guid,
-			realm,
-			race,
-			class,
-			name,
-			level,
-			_hardcore_character.time_played,
-			_hardcore_character.time_tracked,
-			#_hardcore_character.deaths,
-			tradePartners,
-			_hardcore_character.sacrificed_at,
-			converted_successfully,
-			game_version_checker,
-		}
-		local baseVerificationString =
-			Hardcore_join(Hardcore_map(baseVerificationData, Hardcore_stringOrNumberToUnicode), ATTRIBUTE_SEPARATOR)
-		local bubbleHearthIncidentsVerificationString =
-			Hardcore_tableToUnicode(_hardcore_character.bubble_hearth_incidents)
-		local playedtimeGapsVerificationString = Hardcore_tableToUnicode(_hardcore_character.played_time_gap_warnings)
-		if string_format_new == false then
-			return Hardcore_join({
-				baseVerificationString,
-				bubbleHearthIncidentsVerificationString,
-				playedtimeGapsVerificationString,
-			}, ATTRIBUTE_SEPARATOR)
-		else
-			local d1, d2 = DungeonTrackerGetVerificationData()
-			return Hardcore_join({
-				baseVerificationString,
-				bubbleHearthIncidentsVerificationString,
-				playedtimeGapsVerificationString,
-				Hardcore_stringOrNumberToUnicode(d1),
-				Hardcore_stringOrNumberToUnicode(d2),
-				Hardcore_stringOrNumberToUnicode(""), -- Future expansion for dungeon data
-				Hardcore_stringOrNumberToUnicode(Hardcore_GetSecurityStatus()),
-				Hardcore_stringOrNumberToUnicode(Hardcore_Character.last_segment_time_resolution), -- Probably don't need this here
-				Hardcore_stringOrNumberToUnicode(""), -- Future expansion for other data
-			}, ATTRIBUTE_SEPARATOR)
-		end
-	end
-
-	local version = GetAddOnMetadata("Hardcore", "Version")
-	local _, class, _, race, _, name = GetPlayerInfoByGUID(UnitGUID("player"))
-	local realm = GetRealmName()
-	local level = UnitLevel("player")
-	local party_mode = _hardcore_character.party_mode
-	local team_1, team_2 = "", ""
-	if _hardcore_character.team ~= nil then
-		team_1 = _hardcore_character.team[1] or "None"
-		team_2 = _hardcore_character.team[2] or "None"
-	end
-
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
-	tabcontainer:AddChild(scroll_container)
-
-	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("Flow")
-	scroll_container:AddChild(scroll_frame)
-
-	local first_menu_description_title = AceGUI:Create("Label")
-	first_menu_description_title:SetWidth(500)
-	first_menu_description_title:SetText("Verify Your Character - " .. version)
-	first_menu_description_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
-	scroll_frame:AddChild(first_menu_description_title)
-
-	local character_and_level_label = AceGUI:Create("Label")
-	character_and_level_label:SetWidth(_menu_width)
-	character_and_level_label:SetText(
-		"\n\n"
-			.. name
-			.. " (lvl "
-			.. level
-			.. " "
-			.. UnitRace("player")
-			.. " "
-			.. UnitClass("player")
-			.. ") on "
-			.. realm
-			.. "\n ["
-			.. party_mode
-			.. ", "
-			.. team_1
-			.. ", "
-			.. team_2
-			.. "]\n"
-			.. "Played: "
-			.. math.floor(0.5 + _hardcore_character.time_played / 360) / 10
-			.. " hrs\n\n"
-	)
-
-	character_and_level_label:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
-	scroll_frame:AddChild(character_and_level_label)
-
-	local extra_lines = ""
-
-	local general_rules_description = AceGUI:Create("Label")
-	general_rules_description:SetWidth(600)
-	general_rules_description:SetText("\nTo get verified, copy the string below and visit the hardhead website.")
-	general_rules_description:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-	scroll_frame:AddChild(general_rules_description)
-
-	local switch_format_button = AceGUI:Create("Button")
-	switch_format_button:SetText("Use new format")
-	switch_format_button:SetWidth(130)
-	scroll_frame:AddChild(switch_format_button)
-	switch_format_button:SetCallback("OnClick", function()
-		if string_format_new == false then
-			switch_format_button:SetText("Use old format")
-		else
-			switch_format_button:SetText("Use new format")
-		end
-		string_format_new = not string_format_new
-		first_menu_description:SetText(GenerateVerificationString())
-	end)
-
-	first_menu_description = AceGUI:Create("MultiLineEditBox")
-	first_menu_description.button:Hide()
-	first_menu_description:SetMaxLetters(0)
-	first_menu_description:SetHeight(850)
-	first_menu_description.button:SetPoint("BOTTOMLEFT", 0, -150)
-	first_menu_description:SetWidth(750)
-	first_menu_description:SetLabel("")
-	first_menu_description:SetText(GenerateVerificationString())
-	scroll_frame:AddChild(first_menu_description)
-
-	local copy_tip_label = AceGUI:Create("Label")
-	local text = extra_lines .. "\n\n\n\n\n\n\n\n\n\n\n\n\nSelect All (Ctrl-A), Copy (Ctrl-C), and Paste (Ctrl-V)"
-
-	copy_tip_label:SetText(text)
-	copy_tip_label:SetWidth(700)
-	copy_tip_label:SetFontObject(GameFontHighlightSmall)
-	scroll_frame:AddChild(copy_tip_label)
-
-	local character_status_label = AceGUI:Create("Label")
-	local statusString1, statusString2 = Hardcore:GenerateVerificationStatusStrings()
-	local text = "\n" .. statusString1 .. "\n" .. statusString2
-	character_status_label:SetText(text)
-	character_status_label:SetWidth(700)
-	character_status_label:SetFontObject(GameFontHighlightMedium)
-	scroll_frame:AddChild(character_status_label)
 end
 
 local function DrawDKTab(container, dk_button_function)
@@ -2154,7 +1972,6 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 	local tab_table = {
 		{ value = "WelcomeTab", text = "General" },
 		{ value = "RulesTab", text = "Rules" },
-		{ value = "VerifyTab", text = "Verify" },
 		{ value = "DKTab", text = "Death Knight" },
 		{ value = "LevelsTab", text = "Levels" },
 		{ value = "DungeonsTab", text = "Dungeons" },
@@ -2183,8 +2000,6 @@ function ShowMainMenu(_hardcore_character, _hardcore_settings, dk_button_functio
 			DrawGeneralTab(container)
 		elseif group == "RulesTab" then
 			DrawRulesTab(container)
-		elseif group == "VerifyTab" then
-			DrawVerifyTab(container, _hardcore_character)
 		elseif group == "DKTab" then
 			DrawDKTab(container, dk_button_function)
 		elseif group == "LevelsTab" then

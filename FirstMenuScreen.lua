@@ -52,7 +52,7 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		local first_menu_description = AceGUI:Create("Label")
 		first_menu_description:SetFullWidth(1)
 		first_menu_description:SetText(
-			"\n\nIf playing in a duo or trio, click the `Party` tab.\n\n"
+			"\n\nIf playing in a duo, trio, quad or penta, click the `Party` tab.\n\n"
 				.. "To select achievements, click on an icon in the achievement tab.\n\n"
 				.. "At any point during the run, open the HC tab on the character screen to check party status and achievements.\n\n"
 				.. "This window will not appear past level 2 and configuration cannot be changed later so make sure to fill these out correctly."
@@ -98,7 +98,7 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		local title = AceGUI:Create("Label")
 		title:SetWidth(700)
 		title:SetHeight(60)
-		title:SetText("Rules for Duos and Trios\n\n")
+		title:SetText("Rules for Duos, Trios, Quads and Pentas\n\n")
 		title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 		_scroll_frame:AddChild(title)
 
@@ -130,6 +130,8 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		dropdown:AddItem("Solo", "Solo")
 		dropdown:AddItem("Duo", "Duo")
 		dropdown:AddItem("Trio", "Trio")
+		dropdown:AddItem("Quad", "Quad")
+		dropdown:AddItem("Penta", "Penta")
 		dropdown:SetValue(_hardcore_character.party_mode)
 		dropdown:SetPoint("TOP", 2, 5)
 		row_container:AddChild(dropdown)
@@ -161,6 +163,32 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 		tm2:DisableButton(true)
 		row_container:AddChild(tm2)
 
+		local tm3 = AceGUI:Create("EditBox")
+		tm3:SetWidth(120)
+		tm3:SetDisabled(true)
+		tm3:SetLabel("Teammate 3\n")
+		tm3:SetPoint("TOP", 2, 5)
+		if _hardcore_character.team ~= nil then
+			if _hardcore_character.team[3] ~= nil then
+				tm3:SetText(_hardcore_character.team[3])
+			end
+		end
+		tm3:DisableButton(true)
+		row_container:AddChild(tm3)
+
+		local tm4 = AceGUI:Create("EditBox")
+		tm4:SetWidth(120)
+		tm4:SetDisabled(true)
+		tm4:SetLabel("Teammate 4\n")
+		tm4:SetPoint("TOP", 2, 5)
+		if _hardcore_character.team ~= nil then
+			if _hardcore_character.team[4] ~= nil then
+				tm4:SetText(_hardcore_character.team[4])
+			end
+		end
+		tm3:DisableButton(true)
+		row_container:AddChild(tm4)
+
 		dropdown:SetCallback("OnValueChanged", function(args)
 			local new_mode = dropdown:GetValue()
 			tm1:SetText("")
@@ -170,24 +198,60 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 			if new_mode == "Solo" then
 				tm1:SetDisabled(true)
 				tm2:SetDisabled(true)
+				tm3:SetDisabled(true)
+				tm4:SetDisabled(true)
 			elseif new_mode == "Duo" then
 				tm1:SetDisabled(false)
 				tm2:SetDisabled(true)
+				tm3:SetDisabled(true)
+				tm4:SetDisabled(true)
 			elseif new_mode == "Trio" then
 				tm1:SetDisabled(false)
 				tm2:SetDisabled(false)
+				tm3:SetDisabled(true)
+				tm4:SetDisabled(true)
+			elseif new_mode == "Quad" then
+				tm1:SetDisabled(false)
+				tm2:SetDisabled(false)
+				tm3:SetDisabled(false)
+				tm4:SetDisabled(true)
+			elseif new_mode == "Penta" then
+				tm1:SetDisabled(false)
+				tm2:SetDisabled(false)
+				tm3:SetDisabled(false)
+				tm4:SetDisabled(false)
 			end
 		end)
 		tm1:SetCallback("OnTextChanged", function()
 			_hardcore_character.team = {}
 			table.insert(_hardcore_character.team, FormatStrForParty(tm1:GetText()))
 			table.insert(_hardcore_character.team, FormatStrForParty(tm2:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm3:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm4:GetText()))
 		end)
 
 		tm2:SetCallback("OnTextChanged", function()
 			_hardcore_character.team = {}
 			table.insert(_hardcore_character.team, FormatStrForParty(tm1:GetText()))
 			table.insert(_hardcore_character.team, FormatStrForParty(tm2:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm3:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm4:GetText()))
+		end)
+
+		tm3:SetCallback("OnTextChanged", function()
+			_hardcore_character.team = {}
+			table.insert(_hardcore_character.team, FormatStrForParty(tm1:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm2:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm3:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm4:GetText()))
+		end)
+
+		tm4:SetCallback("OnTextChanged", function()
+			_hardcore_character.team = {}
+			table.insert(_hardcore_character.team, FormatStrForParty(tm1:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm2:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm3:GetText()))
+			table.insert(_hardcore_character.team, FormatStrForParty(tm4:GetText()))
 		end)
 	end
 
@@ -237,6 +301,8 @@ function ShowFirstMenu(_hardcore_character, _hardcore_settings, _failure_functio
 			"Solo",
 			"Duo",
 			"Trio",
+			"Quad",
+			"Penta",
 		}
 		for i, mode in ipairs(party_modes) do
 			if _G.extra_rules[mode] ~= nil then

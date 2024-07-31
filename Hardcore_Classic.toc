@@ -28,6 +28,8 @@ Achievements/AchievementG.lua
 Achievements/Solo.lua
 Achievements/Duo.lua
 Achievements/Trio.lua
+Achievements/Quad.lua
+Achievements/Penta.lua
 #Begin achievement modules
 Achievements/Arcanist.lua
 Achievements/FireAndFrost.lua
@@ -80,6 +82,8 @@ Achievements/Vagrant.lua
 Achievements/VoidServant.lua
 Achievements/SelfMadeDuo.lua
 Achievements/SelfMadeTrio.lua
+Achievements/SelfMadeQuad.lua
+Achievements/SelfMadePenta.lua
 #End achievement modules
 
 #Start passive achievements
