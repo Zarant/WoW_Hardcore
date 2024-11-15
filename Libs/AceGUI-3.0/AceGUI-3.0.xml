@@ -5,10 +5,6 @@
 	<Script file="widgets\AceGUIContainer-BlizOptionsGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-DropDownGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-Frame.lua"/>
-	<Script file="widgets\AceGUIContainer-HardcoreFrame.lua"/>
-	<Script file="widgets\AceGUIContainer-Deathlog.lua"/>
-	<Script file="widgets\AceGUIContainer-HardcoreFrameModernMenu.lua"/>
-	<Script file="widgets\AceGUIContainer-HardcoreFrameEmpty.lua"/>
 	<Script file="widgets\AceGUIContainer-InlineGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-ScrollFrame.lua"/>
 	<Script file="widgets\AceGUIContainer-SimpleGroup.lua"/>
@@ -27,7 +23,6 @@
 	<Script file="widgets\AceGUIWidget-InteractiveLabel.lua"/>
 	<Script file="widgets\AceGUIWidget-Keybinding.lua"/>
 	<Script file="widgets\AceGUIWidget-Label.lua"/>
-	<Script file="widgets\AceGUIWidget-HardcoreClassTitleLabel.lua"/>
 	<Script file="widgets\AceGUIWidget-MultiLineEditBox.lua"/>
 	<Script file="widgets\AceGUIWidget-Slider.lua"/>
 </Ui>

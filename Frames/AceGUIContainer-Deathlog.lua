@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
-Frame Container
+Deathlog Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "Frame", 30
+local Type, Version = "Deathlog", 30
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -34,7 +34,6 @@ local function Frame_OnMouseDown(frame)
 end
 
 local function Title_OnMouseDown(frame)
-	frame:GetParent():StartMoving()
 	AceGUI:ClearFocus()
 end
 
@@ -81,6 +80,7 @@ local methods = {
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self.frame:SetFrameLevel(100) -- Lots of room to draw under it
 		self:SetTitle()
+		self:SetSubTitle()
 		self:SetStatusText()
 		self:ApplyStatus()
 		self:Show()
@@ -100,11 +100,12 @@ local methods = {
 		end
 		content:SetWidth(contentwidth)
 		content.width = contentwidth
+		self.titlebg:SetWidth(contentwidth - 35)
 	end,
 
 	["OnHeightSet"] = function(self, height)
 		local content = self.content
-		local contentheight = height - 57
+		local contentheight = height
 		if contentheight < 0 then
 			contentheight = 0
 		end
@@ -114,7 +115,17 @@ local methods = {
 
 	["SetTitle"] = function(self, title)
 		self.titletext:SetText(title)
-		self.titlebg:SetWidth((self.titletext:GetWidth() or 0) + 10)
+		-- self.titlebg:SetWidth(contentwidth)
+	end,
+
+	["SetSubTitle"] = function (self, subtitle_data)
+		local column_offset = 17
+		if subtitle_data == nil then return end
+		for _,v in ipairs(subtitle_data) do
+			self.subtitletext_tbl[v[1]]:SetText(v[1])
+			self.subtitletext_tbl[v[1]]:SetPoint("LEFT", self.frame, "TOPLEFT", column_offset, -26)
+			column_offset = column_offset + v[2]
+		end
 	end,
 
 	["SetStatusText"] = function(self, text)
@@ -123,6 +134,20 @@ local methods = {
 
 	["Hide"] = function(self)
 		self.frame:Hide()
+	end,
+
+	["Minimize"] = function(self)
+		self.frame:Hide()
+		is_minimized = true
+	end,
+
+	["IsMinimized"] = function(self)
+	  return is_minimized
+	end,
+
+	["Maximize"] = function(self)
+		self.frame:Show()
+		is_minimized = false
 	end,
 
 	["Show"] = function(self)
@@ -163,14 +188,14 @@ Constructor
 -------------------------------------------------------------------------------]]
 local FrameBackdrop = {
 	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-	tile = true, tileSize = 32, edgeSize = 32,
+	edgeFile = "Interface\\CHATFRAME\\ChatFrameBorder",
+	tile = false, tileSize = 32, edgeSize = 32,
 	insets = { left = 8, right = 8, top = 8, bottom = 8 }
 }
 
 local PaneBackdrop  = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	edgeFile = "Interface\\Glues\\COMMON\\TextPanel-Border",
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 5, bottom = 3 }
 }
@@ -184,12 +209,15 @@ local function Constructor()
 	frame:SetResizable(true)
 	frame:SetFrameStrata("FULLSCREEN_DIALOG")
 	frame:SetFrameLevel(100) -- Lots of room to draw under it
-	frame:SetBackdrop(FrameBackdrop)
-	frame:SetBackdropColor(0, 0, 0, 1)
+	frame:SetBackdrop(PaneBackdrop)
+	frame:SetBackdropColor(0, 0, 0, .6)
+	frame:SetBackdropBorderColor(1,1,1,1)
+	frame:SetSize(250,150)
+
 	if frame.SetResizeBounds then -- WoW 10.0
 		frame:SetResizeBounds(400, 200)
 	else
-		frame:SetMinResize(400, 200)
+		frame:SetMinResize(150, 100)
 	end
 	frame:SetToplevel(true)
 	frame:SetScript("OnShow", Frame_OnShow)
@@ -199,33 +227,38 @@ local function Constructor()
 	local closebutton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 	closebutton:SetScript("OnClick", Button_OnClick)
 	closebutton:SetPoint("BOTTOMRIGHT", -27, 17)
-	closebutton:SetHeight(20)
+	closebutton:SetHeight(0)
 	closebutton:SetWidth(100)
 	closebutton:SetText(CLOSE)
+	closebutton:Hide()
+
 
 	local statusbg = CreateFrame("Button", nil, frame, "BackdropTemplate")
 	statusbg:SetPoint("BOTTOMLEFT", 15, 15)
 	statusbg:SetPoint("BOTTOMRIGHT", -132, 15)
-	statusbg:SetHeight(24)
+	statusbg:SetHeight(0)
 	statusbg:SetBackdrop(PaneBackdrop)
 	statusbg:SetBackdropColor(0.1,0.1,0.1)
 	statusbg:SetBackdropBorderColor(0.4,0.4,0.4)
 	statusbg:SetScript("OnEnter", StatusBar_OnEnter)
 	statusbg:SetScript("OnLeave", StatusBar_OnLeave)
+	statusbg:Hide()
 
 	local statustext = statusbg:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	statustext:SetPoint("TOPLEFT", 7, -2)
 	statustext:SetPoint("BOTTOMRIGHT", -7, 2)
-	statustext:SetHeight(20)
+	statustext:SetHeight(0)
 	statustext:SetJustifyH("LEFT")
 	statustext:SetText("")
+	statustext:Hide()
 
 	local titlebg = frame:CreateTexture(nil, "OVERLAY")
-	titlebg:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
-	titlebg:SetTexCoord(0.31, 0.67, 0, 0.63)
+	titlebg:SetTexture("Interface\\ClassTrainerFrame\\UI-ClassTrainer-DetailHeaderLeft") 
+	titlebg:SetTexCoord(0, 1, 0, 1)
 	titlebg:SetPoint("TOP", 0, 12)
 	titlebg:SetWidth(100)
 	titlebg:SetHeight(40)
+	titlebg:Hide()
 
 	local title = CreateFrame("Frame", nil, frame)
 	title:EnableMouse(true)
@@ -234,7 +267,17 @@ local function Constructor()
 	title:SetAllPoints(titlebg)
 
 	local titletext = title:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	titletext:SetPoint("TOP", titlebg, "TOP", 0, -14)
+	titletext:SetFont("Fonts\\FRIZQT__.TTF", 13, "")
+	titletext:SetPoint("LEFT", frame, "TOPLEFT", 25, -10)
+
+	local column_types = {"Name", "Guild", "Lvl", "F's", "Race", "Class"}
+	local subtitletext_tbl = {} 
+	for _,v in ipairs(column_types) do
+		subtitletext_tbl[v] = title:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		subtitletext_tbl[v]:SetPoint("LEFT", frame, "TOPLEFT", 17, -26)
+		subtitletext_tbl[v]:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		subtitletext_tbl[v]:SetTextColor(.5,.5,.5);
+	end
 
 	local titlebg_l = frame:CreateTexture(nil, "OVERLAY")
 	titlebg_l:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
@@ -242,6 +285,7 @@ local function Constructor()
 	titlebg_l:SetPoint("RIGHT", titlebg, "LEFT")
 	titlebg_l:SetWidth(30)
 	titlebg_l:SetHeight(40)
+	titlebg_l:Hide()
 
 	local titlebg_r = frame:CreateTexture(nil, "OVERLAY")
 	titlebg_r:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
@@ -249,6 +293,7 @@ local function Constructor()
 	titlebg_r:SetPoint("LEFT", titlebg, "RIGHT")
 	titlebg_r:SetWidth(30)
 	titlebg_r:SetHeight(40)
+	titlebg_r:Hide()
 
 	local sizer_se = CreateFrame("Frame", nil, frame)
 	sizer_se:SetPoint("BOTTOMRIGHT")
@@ -292,12 +337,13 @@ local function Constructor()
 
 	--Container Support
 	local content = CreateFrame("Frame", nil, frame)
-	content:SetPoint("TOPLEFT", 17, -27)
-	content:SetPoint("BOTTOMRIGHT", -17, 40)
+	content:SetPoint("TOPLEFT", 3, -33)
+	content:SetPoint("BOTTOMRIGHT", 15, 6)
 
 	local widget = {
 		localstatus = {},
 		titletext   = titletext,
+		subtitletext_tbl   = subtitletext_tbl,
 		statustext  = statustext,
 		titlebg     = titlebg,
 		sizer_se    = sizer_se,

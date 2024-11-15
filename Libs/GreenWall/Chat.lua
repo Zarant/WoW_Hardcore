@@ -1,14 +1,19 @@
 --[[-----------------------------------------------------------------------
+
 The MIT License (MIT)
+
 Copyright (c) 2010-2020 Mark Rogaski
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
+
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -16,6 +21,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 --]] -----------------------------------------------------------------------
 
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
@@ -105,27 +111,6 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                     if _G[frame] then
                         gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%q',
                                 frame, event, sender, message)
-
-			for banned_tag, _ in pairs(gw_banned_tags) do
-				if message:match("<"..banned_tag..">") then 
-				  return 
-				end
-			end
-
-			if hc_gw_lfgm_mode and hc_gw_lfgm_mode == true then
-				if (not message:match("lfg") and not message:match("lfm") and not message:match("LFG") and not message:match("LFM") and not message:match("lf ") and not message:match("LF ") and not message:match("LF%d") and not message:match("lf%d")) then 
-				  return
-				end
-				local _level, filtered_message = strsplit("-", message, 2)
-				local _level = string.match(message, " (%d+)-")
-				if _level and filtered_message and tonumber(_level) then 
-				  if math.abs(tonumber(_level) - UnitLevel("player")) > 10 then
-				    return
-				  end
-				  message = filtered_message
-				end
-			end
-
                         gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
                                 sender, language, '', target, flags, 0, 0, '', 0, line, guid)
                     end
@@ -135,4 +120,5 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
         end
     end
 end
+
 
