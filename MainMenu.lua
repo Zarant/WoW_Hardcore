@@ -316,6 +316,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.55", scroll_frame)
+	CreateDescriptionLabel(
+		"- Fix opening main HC window after Blizzard API changes\n- Update GreenWall library to latest version\n- Update Ace3 libraries to latest versions",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.54", scroll_frame)
 	CreateDescriptionLabel(
 		"- Dungeon tracker updates for Cataclysm\n- Achievement fixes for Cataclysm",

@@ -1,10 +1,10 @@
 ## Interface: 40400
-## Title: Hardcore 0.11.54
+## Title: Hardcore 0.11.55a
 ## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
 ## X-License: All Rights Reserved
 ## X-Category: Leveling,Guild
-## Version: 0.11.54
+## Version: 0.11.55a
 
 
 ## DefaultState: enabled
