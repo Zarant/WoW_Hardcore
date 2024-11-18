@@ -272,7 +272,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="Hardcore_Name_Sort" inherits="OptionsButtonTemplate" text="Name">
+			<Button name="Hardcore_Name_Sort" inherits="UIPanelButtonTemplate" text="Name">
 				<Size x="100" y="20" />
 				<Anchors>
 					<Anchor point="TOPLEFT" x="65" y="-80" />
@@ -288,7 +288,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="Hardcore_Class_Sort" inherits="OptionsButtonTemplate" text="Class">
+			<Button name="Hardcore_Class_Sort" inherits="UIPanelButtonTemplate" text="Class">
 				<Size x="65" y="20" />
 				<Anchors>
 					<Anchor point="TOPLEFT" x="175" y="-80" />
@@ -304,7 +304,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="Hardcore_Level_Sort" inherits="OptionsButtonTemplate" text="Level">
+			<Button name="Hardcore_Level_Sort" inherits="UIPanelButtonTemplate" text="Level">
 				<Size x="65" y="20" />
 				<Anchors>
 					<Anchor point="TOPLEFT" x="240" y="-80" />
@@ -320,7 +320,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="Hardcore_Zone_Sort" inherits="OptionsButtonTemplate" text="Zone">
+			<Button name="Hardcore_Zone_Sort" inherits="UIPanelButtonTemplate" text="Zone">
 				<Size x="145" y="20" />
 				<Anchors>
 					<Anchor point="TOPLEFT" x="305" y="-80" />
@@ -336,7 +336,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="Hardcore_TOD_Sort" inherits="OptionsButtonTemplate" text="Time">
+			<Button name="Hardcore_TOD_Sort" inherits="UIPanelButtonTemplate" text="Time">
 				<Size x="120" y="20" />
 				<Anchors>
 					<Anchor point="TOPLEFT" x="470" y="-80" />

@@ -1,14 +1,19 @@
 --[[ -----------------------------------------------------------------------
+
 The MIT License (MIT)
+
 Copyright (c) 2010-2020 Mark Rogaski
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
+
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -16,10 +21,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 --]] -----------------------------------------------------------------------
 
 --[[ -----------------------------------------------------------------------
+
 Imported Libraries
+
 --]] -----------------------------------------------------------------------
 
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
@@ -32,7 +40,9 @@ local _
 
 
 --[[ -----------------------------------------------------------------------
+
 Slash Command Handler
+
 --]] -----------------------------------------------------------------------
 
 --- Update or display the value of a user settings variable.
@@ -119,7 +129,7 @@ local function GwSlashCmd(message, editbox)
 
     elseif command == 'version' then
 
-        gw.Write('Hardcore: GreenWall version %s.', gw.version)
+        gw.Write('GreenWall version %s.', gw.version)
         gw.Write('World of Warcraft version %s, build %s (%s), interface %s.',
                 gw.build['version'], gw.build['number'], gw.build['date'], gw.build['interface'])
 
@@ -131,15 +141,17 @@ end
 
 
 --[[ -----------------------------------------------------------------------
+
 Initialization
+
 --]] -----------------------------------------------------------------------
 function GreenWall_OnLoad(self)
 
     --
     -- Set up slash commands
     --
-    SLASH_GREENWALL1 = '/hardcore_greenwall'
-    SLASH_GREENWALL2 = '/hc_gw'
+    SLASH_GREENWALL1 = '/greenwall'
+    SLASH_GREENWALL2 = '/gw'
     SlashCmdList['GREENWALL'] = GwSlashCmd
 
     --
@@ -162,7 +174,7 @@ function GreenWall_OnLoad(self)
     --
     -- Add a tab to the Interface Options panel.
     --
-    self.name = 'Hardcore: GreenWall'
+    self.name = 'GreenWall'
     self.refresh = function(self)
         GreenWallInterfaceFrame_OnShow(self)
     end
@@ -175,15 +187,21 @@ function GreenWall_OnLoad(self)
     self.default = function(self)
         GreenWallInterfaceFrame_SetDefaults(self)
     end
-    InterfaceOptions_AddCategory(self)
+    if InterfaceOptions_AddCategory then
+        InterfaceOptions_AddCategory(self)
+    else
+        local category = Settings.RegisterCanvasLayoutCategory(self, self.name)
+        Settings.RegisterAddOnCategory(category)
+    end
 end
 
 
 --[[ -----------------------------------------------------------------------
+
 Hooks
+
 --]] -----------------------------------------------------------------------
 function GreenWall_ParseText(chat, send)
-    if _G.hardcore_disable_greenwall then return end
     if (send == 1) then
         local chatType = chat:GetAttribute('chatType')
         local message = chat:GetText()
@@ -216,17 +234,18 @@ end
 hooksecurefunc("ChatEdit_ParseText", GreenWall_ParseText)
 
 --[[ -----------------------------------------------------------------------
+
 Frame Event Functions
+
 --]] -----------------------------------------------------------------------
 function GreenWall_OnEvent(self, event, ...)
 
     gw.Debug(GW_LOG_DEBUG, 'event occurred; event=%s', event)
-    if _G.hardcore_disable_greenwall then return end
 
     --
     -- Addon loading check
     --
-    if event == 'ADDON_LOADED' and select(1, ...) == 'Hardcore' then
+    if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 
         --
         -- Initialize the saved variables
@@ -392,6 +411,7 @@ end
 
 
 --[[ -----------------------------------------------------------------------
-END
---]] -----------------------------------------------------------------------
 
+END
+
+--]] -----------------------------------------------------------------------

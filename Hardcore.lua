@@ -3061,14 +3061,17 @@ end
 function Hardcore:initMinimapButton()
 	-- Minimap button click function
 	local function MiniBtnClickFunc(arg1)
-		-- Prevent options panel from showing if Blizzard options panel is showing
-		if InterfaceOptionsFrame:IsShown() or VideoOptionsFrame:IsShown() or ChatConfigFrame:IsShown() then
-			return
+		-- -- Prevent options panel from showing if Blizzard options panel is showing
+		if (InterfaceOptionsFrame and InterfaceOptionsFrame:IsShown()) 
+				or (VideoOptionsFrame and VideoOptionsFrame:IsShown()) 
+				or (ChatConfigFrame and ChatConfigFrame:IsShown()) 
+			then
+				return
 		end
-		-- Prevent options panel from showing if Blizzard Store is showing
-		if StoreFrame and StoreFrame:GetAttribute("isshown") then
-			return
-		end
+		-- -- Prevent options panel from showing if Blizzard Store is showing
+		-- if StoreFrame and StoreFrame:GetAttribute("isshown") then
+		-- 	return
+		-- end
 		-- Left button down
 		if arg1 == "LeftButton" then
 			-- Control key
@@ -3102,6 +3105,10 @@ function Hardcore:initMinimapButton()
 				end
 			end
 		end
+		
+		if arg1 == "RightButton" then
+			Settings.OpenToCategory("Hardcore")
+		end
 	end
 
 	-- Create minimap button using LibDBIcon
@@ -3117,8 +3124,8 @@ function Hardcore:initMinimapButton()
 				return
 			end
 			tooltip:AddLine("Hardcore (" .. GetAddOnMetadata("Hardcore", "Version") .. ")")
-			tooltip:AddLine("|cFFCFCFCFclick|r show window")
-			tooltip:AddLine("|cFFCFCFCFctrl click|r toggle minimap button")
+			tooltip:AddLine("|cFFCFCFCFleft click|r toggle hc window")
+			tooltip:AddLine("|cFFCFCFCFright click|r open hc options")
 		end,
 	})
 
