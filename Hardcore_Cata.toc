@@ -1,4 +1,4 @@
-## Interface: 40400
+## Interface: 40401
 ## Title: Hardcore 0.11.55
 ## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
