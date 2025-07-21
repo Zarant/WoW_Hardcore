@@ -110,8 +110,8 @@ function heirloom_rules:CheckHeirloomFailure()
 
 		local messageString = UnitName("player") .. " has equipped an Heirloom and failed the challenge!"
 		SendChatMessage(messageString, "GUILD")
-		startXGuildChatMsgRelay(messageString)
-		startXGuildDeathMsgRelay()
+		-- startXGuildChatMsgRelay(messageString)
+		-- startXGuildDeathMsgRelay()
 		if CTL then
 			CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
 		end

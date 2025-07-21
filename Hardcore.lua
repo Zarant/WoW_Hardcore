@@ -69,8 +69,6 @@ Hardcore_Settings = {
 	sacrifice = {},
 	hardcore_player_name = "",
 	use_alternative_menu = false,
-	ignore_xguild_chat = false,
-	ignore_xguild_alerts = false,
 	global_custom_pronoun = false,
     mute_death_alert_sounds = false, 
 	reload_reminder_interval = 0,
@@ -119,7 +117,6 @@ local speedrun_levels = {
 	[50] = 1,
 	[60] = 1,
 }
-local last_received_xguild_chat = ""
 local debug = false
 local player_logged_out = false
 local dc_recovery_info = nil
@@ -413,12 +410,12 @@ Hardcore.ALERT_STYLES = ALERT_STYLES
 
 Hardcore_Frame:ApplyBackdrop()
 
-local function startXGuildChatMsgRelay(msg)
-	local commMessage = COMM_COMMANDS[12] .. COMM_COMMAND_DELIM .. msg
-	for _, v in pairs(hardcore_guild_member_dict) do
-		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
-	end
-end
+-- local function startXGuildChatMsgRelay(msg)
+-- 	local commMessage = COMM_COMMANDS[12] .. COMM_COMMAND_DELIM .. msg
+-- 	for _, v in pairs(hardcore_guild_member_dict) do
+-- 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
+-- 	end
+-- end
 
 function Hardcore:initSendSharedDLMsg(target_player)
 	local publishFunc = function(encoded_msg)
@@ -429,38 +426,38 @@ function Hardcore:initSendSharedDLMsg(target_player)
 	HardcoreDeathlog_beginSendSharedMsg(publishFunc)
 end
 
-local function startXGuildDeathMsgRelay()
-	local zone, mapID
-	if IsInInstance() then
-		zone = GetInstanceInfo()
-	else
-		mapID = C_Map.GetBestMapForUnit("player")
-		zone = C_Map.GetMapInfo(mapID).name
-	end
+-- local function startXGuildDeathMsgRelay()
+-- 	local zone, mapID
+-- 	if IsInInstance() then
+-- 		zone = GetInstanceInfo()
+-- 	else
+-- 		mapID = C_Map.GetBestMapForUnit("player")
+-- 		zone = C_Map.GetMapInfo(mapID).name
+-- 	end
 
-	if Last_Attack_Source == nil then
-		Last_Attack_Source = "unknown"
-	end
-	local class = UnitClass("player")
+-- 	if Last_Attack_Source == nil then
+-- 		Last_Attack_Source = "unknown"
+-- 	end
+-- 	local class = UnitClass("player")
 
-	-- player name, level, zone, attack_source, class
-	local commMessage = COMM_COMMANDS[10]
-		.. COMM_COMMAND_DELIM
-		.. UnitName("player")
-		.. "^"
-		.. UnitLevel("player")
-		.. "^"
-		.. zone
-		.. "^"
-		.. Last_Attack_Source
-		.. "^"
-		.. class
-		.. "^"
+-- 	-- player name, level, zone, attack_source, class
+-- 	local commMessage = COMM_COMMANDS[10]
+-- 		.. COMM_COMMAND_DELIM
+-- 		.. UnitName("player")
+-- 		.. "^"
+-- 		.. UnitLevel("player")
+-- 		.. "^"
+-- 		.. zone
+-- 		.. "^"
+-- 		.. Last_Attack_Source
+-- 		.. "^"
+-- 		.. class
+-- 		.. "^"
 
-	for _, v in pairs(hardcore_guild_member_dict) do
-		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
-	end
-end
+-- 	for _, v in pairs(hardcore_guild_member_dict) do
+-- 		CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "WHISPER", v)
+-- 	end
+-- end
 
 function FailureFunction(achievement_name)
 	local max_level = 60
@@ -493,8 +490,8 @@ function FailureFunction(achievement_name)
 
 				local messageString = UnitName("player") .. " has failed " .. _G.achievements[achievement_name].title
 				SendChatMessage(messageString, "GUILD")
-				startXGuildChatMsgRelay(messageString)
-				startXGuildDeathMsgRelay()
+				-- startXGuildChatMsgRelay(messageString)
+				-- startXGuildDeathMsgRelay()
 				if CTL then
 					CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
 				end
@@ -570,8 +567,6 @@ local settings_saved_variable_meta = {
 	["sacrifice"] = {},
 	["hardcore_player_name"] = "",
 	["use_alternative_menu"] = false,
-	["ignore_xguild_chat"] = false,
-	["ignore_xguild_alerts"] = false,
 }
 
 --[[ Post-utility functions]]
@@ -833,7 +828,6 @@ function Hardcore:PLAYER_LOGIN()
 	Hardcore:HandleLegacyDeaths()
 	Hardcore_Character.hardcore_player_name = Hardcore_Settings.hardcore_player_name or ""
 
-	_G.hardcore_disable_greenwall = Hardcore_Settings.ignore_xguild_chat
 	-- Show the first menu screen.  Requires short delay
 	if UnitLevel("player") < 2 then
 		C_Timer.After(1.0, function()
@@ -1412,9 +1406,9 @@ function Hardcore:PLAYER_DEAD()
 				"Our brave " .. playerGreet .. ", " .. name .. " the " .. class ..
 				" has fallen in battle against the Lich King atop Icecrown Citadel - but there may still be hope!"
 
-			-- Send broadcast text messages to guild and greenwall
+			-- Send broadcast text messages to guild
 			SendChatMessage(messageString, "GUILD")
-			startXGuildChatMsgRelay(messageString)
+			-- startXGuildChatMsgRelay(messageString)
 			Hardcore:Print(messageString)
 
 			return -- do not perform standard death actions
@@ -1437,9 +1431,9 @@ function Hardcore:PLAYER_DEAD()
 			or GENDER_POSSESSIVE_PRONOUN[UnitSex("player")]
 		local messageString = string.format(messageTemplate, name, zone, playerPronoun, zone)
 
-		-- Send broadcast text messages to guild and greenwall
+		-- Send broadcast text messages to guild
 		SendChatMessage(messageString, "GUILD")
-		startXGuildChatMsgRelay(messageString)
+		-- startXGuildChatMsgRelay(messageString)
 		Hardcore:Print(messageString)
 
 		-- mark the next resurrection as authorized
@@ -1484,7 +1478,7 @@ function Hardcore:PLAYER_DEAD()
 		return
 	end
 
-	-- Send broadcast alert messages to guild and greenwall
+	-- Send broadcast alert messages to guild
 	local messageString = messageFormat:format(playerGreet, name, class, level, zone)
 	if not (Last_Attack_Source == nil) then
 		messageString = string.format("%s to a %s", messageString, Last_Attack_Source)
@@ -1499,13 +1493,13 @@ function Hardcore:PLAYER_DEAD()
 		messageString = string.format('%s. %s last words were "%s"', messageString, playerPronoun, recent_msg["text"])
 	end
 
-	-- Send broadcast text messages to guild and greenwall
+	-- Send broadcast text messages to guild
 	selfDeathAlert(DeathLog_Last_Attack_Source)
 	selfDeathAlertLastWords(recent_msg["text"])
 
 	SendChatMessage(messageString, "GUILD")
-	startXGuildChatMsgRelay(messageString)
-	startXGuildDeathMsgRelay()
+	-- startXGuildChatMsgRelay(messageString)
+	-- startXGuildDeathMsgRelay()
 	Hardcore:Print(messageString)
 
 	-- Send addon alert notice
@@ -1573,9 +1567,9 @@ function Hardcore:PLAYER_UNGHOST()
 		Hardcore:ShowAlertFrame(ALERT_STYLES.spirithealer, message)
 	end
 
-	-- broadcast to guild and greenwall
+	-- broadcast to guild
 	SendChatMessage(message, "GUILD", nil, nil)
-	startXGuildChatMsgRelay(message)
+	-- startXGuildChatMsgRelay(message)
 end
 
 function Hardcore:MAIL_SHOW()
@@ -1619,7 +1613,7 @@ function Hardcore:PLAYER_LEVEL_UP(...)
 		local messageFormat = "%s the %s has reached level %s!"
 		local messageString = string.format(messageFormat, playerName, localizedClass, level)
 		SendChatMessage(messageString, "GUILD", nil, nil)
-		startXGuildChatMsgRelay(messageString)
+		-- startXGuildChatMsgRelay(messageString)
 	end
 
 	-- Update the character's statistics
@@ -2015,13 +2009,13 @@ function Hardcore:DisplayPlaytimeWarning(level)
 end
 
 -- player name, level, zone, attack_source, class
-local function receiveXGuildChat(data, sender, command)
-	if last_received_xguild_chat and last_received_xguild_chat == data then
-		return
-	end
-	last_received_xguild_chat = data
-	-- Hardcore:FakeGuildMsg("< " .. sender .. "> " .. data)
-end
+-- local function receiveXGuildChat(data, sender, command)
+-- 	if last_received_xguild_chat and last_received_xguild_chat == data then
+-- 		return
+-- 	end
+-- 	last_received_xguild_chat = data
+-- 	-- Hardcore:FakeGuildMsg("< " .. sender .. "> " .. data)
+-- end
 
 -- player name, level, zone, attack_source, class
 local function receiveDeathMsg(data, sender, command)
@@ -2126,20 +2120,7 @@ function Hardcore:CHAT_MSG_ADDON(prefix, datastr, scope, sender)
 				return
 			end
 		end
-		if command == COMM_COMMANDS[11] then -- Received request for guild members
-			-- receiveDeathMsg(data, sender, command) -- Disable greenwall
-			return
-		end
-		if command == COMM_COMMANDS[12] then -- Send guild chat to other guilds
-			-- Disabled for the time being
-			-- local commMessage = COMM_COMMANDS[13] .. COMM_COMMAND_DELIM .. data
-			-- CTL:SendAddonMessage("ALERT", COMM_NAME, commMessage, "GUILD")
-			return
-		end
-		if command == COMM_COMMANDS[13] then -- Send guild chat from another guild to this guild
-			-- receiveXGuildChat(data, sender, command) -- Disable greenwall
-			return
-		end
+
 		if command == COMM_COMMANDS[7] then -- Received request for party change
 			local name, _ = string.split("-", sender)
 			local party_change_token_secret = string.split(COMM_FIELD_DELIM, data)
@@ -3788,7 +3769,7 @@ local options = {
 					desc = "Type of death alerts.",
 					values = {
 						guild_only = "guild only",
-						greenwall_guilds_only = "greenwall guilds only",
+						-- greenwall_guilds_only = "greenwall guilds only",
 						faction_wide = "faction wide",
 					},
 					get = function()
@@ -3809,7 +3790,7 @@ local options = {
 					values = {
 						off = "off",
 						guild_only = "guild only",
-						greenwall_guilds_only = "greenwall guilds only",
+						-- greenwall_guilds_only = "greenwall guilds only",
 						faction_wide = "faction wide",
 					},
 					get = function()
@@ -4180,39 +4161,39 @@ local options = {
 				},
 			},
 		},
-		cross_guild_header = {
-			type = "group",
-			name = "Cross-Guild",
-			order = 16,
-			inline = true,
-			args = {
-				ignore_xguild_chat = {
-					width = "full",
-					type = "toggle",
-					name = "Ignore cross-guild chat [Requires reload]",
-					desc = "Ignore cross-guild chat [Requires reload]",
-					get = function()
-						return Hardcore_Settings.ignore_xguild_chat
-					end,
-					set = function()
-						Hardcore_Settings.ignore_xguild_chat = not Hardcore_Settings.ignore_xguild_chat
-					end,
-					order = 17,
-				},
-				ignore_xguild_alerts = {
-					type = "toggle",
-					name = "Ignore cross-guild alerts",
-					desc = "Ignore cross-guild alerts",
-					get = function()
-						return Hardcore_Settings.ignore_xguild_alerts
-					end,
-					set = function()
-						Hardcore_Settings.ignore_xguild_alerts = not Hardcore_Settings.ignore_xguild_alerts
-					end,
-					order = 18,
-				},
-			},
-		},
+		-- cross_guild_header = {
+		-- 	type = "group",
+		-- 	name = "Cross-Guild",
+		-- 	order = 16,
+		-- 	inline = true,
+		-- 	args = {
+		-- 		ignore_xguild_chat = {
+		-- 			width = "full",
+		-- 			type = "toggle",
+		-- 			name = "Ignore cross-guild chat [Requires reload]",
+		-- 			desc = "Ignore cross-guild chat [Requires reload]",
+		-- 			get = function()
+		-- 				return Hardcore_Settings.ignore_xguild_chat
+		-- 			end,
+		-- 			set = function()
+		-- 				Hardcore_Settings.ignore_xguild_chat = not Hardcore_Settings.ignore_xguild_chat
+		-- 			end,
+		-- 			order = 17,
+		-- 		},
+		-- 		ignore_xguild_alerts = {
+		-- 			type = "toggle",
+		-- 			name = "Ignore cross-guild alerts",
+		-- 			desc = "Ignore cross-guild alerts",
+		-- 			get = function()
+		-- 				return Hardcore_Settings.ignore_xguild_alerts
+		-- 			end,
+		-- 			set = function()
+		-- 				Hardcore_Settings.ignore_xguild_alerts = not Hardcore_Settings.ignore_xguild_alerts
+		-- 			end,
+		-- 			order = 18,
+		-- 		},
+		-- 	},
+		-- },
 		apply_defaults = {
 			type = "execute",
 			name = "Defaults",
@@ -4229,8 +4210,8 @@ local options = {
 				Hardcore_Settings.achievement_alert_frame_y_offset = nil
 				Hardcore_Settings.achievement_alert_frame_scale = nil
 				Hardcore_Settings.show_minimap_mailbox_icon = false
-				Hardcore_Settings.ignore_xguild_alerts = false
-				Hardcore_Settings.ignore_xguild_chat = false
+				-- Hardcore_Settings.ignore_xguild_alerts = false
+				-- Hardcore_Settings.ignore_xguild_chat = false
 				Hardcore_Settings.reload_reminder_show = true
 				Hardcore_Settings.reload_reminder_interval = 0
 				Hardcore:ApplyAlertFrameSettings()

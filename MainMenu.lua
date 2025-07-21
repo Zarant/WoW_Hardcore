@@ -316,6 +316,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 
+	CreateHeadingLabel("11.56", scroll_frame)
+	CreateDescriptionLabel(
+		"- Removed GreenWall entirely",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.55", scroll_frame)
 	CreateDescriptionLabel(
 		"- Fix opening main HC window after Blizzard API changes\n- Update GreenWall library to latest version\n- Update Ace3 libraries to latest versions",
@@ -1869,11 +1875,11 @@ local function DrawOfficerToolsTab(container)
 
 	officer_announcement_container:AddChild(announcement_edit_text)
 
-	local green_wall_config_container = AceGUI:Create("InlineGroup")
-	green_wall_config_container:SetFullWidth(true)
-	green_wall_config_container:SetLayout("Flow")
-	green_wall_config_container:SetTitle("Current Greenwall Configuration")
-	scroll_frame:AddChild(green_wall_config_container)
+	-- local green_wall_config_container = AceGUI:Create("InlineGroup")
+	-- green_wall_config_container:SetFullWidth(true)
+	-- green_wall_config_container:SetLayout("Flow")
+	-- green_wall_config_container:SetTitle("Current Greenwall Configuration")
+	-- scroll_frame:AddChild(green_wall_config_container)
 
 	local current_gw_config_text = AceGUI:Create("Label")
 	current_gw_config_text:SetWidth(850)
@@ -1927,7 +1933,7 @@ local function DrawOfficerToolsTab(container)
 	local officer_notes_guide_text = AceGUI:Create("Label")
 	officer_notes_guide_text:SetWidth(850)
 	officer_notes_guide_text:SetText(
-		"The followiong commands are used in officer notes to configure greenwall.\n\n |c00FFFF00GWr:|r - Puts guild into LFG/LFM mode. In LFG/LFM mode, x-guild chat will only show up for LF messages and only if the requester is within 10 levels of the receiving character. Announcements can still be made using the announcement tool below. NOTE that there must be a color `:`.\nExample usage: |c00FFFF00GWr:|r\n\n |c00FFFF00GWd:|r - Puts guild into HC defense mode. NOTE that the colon `:` is needed. If this is put into officer notes, players in this guild will not emit a death notice.\nExample usage: |c00FFFF00GWd:|r\n\n |c00FFFF00GWi:x|r - Mute guild member under x level.\nExample usage: |c00FFFF00GWi:15|r, will mute players (within the guild) under level 15\n\n |c00FFFF00GWb:x|r - Mutes messages coming from a guild with the matching tag.\nExample usage: |c00FFFF00GWb:HG|r, will mute all messages coming from HG players.\n\n |c00FFFF00GWp:<GuildName>:<GuildTag>|r - Adds a peer guild. Messages coming from other guilds will be prefixed with <GuildTag>.\nExample usage: |c00FFFF00GWp:HC Honor Guard:HG|r - Players will get messages from HC Honor Guard, which will be prefixed with <HG>.\n\n |c00FFFF00GWc:<CustomChannelName>:<ChannelPassword>|r - [REQUIRED] This determines what channel and password to use for communication.\nExample usage: |c00FFFF00GWc:HCCommonCommunicationChannel:SomeHCPassword|r - Players will communicate over the hidden HCCommonCommunicationChannel which requires SomeHCPassword password.\n\n"
+		"GreenWall has been removed.\n\n"
 	)
 	officer_notes_guide_text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
 	officer_notes_guide_container:AddChild(officer_notes_guide_text)
