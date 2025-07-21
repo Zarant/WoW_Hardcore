@@ -328,6 +328,12 @@ local function DrawGeneralTab(container)
 		scroll_frame
 	)
 
+	CreateHeadingLabel("11.56", scroll_frame)
+	CreateDescriptionLabel(
+		"- Removed GreenWall entirely",
+		scroll_frame
+	)
+
 	CreateHeadingLabel("11.55", scroll_frame)
 	CreateDescriptionLabel(
 		"- Fix opening main HC window after Blizzard API changes\n- Update GreenWall library to latest version\n- Update Ace3 libraries to latest versions",
