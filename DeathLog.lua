@@ -507,20 +507,13 @@ local function createEntry(checksum)
 
   -- Save in-guilds for next part of migration TODO
   if death_ping_lru_cache_tbl[checksum]["player_data"]["in_guild"] then return end
-  if hardcore_settings.alert_subset ~= nil and hardcore_settings.alert_subset == "greenwall_guilds_only" and death_ping_lru_cache_tbl[checksum]["player_data"]["guild"] and hc_peer_guilds[death_ping_lru_cache_tbl[checksum]["player_data"]["guild"]] then
-    alertIfValid(death_ping_lru_cache_tbl[checksum]["player_data"])
-    return
-  end
+
   if hardcore_settings.alert_subset ~= nil and hardcore_settings.alert_subset == "faction_wide" then
     alertIfValid(death_ping_lru_cache_tbl[checksum]["player_data"])
     return
   end
 
-  -- Override if players are in greenwall
-  if death_ping_lru_cache_tbl[checksum]["player_data"]["guild"] and hc_peer_guilds[death_ping_lru_cache_tbl[checksum]["player_data"]["guild"]] then
-    alertIfValid(death_ping_lru_cache_tbl[checksum]["player_data"])
-    return
-  end
+
 end
 
 local function shouldCreateEntry(checksum)
@@ -535,7 +528,7 @@ local function shouldCreateEntry(checksum)
       end
     end
   end
-  if hardcore_settings.death_log_types ~= nil and hardcore_settings.death_log_types == "greenwall_guilds_only" and death_ping_lru_cache_tbl[checksum]["player_data"] and death_ping_lru_cache_tbl[checksum]["player_data"]["guild"] and hc_peer_guilds[death_ping_lru_cache_tbl[checksum]["player_data"]["guild"]] then return true end
+  
   if death_ping_lru_cache_tbl[checksum]["in_guild"] then return true end
 
   return false

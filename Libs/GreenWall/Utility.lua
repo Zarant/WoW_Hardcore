@@ -1,19 +1,14 @@
 --[[-----------------------------------------------------------------------
-
 The MIT License (MIT)
-
 Copyright (c) 2010-2020 Mark Rogaski
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,13 +16,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 --]]-----------------------------------------------------------------------
 
 --[[-----------------------------------------------------------------------
-
 Imported Libraries
-
 --]]-----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
@@ -71,7 +63,7 @@ end
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Write(...)
     local msg = string.format(unpack({ ... }))
-    DEFAULT_CHAT_FRAME:AddMessage('|cff0bda51GreenWall:|r ' .. msg)
+    DEFAULT_CHAT_FRAME:AddMessage('|cffed9121Hardcore-GreenWall|r: ' .. msg)
     gw.Log(msg)
 end
 
@@ -80,13 +72,13 @@ end
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Error(...)
     local msg = string.format(unpack({ ... }))
-    DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg)
+    DEFAULT_CHAT_FRAME:AddMessage('|cffabd473Hardcore-GreenWall:|r |cffff6000[ERROR] ' .. msg)
     gw.Log('[ERROR] ' .. msg)
 end
 
 
 --- Write a debugging message to the default chat frame with a detail level.
--- Messages will be filtered with the "/greenwall debug <level>" command.
+-- Messages will be filtered with the "/hardcore_greenwall debug <level>" command.
 -- @param level A positive integer specifying the debug level to display this under.
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Debug(level, ...)
@@ -106,7 +98,7 @@ function gw.Debug(level, ...)
             local trace = format('debug/%d [%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if gw.settings:get('verbose') then
-                DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
+                DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dHardcore-GreenWall:|r |cff778899%s|r', trace))
             end
         end
     end
@@ -279,7 +271,6 @@ end
 
 
 --[[-----------------------------------------------------------------------
-
 END
-
 --]]-----------------------------------------------------------------------
+

@@ -1,19 +1,14 @@
 --[[-----------------------------------------------------------------------
-
 The MIT License (MIT)
-
 Copyright (c) 2010-2020 Mark Rogaski
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,13 +16,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 --]]-----------------------------------------------------------------------
 
 --[[-----------------------------------------------------------------------
-
 Imported Libraries
-
 --]]-----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
@@ -35,13 +27,12 @@ local base64 = LibStub:GetLibrary("Encoding:Hash:Base64BCA-1.0")
 
 
 --[[-----------------------------------------------------------------------
-
 Class Variables
-
 --]]-----------------------------------------------------------------------
 
 GwChannel = {}
 GwChannel.__index = GwChannel
+hardcore_guild_member_dict = {} -- Tracks the most recent message received by someone on 
 
 
 --- GwChannel constructor function.
@@ -76,9 +67,7 @@ end
 
 
 --[[-----------------------------------------------------------------------
-
 Channel Management Methods
-
 --]]-----------------------------------------------------------------------
 
 --- Configure the channel.
@@ -231,9 +220,7 @@ end
 
 
 --[[-----------------------------------------------------------------------
-
 Informational Methods
-
 --]]-----------------------------------------------------------------------
 
 --- Dump the channel status.
@@ -248,9 +235,7 @@ end
 
 
 --[[-----------------------------------------------------------------------
-
 Transmit Methods
-
 --]]-----------------------------------------------------------------------
 
 --- Sends an encoded message on the shared channel.
@@ -291,7 +276,14 @@ end
 function GwChannel:tl_send(type, message)
     local opcode
     if type == GW_MTYPE_CHAT then
-        opcode = 'C'
+	if hc_gw_lfgm_mode and hc_gw_lfgm_mode == true then
+		  if (not message:match("lfg") and not message:match("lfm") and not message:match("LFG") and not message:match("LFM") and not message:match("lf ") and not message:match("LF ") and not message:match("LF%d") and not message:match("lf%d")) then 
+		  return
+		end
+		message = UnitLevel("player") .. "-" .. message
+	end
+
+	opcode = 'C'
     elseif type == GW_MTYPE_BROADCAST then
         opcode = 'B'
     elseif type == GW_MTYPE_NOTICE then
@@ -302,6 +294,8 @@ function GwChannel:tl_send(type, message)
         opcode = 'M'
     elseif type == GW_MTYPE_EXTERNAL then
         opcode = 'E'
+    elseif type == GW_MTYPE_HC_ANNOUNCEMENT then
+        opcode = 'H'
     else
         gw.Debug(GW_LOG_ERROR, 'unknown message type: %d', type)
         return
@@ -313,6 +307,21 @@ function GwChannel:tl_send(type, message)
     -- Send the message
     self:tl_enqueue(segment)
     self:tl_flush()
+
+    -- Format the message segment
+    if (Hardcore_Settings.rank_type and Hardcore_Settings.rank_type == "officer") then
+	    local segment = strsub(strjoin('#', "L", gw.config.guild_id, '', ""), 1, GW_MAX_MESSAGE_LENGTH)
+	    -- Send the message
+	    self:tl_enqueue(segment)
+	    self:tl_flush()
+    end
+
+    if hc_gw_lfgm_mode and hc_gw_lfgm_mode == true then
+	    local segment = strsub(strjoin('#', "W", gw.config.guild_id, '', ""), 1, GW_MAX_MESSAGE_LENGTH)
+	    -- Send the message
+	    self:tl_enqueue(segment)
+	    self:tl_flush()
+    end
 end
 
 --- Add a segment to the channel transmit queue.
@@ -368,9 +377,7 @@ end
 
 
 --[[-----------------------------------------------------------------------
-
 Receive Methods
-
 --]]-----------------------------------------------------------------------
 
 --- Handler for data received on a channel.
@@ -390,7 +397,13 @@ function GwChannel:receive(f, ...)
                     gw.APIDispatcher(addon, sender, guild_id, api_message)
                 end
             end
+	elseif mtype == GW_MTYPE_HC_ANNOUNCEMENT then
+	  local sender_short = string.split("-", sender)
+	  message = "<" .. sender_short .. "> " .. message
+	  Hardcore:Notify(message)
         elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then
+	  local sender_short = string.split("-", sender)
+	  hardcore_guild_member_dict[guild_id] = sender_short
             -- Process the chat message if it from another co-guild.
             gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%q',
                     self.number, mtype, sender, guild_id, message)
@@ -471,6 +484,10 @@ function GwChannel:tl_receive(...)
         type = GW_MTYPE_ADDON
     elseif opcode == 'E' then
         type = GW_MTYPE_EXTERNAL
+    elseif opcode == 'H' then
+        type = GW_MTYPE_HC_ANNOUNCEMENT
+    elseif opcode == 'W' then
+        type = GW_MTYPE_HC_WHISPER
     else
         gw.Debug(GW_LOG_WARNING, 'unknown segment opcode: %s', opcode)
     end
