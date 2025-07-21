@@ -315,6 +315,12 @@ local function DrawGeneralTab(container)
 	changelog_title:SetText("\n\nChangelog")
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
+	
+	CreateHeadingLabel("11.57b", scroll_frame)
+	CreateDescriptionLabel(
+		"- Fixed Lua error related to missing Monk class color.\n- Added checks to prevent errors when extra rules are not defined.\n- Enabled tracked time to update correctly on the character screen.",
+		scroll_frame
+	)
 
 	CreateHeadingLabel("11.56", scroll_frame)
 	CreateDescriptionLabel(
