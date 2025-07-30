@@ -316,6 +316,7 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 	
+<<<<<<< HEAD
 	CreateHeadingLabel("11.58 - Mists of Pandaria Update", scroll_frame)
 	CreateDescriptionLabel(
 		"- The addon now works with the Mists of Pandaria version of the game.\n" ..
@@ -327,6 +328,9 @@ local function DrawGeneralTab(container)
 	)
 	
 	CreateHeadingLabel("11.57", scroll_frame)
+=======
+	CreateHeadingLabel("11.57b", scroll_frame)
+>>>>>>> master
 	CreateDescriptionLabel(
 		"- Fixed Lua error related to missing Monk class color.\n- Added checks to prevent errors when extra rules are not defined.\n- Enabled tracked time to update correctly on the character screen.",
 		scroll_frame
@@ -337,6 +341,15 @@ local function DrawGeneralTab(container)
 		"- Removed GreenWall entirely",
 		scroll_frame
 	)
+<<<<<<< HEAD
+=======
+
+	CreateHeadingLabel("11.56", scroll_frame)
+	CreateDescriptionLabel(
+		"- Removed GreenWall entirely",
+		scroll_frame
+	)
+>>>>>>> master
 
 	CreateHeadingLabel("11.55", scroll_frame)
 	CreateDescriptionLabel(

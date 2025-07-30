@@ -1,10 +1,18 @@
 ## Interface: 50500
+<<<<<<< HEAD:Hardcore.toc
 ## Title: Hardcore 0.11.58b
+=======
+## Title: Hardcore 0.11.57b
+>>>>>>> master:Hardcore_Cata.toc
 ## Notes: Supports Classic Hardcore
 ## Author: The Classic Hardcore team, Molikar (Sean Kennedy)
 ## X-License: All Rights Reserved
 ## X-Category: Leveling,Guild
+<<<<<<< HEAD:Hardcore.toc
 ## Version: 0.11.58b
+=======
+## Version: 0.11.57b
+>>>>>>> master:Hardcore_Cata.toc
 
 
 ## DefaultState: enabled
@@ -168,4 +176,9 @@ id_to_npc.lua
 npc_to_id.lua
 DeathLog.lua
 SlashCommands.lua
+<<<<<<< HEAD:Hardcore.toc
 LevelToast.lua
+=======
+LevelToast.lua
+Hardcore.lua
+>>>>>>> master:Hardcore_Cata.toc
