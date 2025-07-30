@@ -1,22 +1,23 @@
 ## Interface: 50500
-## Title: Hardcore 0.11.57b
+## Title: Hardcore 0.11.58b
 ## Notes: Supports Classic Hardcore
-## Author: The Classic Hardcore team, Molikar (Sean Kennedy), Mark Rogaski <stigg@aie-guild.org> as GreenWall author
+## Author: The Classic Hardcore team, Molikar (Sean Kennedy)
 ## X-License: All Rights Reserved
 ## X-Category: Leveling,Guild
-## Version: 0.11.57b
+## Version: 0.11.58b
 
 
 ## DefaultState: enabled
-## SavedVariables: Hardcore_Settings,GreenWallAccount, Backup_Character_Data
-## SavedVariablesPerCharacter: WARNING,Hardcore_Character,GreenWall,GreenWallMeta,GreenWallLog
+## SavedVariables: Hardcore_Settings,Backup_Character_Data
+## SavedVariablesPerCharacter: WARNING,Hardcore_Character
 
 embeds.xml
+Hardcore.xml
+Hardcore.lua
 
 CustomLayouts.lua
 utils.lua
 Security.lua
-Hardcore.xml
 
 #Tokens
 DKToken.lua
@@ -156,6 +157,7 @@ InspectStatusScreen.lua
 AchievementTab.lua
 FirstMenuScreen.lua
 ReloadReminder.lua
+dungeon-db.lua
 Dungeons.lua
 Survey.lua
 MainMenu.lua
@@ -166,20 +168,4 @@ id_to_npc.lua
 npc_to_id.lua
 DeathLog.lua
 SlashCommands.lua
-Hardcore.lua
-
-Libs/GreenWall/Constants.lua
-Libs/GreenWall/Globals.lua
-Libs/GreenWall/Settings.lua
-Libs/GreenWall/Utility.lua
-Libs/GreenWall/HoldDown.lua
-Libs/GreenWall/Config.lua
-Libs/GreenWall/Compat.lua
-Libs/GreenWall/Chat.lua
-Libs/GreenWall/Channel.lua
-Libs/GreenWall/SystemEventHandler.lua
-Libs/GreenWall/API.lua
-Libs/GreenWall/Interface.lua
-Libs/GreenWall/GreenWall.lua
-
-Libs/GreenWall/GreenWall.xml
+LevelToast.lua

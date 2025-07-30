@@ -89,11 +89,10 @@ local function DungeonTrackerGetDungeonMaxLevel(name)
 	local max_level = 1000 -- Default: if we can't find it, or game version not set: it doesn't have a max level
 
 	if dt_db_max_levels ~= nil and dt_db_max_levels[name] ~= nil then
-		if Hardcore_Character.game_version ~= nil then
-			if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
-				max_level = dt_db_max_levels[name][1]
-			elseif Hardcore_Character.game_version == "WotLK" or Hardcore_Character.game_version == "Cata" then
-				max_level = dt_db_max_levels[name][2]
+		if Hardcore_Character.game_version ~= nil and _G.HC_CONSTANTS and _G.HC_CONSTANTS.DB_LEVEL_INDEX then
+			local index = _G.HC_CONSTANTS.DB_LEVEL_INDEX
+			if dt_db_max_levels[name] and dt_db_max_levels[name][index] then
+				max_level = dt_db_max_levels[name][index]
 			end
 		end
 	end
@@ -108,16 +107,9 @@ end
 -- game where the max levels were different
 
 local function DungeonTrackerGetDungeonMaxLevelAtRunTime(run)
-
-	-- If we are in cata now, but the run started before pre-patch day, we use the WotLK max level (if it was differen than Cata)
-	if _G["HardcoreBuildLabel"] == "Cata" and run.start ~= nil and _dt_db_wotlk_max_levels[ run.name ] ~= nil then
-		if run.start < 1714482000 then			-- Wed 30 April 2024, 15:00 PDT
-			return _dt_db_wotlk_max_levels[ run.name ]
-		end
-	end
-
-	-- Default to the current version's max level if not Cata
-	return DungeonTrackerGetDungeonMaxLevel(run.name)
+    -- This logic is for a past event. For MoP and future versions,
+    -- simply return the current max level.
+    return DungeonTrackerGetDungeonMaxLevel(run.name)
 end
 
 -- DungeonTrackerGetAllDungeonMaxLevels()
@@ -128,15 +120,28 @@ end
 
 function DungeonTrackerGetAllDungeonMaxLevels()
 	local the_table = {}
+	local game_version = Hardcore_Character.game_version
+	-- Use the constant for the database level index, which is correctly set to 3 for MoP
+	local level_index = _G.HC_CONSTANTS and _G.HC_CONSTANTS.DB_LEVEL_INDEX or 2
 
 	for i, v in pairs(dt_db) do
+		-- Only show entries that are dungeons
 		if v[4] == "D" then
-			local max_era_level = v[7][1]
-			if max_era_level == 1000 then
-				table.insert(the_table, { v[3], "--", v[7][2] })
-			else
-				table.insert(the_table, { v[3], max_era_level, v[7][2] })
+			local name = v[3]
+			local era_level = v[7][1]
+			-- This now correctly gets the level from the MoP slot (index 3)
+			-- It no longer falls back to index 2 if the MoP level is nil
+			local current_level = v[7][level_index]
+
+			-- If a level is not defined or is set to 1000 (meaning no cap), display it as "--"
+			if era_level == 1000 or era_level == nil then
+				era_level = "--"
 			end
+			if current_level == 1000 or current_level == nil then
+				current_level = "--"
+			end
+
+			table.insert(the_table, { name, era_level, current_level })
 		end
 	end
 
@@ -343,16 +348,8 @@ local function DungeonTrackerWarnInfraction()
 	end
 
 	-- Get max level to know if we should even warn
-	if Hardcore_Character.game_version ~= nil then
-		local max_level
-		if Hardcore_Character.game_version == "Era" or Hardcore_Character.game_version == "SoM" then
-			max_level = 60
-		elseif Hardcore_Character.game_version == "WotLK" then
-			max_level = 80
-		else -- Cataclysm or anything else
-			max_level = 85
-		end
-		if UnitLevel("player") >= max_level then
+	if _G.HC_CONSTANTS and _G.HC_CONSTANTS.MAX_LEVEL then
+		if UnitLevel("player") >= _G.HC_CONSTANTS.MAX_LEVEL then
 			Hardcore_Character.dt.warn_infractions = false
 			return
 		end
@@ -1488,23 +1485,25 @@ local function DungeonTracker()
 	
 		-- Move current to pending
 		if next(Hardcore_Character.dt.current) then
-			-- If we didn't find an instance ID yet, we drop this "ghost" run immediately (there is no point in keeping it)
-			if Hardcore_Character.dt.current.iid == nil then
-				Hardcore:Debug("Dropping active run without instanceID in " .. Hardcore_Character.dt.current.name)
-			elseif Hardcore_Character.dt.current.name == "Scarlet Monastery" then
-				-- If we didn't find the SM wing, we drop this run as well.
+			-- Use a local variable to hold the run and clear the global state immediately.
+			local runToProcess = Hardcore_Character.dt.current
+			Hardcore_Character.dt.current = {}
+
+			-- Now process the local variable. This prevents duplication even if an error occurs.
+			if runToProcess.iid == nil then
+				Hardcore:Debug("Dropping active run without instanceID in " .. runToProcess.name)
+			elseif runToProcess.name == "Scarlet Monastery" then
 				Hardcore:Debug("Dropping active Scarlet Monastery run without identified wing")
 			else
-				Hardcore:Debug("Queuing active run in " .. Hardcore_Character.dt.current.name)
-				table.insert(Hardcore_Character.dt.pending, Hardcore_Character.dt.current)
+				Hardcore:Debug("Queuing active run in " .. runToProcess.name)
+				table.insert(Hardcore_Character.dt.pending, runToProcess)
 			end
-			Hardcore_Character.dt.current = {}
-			
+
 			-- We don't need the combat log anymore
 			if combat_log_frame ~= nil then
 				combat_log_frame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 				combat_log_frame:UnregisterEvent("PLAYER_TARGET_CHANGED")
-				combat_log_frame.dtcl_script_registered = nil			-- trigger re-registering later
+				combat_log_frame.dtcl_script_registered = nil
 			end				
 		end
 	end

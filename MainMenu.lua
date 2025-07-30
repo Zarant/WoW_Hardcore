@@ -316,7 +316,17 @@ local function DrawGeneralTab(container)
 	changelog_title:SetFont("Interface\\Addons\\Hardcore\\Media\\BreatheFire.ttf", 20, "")
 	scroll_frame:AddChild(changelog_title)
 	
-	CreateHeadingLabel("11.57b", scroll_frame)
+	CreateHeadingLabel("11.58 - Mists of Pandaria Update", scroll_frame)
+	CreateDescriptionLabel(
+		"- The addon now works with the Mists of Pandaria version of the game.\n" ..
+		"- Added support for the Monk class, so the addon won't cause errors for them.\n" ..
+		"- Updated the dungeon list to include all Mists of Pandaria dungeons and raids with their correct max levels in the \"Rules\" tab.\n" ..
+		"- Fixed several major bugs that could cause the addon to break or fail to load when starting up the game.\n" ..
+		"- Cleaned up and organized the addon's internal files. This should make it run more smoothly and will make future updates easier.",
+		scroll_frame
+	)
+	
+	CreateHeadingLabel("11.57", scroll_frame)
 	CreateDescriptionLabel(
 		"- Fixed Lua error related to missing Monk class color.\n- Added checks to prevent errors when extra rules are not defined.\n- Enabled tracked time to update correctly on the character screen.",
 		scroll_frame
@@ -686,9 +696,9 @@ local function DrawRulesTab(container)
 
 		local max_level_label = AceGUI:Create("Label")
 		max_level_label:SetWidth(200)
-		if _G["HardcoreBuildLabel"] == "Cata" then
-			max_level_label:SetText("|c00FFFF00Max Lvl (Cata)|r")
-		else
+		if _G["HardcoreBuildLabel"] == "Cata" or _G["HardcoreBuildLabel"] == "MoP" then
+			max_level_label:SetText("|c00FFFF00Max Lvl (MoP)|r")
+		elseif _G["HardcoreBuildLabel"] == "WotLK" then
 			max_level_label:SetText("|c00FFFF00Max Lvl (WotLK)|r")
 		end
 		max_level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")

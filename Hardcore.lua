@@ -38,6 +38,7 @@ local CLASSES = {
 	[7] = "Shaman",
 	[8] = "Mage",
 	[9] = "Warlock",
+	[10] = "Monk",
 	[11] = "Druid",
 }
 
@@ -51,6 +52,7 @@ local CLASS_DICT = {
 	["Shaman"] = 1,
 	["Mage"] = 1,
 	["Warlock"] = 1,
+	["Monk"] = 1,
 	["Druid"] = 1,
 }
 
@@ -402,7 +404,6 @@ local ALERT_STYLES = {
 		alertSound = 8959,
 	},
 }
-Hardcore_Alert_Frame:SetScale(0.7)
 
 -- the big frame object for our addon
 local Hardcore = CreateFrame("Frame", "Hardcore", nil, "BackdropTemplate")
@@ -460,21 +461,9 @@ end
 -- end
 
 function FailureFunction(achievement_name)
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		if Hardcore_Character.game_version == "WotLK" then
-			max_level = 80
-		else
-			max_level = 85
-		end
-	end
-	if UnitLevel("player") == max_level then
-		return
-	end
+    if UnitLevel("player") == _G.HC_CONSTANTS.MAX_LEVEL then
+        return
+    end
 
 	for i, v in ipairs(Hardcore_Character.achievements) do
 		if v == achievement_name then
@@ -772,18 +761,7 @@ TradeFrameTradeButton:SetScript("OnClick", function()
 	local legacy_duo_support = #Hardcore_Character.trade_partners > 0
 	local target_trader = TradeFrameRecipientNameText:GetText()
 	local level = UnitLevel("player")
-	local max_level = 60
-	if
-		(Hardcore_Character.game_version ~= "")
-		and (Hardcore_Character.game_version ~= "Era")
-		and (Hardcore_Character.game_version ~= "SoM")
-	then
-		if Hardcore_Character.game_version == "WotLK" then
-			max_level = 80
-		else
-			max_level = 85
-		end
-	end
+	local max_level = _G.HC_CONSTANTS.MAX_LEVEL
 	if Hardcore_Character.team ~= nil then
 		for _, name in ipairs(Hardcore_Character.team) do
 			if target_trader == name then
@@ -1035,9 +1013,6 @@ function Hardcore:PLAYER_LOGIN()
 	-- initiate pulse played time
 	Hardcore:InitiatePulsePlayed()
 
-	-- initiate dungeon tracking (pass Hardcore.lua locals needed for communication)
-	DungeonTrackerInitiate(COMM_NAME, COMM_COMMANDS[15], COMM_COMMAND_DELIM, COMM_FIELD_DELIM)
-
 	-- initiate survey module (pass Hardcore.lua locals needed for communication)
 	SurveyInitiate(COMM_NAME, COMM_COMMANDS[18], COMM_COMMANDS[19], COMM_COMMAND_DELIM, COMM_FIELD_DELIM)
 
@@ -1075,10 +1050,20 @@ function Hardcore:PLAYER_LOGIN()
 	-- Set the game_version (saved in the data file) from the addon version
 	-- If we don't do this, toons that went through automatic transfer during WotLK->Cata will remain
 	-- labeled as "WotLK", with the associated L80 / L85 problems.
-	--if Hardcore_Character.game_version == "" or Hardcore_Character.game_version == "Era" then
-		if _G["HardcoreBuildLabel"] == nil then
-		-- pass
-		elseif _G["HardcoreBuildLabel"] == "Classic" then
+	-- Auto-detect game version based on the client's interface number
+		local build, _, _, interfaceVersion = GetBuildInfo()
+
+		if interfaceVersion >= 50000 and interfaceVersion < 60000 then -- MoP Interface Range
+			_G["HardcoreBuildLabel"] = "MoP"
+			Hardcore_Character.game_version = "MoP"
+		elseif interfaceVersion >= 40000 and interfaceVersion < 50000 then -- Cata Interface Range
+			_G["HardcoreBuildLabel"] = "Cata"
+			Hardcore_Character.game_version = "Cata"
+		elseif interfaceVersion >= 30000 and interfaceVersion < 40000 then -- WotLK Interface Range
+			_G["HardcoreBuildLabel"] = "WotLK"
+			Hardcore_Character.game_version = "WotLK"
+		else -- Fallback for Classic / SoM
+			_G["HardcoreBuildLabel"] = "Classic"
 			C_Timer.After(5.0, function()
 				if inSOM() then
 					Hardcore_Character.game_version = "SoM"
@@ -1086,10 +1071,7 @@ function Hardcore:PLAYER_LOGIN()
 					Hardcore_Character.game_version = "Era"
 				end
 			end)
-		else
-			Hardcore_Character.game_version = _G["HardcoreBuildLabel"]
 		end
-	--end
 
 	if Hardcore_Settings.hardcore_player_name == nil or Hardcore_Settings.hardcore_player_name == "" then
 		Hardcore:Print(
@@ -1102,8 +1084,33 @@ function Hardcore:PLAYER_LOGIN()
 		)
 	end
 
-	-- Store some basic info that helps interpretation of the data file
-	Hardcore_StoreCharacterInfo()
+    -- Store some basic info that helps interpretation of the data file
+    Hardcore_StoreCharacterInfo()
+
+    _G.HC_CONSTANTS = {}
+    local game_version = Hardcore_Character.game_version
+
+    if game_version == "Era" or game_version == "SoM" then
+        _G.HC_CONSTANTS.MAX_LEVEL = 60
+        _G.HC_CONSTANTS.DB_LEVEL_INDEX = 1
+    elseif game_version == "WotLK" then
+        _G.HC_CONSTANTS.MAX_LEVEL = 80
+        _G.HC_CONSTANTS.DB_LEVEL_INDEX = 2
+    elseif game_version == "Cata" then
+        _G.HC_CONSTANTS.MAX_LEVEL = 85
+        _G.HC_CONSTANTS.DB_LEVEL_INDEX = 2 -- Cata uses the same DB index as WotLK
+    elseif game_version == "MoP" then
+        -- Add the new MoP constants
+        _G.HC_CONSTANTS.MAX_LEVEL = 90
+        _G.HC_CONSTANTS.DB_LEVEL_INDEX = 3 -- We will use a new index 3 for MoP
+    else
+        -- Default fallback for unknown versions
+        _G.HC_CONSTANTS.MAX_LEVEL = 60
+        _G.HC_CONSTANTS.DB_LEVEL_INDEX = 1
+    end
+	Hardcore_InitializeDungeonDB()
+	DungeonTrackerInitiate(COMM_NAME, COMM_COMMANDS[15], COMM_COMMAND_DELIM, COMM_FIELD_DELIM)
+	reorderPassiveAchievements()
 end
 
 function Hardcore:PLAYER_LOGOUT()
@@ -2761,6 +2768,8 @@ function Hardcore:GetClassColorText(classname)
 		return "|c00c79c6e"
 	elseif "Death Knight" == classname then
 		return "|c00C41E3A"
+	elseif "Monk" == classname then
+        return "|c0000ff96"
 	end
 
 	Hardcore:Debug("ERROR: classname not found")
@@ -4225,7 +4234,6 @@ local options = {
 LibStub("AceConfig-3.0"):RegisterOptionsTable("Hardcore", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Hardcore", "Hardcore")
 
-reorderPassiveAchievements()
 --[[ Start Addon ]]
 --
 Hardcore:Startup()
